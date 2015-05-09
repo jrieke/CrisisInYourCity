@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<meta charset="utf-8">
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="http://rawgithub.com/markmarkoh/datamaps/master/dist/datamaps.none.min.js"></script>
+
+<div id="map" style="height: 500px; width: 960px;"></div>
+
+<script>
+  var map = new Datamap({
+    element: document.getElementById('map'),
+    geographyConfig: {
+      dataUrl: 'data/sdpd_beats_0.1.topojson',
+      highlightFillColor: '#ff0000'
+    },
+    scope: 'sdpd_beats_wgs84',
+    fills: {
+      defaultFill: '#ccc'
+    },
+    setProjection: function(element) {
+      var projection = d3.geo.mercator()
+    		.center([-117.1563889, 32.7152778])
+    		.scale(30000);
+		
+       var path = d3.geo.path().projection(projection);
+       return {path: path, projection: projection};
+    }
+  });
+</script>
+</body>
+</html>
