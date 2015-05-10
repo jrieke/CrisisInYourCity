@@ -29,9 +29,9 @@ var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height);
 
-d3.json("data/sdpd_beats_0.1.topojson", function(error, topology) {
+d3.json("data/SanDiego.json", function(error, topology) {
   svg.selectAll("path")
-      .data(topojson.feature(topology, topology.objects.sdpd_beats_wgs84).features)
+      .data(topojson.feature(topology, topology.objects.SanDiego).features)
       .enter().append("path")
       .attr("d", path);
 });
