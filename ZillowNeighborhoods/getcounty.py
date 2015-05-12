@@ -15,6 +15,11 @@ for item in list(items):
 	if item['properties']['COUNTY'] != sys.argv[2]:
 		items.remove(item)
 
+with open('ids.txt', 'w+') as ids:
+	for item in items:
+		item['id'] = item['id'].replace(' ', '')
+		ids.write(item['id'] + '\n')
+
 j['objects'][county_without_spaces] = j['objects']['ZillowNeighborhoods-' + state]
 del j['objects']['ZillowNeighborhoods-' + state]
 

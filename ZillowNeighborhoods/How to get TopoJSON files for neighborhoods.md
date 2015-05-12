@@ -6,7 +6,7 @@
 
 3) Unzip, navigate into the folder and run (with XX the state):
 
-	topojson -p -o ZillowNeighborhoods-XX.json ZillowNeighborhoods-XX.shp
+	topojson -p --id-property REGIONID -o ZillowNeighborhoods-XX.json ZillowNeighborhoods-XX.shp
 
 4) Use getcounty.py to extract the area you want:
 
