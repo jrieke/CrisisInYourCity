@@ -1,13 +1,383 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html>
 <head>
+  <title>Visualization</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.96.1/css/materialize.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.css">
+
+  <!--Let browser know website is mobile optimized-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+  <style type="text/css">
+
+  a {
+    color: #f0f0f0;
+    margin-left: 25px;
+    margin-right: 25px;
+  }
+
+  #title2:hover {color: #00bcd4}
+  #title3:hover {color: #8bc34a}
+  #title4:hover {color: #ffb300}
+
+  .description {
+    position: absolute; 
+    top: 50px; 
+    height: 50px; 
+    width: 100%; 
+    z-index: 10; 
+    visibility: hidden; 
+    font-size: 0.9em; 
+  }
+
+  .description p {
+    color: #f8f8f8
+  }
+
+
+  /* time chart */
+  #time_chart .c3-line {
+    stroke-width: 3px;
+    stroke-linecap: round;
+    /*stroke-linejoin: round;*/
+  }
+
+
+  #time_chart .c3-axis-y .domain {
+    visibility: hidden
+  }
+  #time_chart .c3-axis-y .tick {
+    visibility: hidden
+  }
+
+
+  #time_chart .c3-axis-x line {
+    visibility: hidden
+  }
+  #time_chart .c3-axis-x .domain {
+    visibility: hidden
+  }
+  #time_chart .c3-axis-x text {
+    fill: #f8f8f8;
+  }
+
+
+  #time_chart .c3-ygrid {
+    /*stroke-dasharray: 0;*/
+    stroke-width: 1.5px;
+  }
+
+  /* bar chart */
+  #bar_chart .c3-axis-y .domain {
+    visibility: hidden
+  }
+  #bar_chart .c3-axis-y .tick {
+    visibility: hidden
+  }
+
+  #bar_chart .c3-axis-x line {
+    visibility: hidden
+  }
+  #bar_chart .c3-axis-x .domain {
+    visibility: hidden
+  }
+  #bar_chart .c3-axis-x text {
+    fill: #f8f8f8;
+  }
+
+  </style>
+  
+
 
 </head>
 
-<body>
+<body class="grey darken-1">
 
-<h1> Initial node setup </h1>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.96.1/js/materialize.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.js"></script>
 
+<script src="js/datamaps.none.min.js"></script>
+
+
+<div class="center-align grey darken-3" style="position: absolute; top: 0px; height: 50px; width: 100%">
+  <p>
+    <a href="#" id="title" class="red-text text-lighten-1" style="font-weight: bold">Sale Price</a>
+    <a href="#" id="title2">Number of Sales</a>
+    <a href="#" id="title3">Foreclosures</a>
+    <a href="#" id="title4">Sold for Loss</a>
+  </p>
+</div>
+
+<div id="description1" class="description center-align" style="background-color: rgba(239, 83, 80, .7);">
+  <p>Median sale price for all homes sold on Zillow in one month</p>
+</div>
+
+<div id="description2" class="description center-align" style="background-color: rgba(0, 188, 212, .7);">
+  <p>Number of homes sold on Zillow in one month</p>
+</div>
+
+<div id="description3" class="description center-align" style="background-color: rgba(139, 195, 74, .7);">
+  <p>Number of homes foreclosed in one month</p>
+</div>
+<div id="description4" class="description center-align" style="background-color: rgba(255, 160, 0, .7);">
+  <p>Percentage of homes sold on Zillow in one month for less than acquired</p>
+</div>
+
+
+
+<div class="section" style="position: absolute; top: 60px; bottom: 50px; left: 190px; right: 190px; margin-bottom: 0px">
+
+  <div style="float: left; position: relative; width: 42%; height: 100%">
+
+<!--   <div class="center-align">
+    <div class="row">
+      <div class="col s4"><p class="teal-text text-lighten-2">Sale Price</p></div>
+      <div class="col s4"><p class="red-text text-lighten-1">Number of Sales</p></div>
+      <div class="col s4"><p class="amber-text">Foreclosures</p></div>
+    </div>
+    <div class="row">
+      <div class="col s4"><p class="light-green-text">Median Sale Price</p></div>
+      <div class="col s4"><p class="light-blue-text">Median Sale Price</p></div>
+      <div class="col s4"><p class="pink-text">Median Sale Price</p></div>
+    </div>
+  </div>
+ -->
+
+  <!-- <div class="row center-align">
+
+    <div class="col s6" style="padding-right: 0px;">
+      <ul class="collection" style="border-style: none">
+        <li class="collection-item active">Sale Price</li>
+        <li class="collection-item">Sales</li>
+        <li class="collection-item">Foreclosures</li>
+      </ul>
+    </div>
+    <div class="col s6" style="padding-left: 0px;">
+      <ul class="collection" style="border-style: none">
+        <li class="collection-item">Sold for Loss</li>
+        <li class="collection-item">Decreasing Value</li>
+        <li class="collection-item">Crime</li>
+      </ul>
+    </div>
+
+  </div> -->
+    <!-- <ul class="collapsible grey lighten-2" data-collapsible="accordion" style="box-shadow: none;">
+      <li>
+        <div class="collapsible-header active"><i class="mdi-image-filter-drama"></i>Median Sale Price</div>
+        <div class="collapsible-body"><p>Lorem ipsum dolor sit amet.</p></div>
+      </li>
+      <li>
+        <div class="collapsible-header"><i class="mdi-maps-place"></i>Number of Sales</div>
+        <div class="collapsible-body"><p>Lorem ipsum dolor sit amet.</p></div>
+      </li>
+      <li>
+        <div class="collapsible-header"><i class="mdi-social-whatshot"></i>Foreclosures</div>
+        <div class="collapsible-body"><p>Lorem ipsum dolor sit amet.</p></div>
+      </li>
+    </ul> -->
+
+    <div id="bar_chart" style="height: 42.5%; width: 100%; margin-bottom: 15%" class="valign-wrapper">
+    </div>
+    <div id="time_chart" style="height: 42.5%; width: 100%" class="valign-wrapper">
+    </div>
+
+  </div>
+
+
+
+  <div style="float: right; position: relative; width: 53%; height: 100%">
+    <div id="map" style="height: 100%"></div>
+  </div>
+
+</div>
+
+<div class="center-align grey darken-2 grey-text text-lighten-1" style="position: absolute; bottom: 0px; height: 50px; width: 100%; font-size: 0.9em">
+  <p>&copy; Johannes Rieke, Chris Blum, Sindre Magnussen, Petter Astrup, Nemanja Aksic</p>
+</div>
+
+
+<script type="text/javascript">
+  var size = d3.select('#bar_chart').node().getBoundingClientRect();
+  var bar_chart = c3.generate({
+    bindto: '#bar_chart',
+    size: size,
+    data: {
+      x: 'neighborhoods',
+      columns: [
+          ['neighborhoods', 'La Jolla', 'Pacific Beach', 'Old Town', 'Balboa Park', 'Ocean Beach', 'Mission Bay'],
+          ['data1', 30, 200, 100, 400, 150, 250]
+      ],
+      colors: {
+        data1: '#ef5350'
+      },
+      type: 'bar'
+      // labels: {
+      //   format: function(v, id, i, j) {return d3.html('<span style="color: #f8f8f8">' + v + '</span>');}
+      // }
+    },
+    legend: {show: false},
+    bar: {
+      width: {
+          ratio: 0.5 // this makes bar width 50% of length between ticks
+      }
+    },
+    axis: {
+      x: {
+        type: 'category'  // needed to show string labels
+      }
+    }
+    // tooltip: {show: false}
+});
+
+
+</script>
+
+<script type="text/javascript">
+  var size = d3.select('#time_chart').node().getBoundingClientRect();
+
+  var time_chart = c3.generate({
+    bindto: '#time_chart',
+    size: size, 
+    data: {
+      x: 'years',
+      columns: [
+        ['years', 2005, 2006, 2007, 2008],
+        ['data 1', 50, 70, 10, 30], 
+        ['data2', 30, 200, 150, 300]
+      ],
+      colors: {
+        'data 1': '#f8f8f8',
+        data2: '#ef5350'
+      }
+    },
+    padding: {
+      right: 10
+    },    
+    point: {show: false},
+    legend: {show: false},
+    grid: {y: {
+      show: true
+      // lines: [{value: 0}]
+    }},
+    axis: {
+      y: {
+        min: 0, 
+        padding: {bottom: 0}, 
+        tick: {
+          count: 4
+        }
+      }
+    }
+    // tooltip: {show: false}
+  });
+
+  window.addEventListener('resize', function() {
+    time_chart.resize();
+  });
+</script>
+
+<script type="text/javascript">
+  d3.select('#title')
+    .on('mouseover', function() {
+      d3.select('#description1')
+        .style('visibility', 'visible');
+    })
+    .on('mouseout', function() {
+      d3.select('#description1')
+        .style('visibility', 'hidden');
+    });
+  d3.select('#title2')
+    .on('mouseover', function() {
+      d3.select('#description2')
+        .style('visibility', 'visible');
+    })
+    .on('mouseout', function() {
+      d3.select('#description2')
+        .style('visibility', 'hidden');
+    });
+
+  d3.select('#title3')
+    .on('mouseover', function() {
+      d3.select('#description3')
+        .style('visibility', 'visible');
+    })
+    .on('mouseout', function() {
+      d3.select('#description3')
+        .style('visibility', 'hidden');
+    });
+  d3.select('#title4')
+    .on('mouseover', function() {
+      d3.select('#description4')
+        .style('visibility', 'visible');
+    })
+    .on('mouseout', function() {
+      d3.select('#description4')
+        .style('visibility', 'hidden');
+    });
+</script>
+
+<script>
+  var size = d3.select('#map').node().getBoundingClientRect();
+
+  var colorScale = d3.scale.linear()
+    .domain([0, 1])
+    .range(['#f8f8f8', '#f44336']);
+
+  var ids = ['AmphitheaterAndWaterPark', 'BellaLago', 'BonitaLongCanyon', 'EastLake', 'EastlakeTrails', 'EastlakeVistas', 'EastlakeWoods', 'EstlakeGreens', 'FentonSt', 'GolfCourse', 'LynwoodHills', 'Northwest', 'OtayRanch', 'PaseoRanchoero', 'RanchoDelRey', 'RollingHillsRanch', 'Southwest', 'Sunbow', 'TerraNova', 'ThomyLocustPl', 'VillageCenter', 'YosemiteDr', 'AlliedGardens', 'AltaVista', 'BalboaPark', 'BarioLogan', 'BayHo', 'BayPark', 'BayTerrace', 'BirdLand', 'CarmelMountain', 'CarmelValley', 'ChollasView', 'CityHeightsEast', 'CityHeightsWest', 'ClairemontMesa', 'CollegeArea', 'Columbia', 'Core', 'CortezHill', 'Darnall', 'DelCerro', 'DelMarHeights', 'EastVillage', 'EggerHighlands', 'ElCerritos', 'EmeraldHills', 'Encanto', 'GaslampQuarter', 'Gateway', 'GrantHill', 'Grantville', 'HortonPlaza', 'Jomacha-Lomita', 'KearnyMesa', 'Kensington', 'LaJolla', 'LaJollaVillage', 'LakeMurray', 'LincolnPark', 'LindaVista', 'LittleItaly', 'LomaPortal', 'Marina', 'Memorial', 'Midtown', 'MidtownDistrict', 'MiraMesa', 'Miramar', 'MissionBay', 'MissionValley', 'MorenoMission', 'MountHope', 'MountainView', 'Nestor', 'NormalHeights', 'NorthCity', 'NorthClairemont', 'NorthHills', 'OakPark', 'OceanBeach', 'OldTown', 'PacificBeach', 'PalmCity', 'ParadiseHills', 'ParkWest', 'RanchoBernadino', 'RanchoPenasquitos', 'Rolando', 'Roseville', 'SabreSprings', 'SanCarlos', 'SanYsidro', 'ScrippsRanch', 'SerraMesa', 'SkyLine', 'SorrentoValley', 'SouthPark', 'Southcrest', 'Talmadge', 'Tierrasanta', 'TijuanaRiverValley', 'TorreyPines', 'UniversityCity', 'ValenciaPark', 'Webster', 'WestUniversityHeights', 'WoodedArea'];
+
+  var map = new Datamap({
+    element: document.getElementById('map'),
+    responsive: true,
+    geographyConfig: {
+      dataUrl: 'data/SanDiego.json',
+      borderColor: '#757575',      
+      highlightFillColor: 'foo',  // just some random string to keep fill color the same
+      highlightBorderColor: 'black',
+      highlightBorderWidth: '2',
+      popupTemplate: function(geography, data) {
+          return '<div class="hoverinfo"><strong>' + geography.properties.NAME + '</strong></div>';
+      }
+    },
+    scope: 'SanDiego',
+    fills: {
+      defaultFill: '#f8f8f8',
+      special: '#0000ff'
+    },
+    data: {
+
+    },
+    
+    setProjection: function(element) {
+      var projection = d3.geo.mercator()
+    		.center([-117.1063889, 32.8152778])
+    		.scale(38000)
+        .translate([size.width / 2, size.height / 2]);
+		
+       var path = d3.geo.path().projection(projection);
+       return {path: path, projection: projection};
+    }
+  });
+
+  var data = {};
+  ids.map(function(id) {
+    data[id] = colorScale(Math.random());
+  });
+
+  // does anyhow only work with timeout
+  window.setTimeout(function() {
+    map.updateChoropleth(data);
+      // can currently not deal with spaces in an area ID, see https://github.com/markmarkoh/datamaps/issues/127
+      // example: 'La Jolla': ... will not work
+  }, 1000);
+
+  window.addEventListener('resize', function() {
+        map.resize();
+    });
+
+
+</script>
 </body>
 </html>

@@ -11,13 +11,12 @@ var app = express();
 var index = require('./routes/index');
 
 //database setup
-var mongoose = require('mongoose');
-mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/projecttest');
+// var mongoose = require('mongoose');
+// mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/projecttest');
 
 //Configures the Template engine
-app.engine('handlebars', handlebars({defaultLayout: 'layout'}));
+app.engine('handlebars', handlebars());//{defaultLayout: 'layout'}));
 app.set('view engine', 'handlebars');
-app.set('views', __dirname + '/views');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -25,9 +24,6 @@ app.use(cookieParser());
 app.use(session({ secret: 'keyboard cat',
 	saveUninitialized: true,
 	resave: true}));
-
-//set environment ports and start application
-app.set('port', process.env.PORT || 3000);
 
 //routes
 app.get('/', index.view);
