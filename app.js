@@ -32,6 +32,9 @@ app.get('/', index.view);
 app.get('/front', function(req, res) {
 	res.render('front');
 });
+app.get('/hslider', function(req, res) {
+	res.render('index_hslider');
+});
 
 //set environment ports and start application
 app.set('port', process.env.PORT || 3000);
