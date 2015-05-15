@@ -13,7 +13,7 @@
   <style type="text/css">
 
   .nav-item {
-    color: #f0f0f0;
+    color: #f8f8f8;
     padding-left: 25px;
     padding-right: 25px;
     cursor: pointer;
@@ -22,9 +22,9 @@
     display: inline-block;
   }
 
-  #title2:hover {color: #00bcd4}
-  #title3:hover {color: #8bc34a}
-  #title4:hover {color: #ffb300}
+  #title2:hover {background: #00bcd4}
+  #title3:hover {background: #8bc34a}
+  #title4:hover {background: #ffb300}
 
   .description {
     position: absolute; 
@@ -146,28 +146,28 @@
 <script src="js/d3.slider.js"></script>
 
 <div class="center-align grey darken-3" style="position: absolute; top: 0px; height: 50px; width: 100%">
-  <div id="title" class="nav-item red-text text-lighten-1" style="font-weight: bold">Sale Price</div>
+  <div id="title" class="nav-item" style="background: rgba(239, 83, 80, 1)">Sale Price</div>
   <div id="title2" class="nav-item">Number of Sales</div>
   <div id="title3" class="nav-item">Foreclosures</div>
   <div id="title4" class="nav-item">Sold for Loss</div>
 </div>
 
-<div id="description1" class="description" style="background-color: rgba(239, 83, 80, .7);">
+<div id="description1" class="description" style="background-color: rgba(239, 83, 80, 1);">
   Median sale price for all homes sold on Zillow in one month
 </div>
-<div id="description2" class="description" style="background-color: rgba(0, 188, 212, .7);">
+<div id="description2" class="description" style="background-color: rgba(0, 188, 212, 1);">
   Number of homes sold on Zillow in one month
 </div>
-<div id="description3" class="description" style="background-color: rgba(139, 195, 74, .7);">
+<div id="description3" class="description" style="background-color: rgba(139, 195, 74, 1);">
   Number of homes foreclosed in one month
 </div>
-<div id="description4" class="description" style="background-color: rgba(255, 160, 0, .7);">
+<div id="description4" class="description" style="background-color: rgba(255, 179, 0, 1);">
   Percentage of homes sold on Zillow in one month for less than acquired
 </div>
 
 
 
-<div class="section" style="position: absolute; top: 60px; bottom: 50px; left: 180px; right: 180px; margin-bottom: 0px">
+<div class="section" style="position: absolute; top: 80px; bottom: 50px; left: 180px; right: 180px; margin-bottom: 0px">
 
   <div style="float: left; position: relative; width: 37.5%; height: 100%">
 
@@ -229,9 +229,9 @@
     <span style="color: #f8f8f8">Jan</span><br><span id="year" style="font-size: 2em; color: #f8f8f8">2005</span>
     <div id="time_slider" style="display: block; margin-left: auto; margin-right: auto; margin-top: 20px; height: 75%">
       <div id="slider-progress" class="d3-slider d3-slider-vertical" style="position: absolute; top: 0px; left: 0px; height: 0%; width: 100%; background: #f8f8f8"></div>
-      <!-- <div class="time_point" style="top: 30%"></div>
-      <div class="time_point" style="top: 60%"></div> -->
-
+<!--       <div class="time_point" style="top: 30%"></div>
+      <div class="time_point" style="top: 60%"></div>
+ -->
     </div>
 
   </div>
@@ -407,11 +407,17 @@
     
   }
 
+  // var active = 1;
+
 
   d3.select('#title')
     .on('mouseover', function() {
       d3.select('#description1')
         .style('visibility', 'visible');
+      // d3.select('#title').style('background', '#ef5350');
+      // d3.select('#title2').style('background', 'none');
+      // d3.select('#title3').style('background', 'none');
+      // d3.select('#title4').style('background', 'none');
     })
     .on('mouseout', function() {
       d3.select('#description1')
