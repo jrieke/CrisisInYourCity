@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Visualization</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.96.1/css/materialize.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.css">
+
+  <link rel="stylesheet" href="css/d3.slider.css">
+
+  <!--Let browser know website is mobile optimized-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+  <style type="text/css">
+
+  .nav-item {
+    color: #f8f8f8;
+    padding-left: 25px;
+    padding-right: 25px;
+    cursor: pointer;
+    height: 50px;
+    line-height: 50px;  /* vertical alignment */
+    display: inline-block;
+  }
+
+  #title:hover {background: #ef5350}
+  #title2:hover {background: #00bcd4}
+  #title3:hover {background: #8bc34a}
+  #title4:hover {background: #ffb300}
+
+  .description {
+    position: absolute; 
+    top: 60%; 
+    height: 40%; 
+    line-height: 100px;  /* vertical alignment */
+    width: 100%; 
+    z-index: 1; 
+    visibility: hidden; 
+    font-size: 1.1em; 
+    color: #f8f8f8;
+    text-align: center;
+  }
+
+
+  </style>
+  
+
+
+</head>
+
+<body class="grey darken-1">
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.96.1/js/materialize.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.12/jquery.mousewheel.min.js"></script>
+
+<script src="js/datamaps.none.min.js"></script>
+<script src="js/d3.slider.js"></script>
+
+<div class="center-align grey darken-3" style="position: absolute; top: 0px; height: 60%; width: 100%">
+
+  <!-- transition this to height: 50px later -->
+  
+  <div style="position: absolute; top: 0px; bottom: 50px; width: 100%; color: #bdbdbd; padding-top: 5%">
+  <h2>Financial Crisis</h2>
+  <h4>in San Diego</h4>
+  <p>or any kind of description</p>
+  
+  </div>
+  <div style="position: absolute; bottom: 0px; height: 50px; width: 100%">
+    <div id="title" class="nav-item">Sale Price</div>
+    <div id="title2" class="nav-item">Number of Sales</div>
+    <div id="title3" class="nav-item">Foreclosures</div>
+    <div id="title4" class="nav-item">Sold for Loss</div>
+  </div>
+</div>
+
+
+<!-- <div class="description" style="visibility: visible; color: #bdbdbd">Select one above to start</div> -->
+
+<div id="description1" class="description valign-wrapper" style="background-color: rgba(239, 83, 80, 1); line-height: normal">
+  <div class="row valign-wrapper" style="padding-left: 35%; padding-right: 35%">
+    <div class="col s3" style="font-size: 120px; opacity: 0.5">&#36;</div>
+    <div class="col s9" style="text-align: left; line-height: 2">Median sale price for all homes sold on Zillow in one month</div>
+  </div>
+  
+</div>
+<div id="description2" class="description" style="background-color: rgba(0, 188, 212, 1);">
+  Number of homes sold on Zillow in one month
+</div>
+<div id="description3" class="description" style="background-color: rgba(139, 195, 74, 1);">
+  Number of homes foreclosed in one month
+</div>
+<div id="description4" class="description" style="background-color: rgba(255, 179, 0, 1);">
+  Percentage of homes sold on Zillow in one month for less than acquired
+</div>
+
+
+
+<div id="footer" class="center-align grey darken-2 grey-text text-lighten-1" style="position: absolute; bottom: 0px; height: 50px; width: 100%; font-size: 0.9em; z-index: 2">
+  <p>&copy; Johannes Rieke, Chris Blum, Sindre Magnussen, Petter Astrup, Nemanja Aksic</p>
+</div>
+
+<script type="text/javascript">
+
+  d3.select('#title')
+    .on('mouseover', function() {
+      d3.select('#description1')
+        .style('visibility', 'visible');
+      // d3.select('#title').style('background', '#ef5350');
+      // d3.select('#title2').style('background', 'none');
+      // d3.select('#title3').style('background', 'none');
+      // d3.select('#title4').style('background', 'none');
+    })
+    .on('mouseout', function() {
+      d3.select('#description1')
+        .style('visibility', 'hidden');
+    })
+    .on('click', function() {
+      updateVisualizations('#f44336', '#ef5350');
+    });
+
+  d3.select('#title2')
+    .on('mouseover', function() {
+      d3.select('#description2')
+        .style('visibility', 'visible');
+    })
+    .on('mouseout', function() {
+      d3.select('#description2')
+        .style('visibility', 'hidden');
+    })
+    .on('click', function() {
+      updateVisualizations('#00bcd4', '#00bcd4');
+    });
+
+  d3.select('#title3')
+    .on('mouseover', function() {
+      d3.select('#description3')
+        .style('visibility', 'visible');
+    })
+    .on('mouseout', function() {
+      d3.select('#description3')
+        .style('visibility', 'hidden');
+    })
+    .on('click', function() {
+      updateVisualizations('#8bc34a', '#8bc34a');
+    });
+
+  d3.select('#title4')
+    .on('mouseover', function() {
+      d3.select('#description4')
+        .style('visibility', 'visible');
+    })
+    .on('mouseout', function() {
+      d3.select('#description4')
+        .style('visibility', 'hidden');
+    })
+    .on('click', function() {
+      updateVisualizations('#ffb300', '#ffb300');
+    });
+
+</script>
+
+</body>
+</html>

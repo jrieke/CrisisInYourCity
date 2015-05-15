@@ -28,6 +28,11 @@ app.use(session({ secret: 'keyboard cat',
 //routes
 app.get('/', index.view);
 
+// TODO: Only for testing, the frontpage will probably be integrated into index later
+app.get('/front', function(req, res) {
+	res.render('front');
+});
+
 //set environment ports and start application
 app.set('port', process.env.PORT || 3000);
 http.createServer(app).listen(app.get('port'), function(){
