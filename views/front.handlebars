@@ -12,7 +12,11 @@
 
   <style type="text/css">
 
-  .nav-item {
+  body {
+    overflow: hidden;
+  }
+
+  .navbar-item {
     color: #f8f8f8;
     padding-left: 25px;
     padding-right: 25px;
@@ -27,15 +31,15 @@
   #title3:hover {background: #8bc34a}
   #title4:hover {background: #ffb300}
 
-  .description {
+  .navbar-description {
     position: absolute; 
-    top: 60%; 
-    height: 40%; 
-    line-height: 100px;  /* vertical alignment */
+    bottom: 0px;
+    height: 50px; 
+    line-height: 50px;  /* vertical alignment */
     width: 100%; 
-    z-index: 1; 
+    z-index: 10; 
     visibility: hidden; 
-    font-size: 1.1em; 
+    font-size: 0.9em; 
     color: #f8f8f8;
     text-align: center;
   }
@@ -59,44 +63,40 @@
 <script src="js/datamaps.none.min.js"></script>
 <script src="js/d3.slider.js"></script>
 
-<div class="center-align grey darken-3" style="position: absolute; top: 0px; height: 60%; width: 100%">
+<div id="front-description" class="white-text center-align grey darken-3" style="position: absolute; height: 50%; top: 0px; width: 100%; overflow: hidden"><h2>Financial Crisis</h2>
+    <h4>in San Diego</h4>
+    <p>or any kind of description</p></div>
 
-  <!-- transition this to height: 50px later -->
-  
-  <div style="position: absolute; top: 0px; bottom: 50px; width: 100%; color: #bdbdbd; padding-top: 5%">
-  <h2>Financial Crisis</h2>
-  <h4>in San Diego</h4>
-  <p>or any kind of description</p>
-  
+<div id="navbar-wrapper" style="position: absolute; top: 50%; height: 100px; width: 100%">
+
+  <div id="navbar" class="center-align grey darken-3" style="position: absolute; bottom: 50px; height: 50px; width: 100%">
+    <div id="title" class="navbar-item">Sale Price</div>
+    <div id="title2" class="navbar-item">Number of Sales</div>
+    <div id="title3" class="navbar-item">Foreclosures</div>
+    <div id="title4" class="navbar-item">Sold for Loss</div>
   </div>
-  <div style="position: absolute; bottom: 0px; height: 50px; width: 100%">
-    <div id="title" class="nav-item">Sale Price</div>
-    <div id="title2" class="nav-item">Number of Sales</div>
-    <div id="title3" class="nav-item">Foreclosures</div>
-    <div id="title4" class="nav-item">Sold for Loss</div>
+
+  <div id="description1" class="navbar-description" style="background-color: rgba(239, 83, 80, 1);">
+    Median sale price for all homes sold on Zillow in one month
   </div>
+  <div id="description2" class="navbar-description" style="background-color: rgba(0, 188, 212, 1);">
+    Number of homes sold on Zillow in one month
+  </div>
+  <div id="description3" class="navbar-description" style="background-color: rgba(139, 195, 74, 1);">
+    Number of homes foreclosed in one month
+  </div>
+  <div id="description4" class="navbar-description" style="background-color: rgba(255, 179, 0, 1);">
+    Percentage of homes sold on Zillow in one month for less than acquired
+  </div>
+
+
 </div>
 
 
 <!-- <div class="description" style="visibility: visible; color: #bdbdbd">Select one above to start</div> -->
 
-<div id="description1" class="description valign-wrapper" style="background-color: rgba(239, 83, 80, 1); line-height: normal">
-  <div class="row valign-wrapper" style="padding-left: 35%; padding-right: 35%">
-    <div class="col s3" style="font-size: 120px; opacity: 0.5">&#36;</div>
-    <div class="col s9" style="text-align: left; line-height: 2">Median sale price for all homes sold on Zillow in one month</div>
-  </div>
-  
-</div>
-<div id="description2" class="description" style="background-color: rgba(0, 188, 212, 1);">
-  Number of homes sold on Zillow in one month
-</div>
-<div id="description3" class="description" style="background-color: rgba(139, 195, 74, 1);">
-  Number of homes foreclosed in one month
-</div>
-<div id="description4" class="description" style="background-color: rgba(255, 179, 0, 1);">
-  Percentage of homes sold on Zillow in one month for less than acquired
-</div>
 
+<div id="content" style="opacity: 0.3; background-image: url(images/content.png); background-size: contain; position: absolute; top: calc(50% + 50px); height: 80%; width: 100%;"></div>
 
 
 <div id="footer" class="center-align grey darken-2 grey-text text-lighten-1" style="position: absolute; bottom: 0px; height: 50px; width: 100%; font-size: 0.9em; z-index: 2">
@@ -104,6 +104,28 @@
 </div>
 
 <script type="text/javascript">
+
+  function slideUp() {
+
+    d3.select('#navbar-wrapper')
+      .transition()
+      .duration(1000)
+      .style('top', '0px');
+
+    d3.select('#front-description')
+      .transition()
+      .duration(1000)
+      .style('top', '-50%');
+
+    d3.select('#content')
+      .transition()
+      .duration(1000)
+      .style('top', '50px')
+
+    d3.select('#content')
+      .style('background-image', 'url(images/content2.png)')
+      .style('opacity', 1);
+  }
 
   d3.select('#title')
     .on('mouseover', function() {
@@ -119,6 +141,7 @@
         .style('visibility', 'hidden');
     })
     .on('click', function() {
+      slideUp();
       updateVisualizations('#f44336', '#ef5350');
     });
 
@@ -132,6 +155,7 @@
         .style('visibility', 'hidden');
     })
     .on('click', function() {
+      slideUp();
       updateVisualizations('#00bcd4', '#00bcd4');
     });
 
@@ -145,6 +169,7 @@
         .style('visibility', 'hidden');
     })
     .on('click', function() {
+      slideUp();
       updateVisualizations('#8bc34a', '#8bc34a');
     });
 
@@ -158,6 +183,7 @@
         .style('visibility', 'hidden');
     })
     .on('click', function() {
+      slideUp();
       updateVisualizations('#ffb300', '#ffb300');
     });
 
