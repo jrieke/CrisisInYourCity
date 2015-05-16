@@ -12,7 +12,11 @@
 
   <style type="text/css">
 
-  .nav-item {
+  body {
+    overflow: hidden;
+  }
+
+  #navbar div {
     color: #f8f8f8;
     padding-left: 25px;
     padding-right: 25px;
@@ -22,21 +26,35 @@
     display: inline-block;
   }
 
+  /*#title {border-bottom: 3px solid #ef5350; margin-left: 1px;}
+  #title2 {border-bottom: 3px solid #00bcd4; margin-left: 1px;}
+  #title3 {border-bottom: 3px solid #8bc34a; margin-left: 1px;}
+  #title4 {border-bottom: 3px solid #ffb300; margin-left: 1px;}*/
+
+  #title:hover {background: #ef5350}
   #title2:hover {background: #00bcd4}
   #title3:hover {background: #8bc34a}
   #title4:hover {background: #ffb300}
 
-  .description {
+
+  #description {
     position: absolute; 
-    top: 50px; 
+    bottom: 0px; 
     height: 50px; 
     line-height: 50px;  /* vertical alignment */
     width: 100%; 
-    z-index: 10; 
-    visibility: hidden; 
+    z-index: 1; 
+    /*visibility: hidden; */
     font-size: 0.9em; 
     color: #f8f8f8;
     text-align: center;
+  }
+
+  #description div {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    visibility: hidden;
   }
 
 
@@ -145,31 +163,46 @@
 <script src="js/datamaps.none.min.js"></script>
 <script src="js/d3.slider.js"></script>
 
-<div class="center-align grey darken-3" style="position: absolute; top: 0px; height: 50px; width: 100%">
-  <div id="title" class="nav-item" style="background: rgba(239, 83, 80, 1)">Sale Price</div>
-  <div id="title2" class="nav-item">Number of Sales</div>
-  <div id="title3" class="nav-item">Foreclosures</div>
-  <div id="title4" class="nav-item">Sold for Loss</div>
+<div id="front-header" style="position: absolute; top: 0px; width: 100%; height: 400px">
+
+  <div id="navbar-wrapper" class="grey darken-3" style="position: absolute; bottom: 50px; width: 100%; top: 0px">
+
+    <div id="navbar-header" class="center-align" style="padding: 20px; color: #f8f8f8;">
+      <h3>Some description</h3>
+    </div>
+
+    <div id="navbar" class="center-align" style="position: absolute; bottom: 0px; height: 50px; width: 100%">
+      <div id="title">Sale Price</div><!--
+      --><div id="title2">Number of Sales</div><!--
+      --><div id="title3">Foreclosures</div><!--
+      --><div id="title4">Sold for Loss</div>
+    </div>
+
+  </div>
+
+  <div id="description">
+    <div id="description1" style="background-color: rgba(239, 83, 80, 1);">
+      Median sale price for all homes sold on Zillow in one month
+    </div>
+    <div id="description2" style="background-color: rgba(0, 188, 212, 1);">
+      Number of homes sold on Zillow in one month
+    </div>
+    <div id="description3" style="background-color: rgba(139, 195, 74, 1);">
+      Number of homes foreclosed in one month
+    </div>
+    <div id="description4" style="background-color: rgba(255, 179, 0, 1);">
+      Percentage of homes sold on Zillow in one month for less than acquired
+    </div>
+  </div>
+
 </div>
 
-<div id="description1" class="description" style="background-color: rgba(239, 83, 80, 1);">
-  Median sale price for all homes sold on Zillow in one month
-</div>
-<div id="description2" class="description" style="background-color: rgba(0, 188, 212, 1);">
-  Number of homes sold on Zillow in one month
-</div>
-<div id="description3" class="description" style="background-color: rgba(139, 195, 74, 1);">
-  Number of homes foreclosed in one month
-</div>
-<div id="description4" class="description" style="background-color: rgba(255, 179, 0, 1);">
-  Percentage of homes sold on Zillow in one month for less than acquired
-</div>
 
+<div id="content-overlay" class="section" style="z-index: 1; position: absolute; top: 400px; height: calc(100% - 120px); left: 180px; right: 180px"></div>
 
+<div id="content" class="section" style="position: absolute; top: 400px; height: calc(100% - 120px); left: 180px; right: 180px">
 
-<div class="section" style="position: absolute; top: 80px; bottom: 50px; left: 180px; right: 180px; margin-bottom: 0px">
-
-  <div style="float: left; position: relative; width: 37.5%; height: 100%">
+  <div style="position: absolute; left: 0px; width: 37.5%; height: 100%">
 
 <!--   <div class="center-align">
     <div class="row">
@@ -218,16 +251,14 @@
       </li>
     </ul> -->
 
-    <div id="bar_chart" style="height: 42.5%; width: 100%; margin-bottom: 15%" class="valign-wrapper">
-    </div>
-    <div id="time_chart" style="height: 42.5%; width: 100%" class="valign-wrapper">
-    </div>
+    <div id="bar_chart" style="position: absolute; top: 0px; height: 42.5%; width: 100%; margin-bottom: 15%" class="valign-wrapper"></div>
+    <div id="time_chart" style="position: absolute; bottom: 0px; height: 42.5%; width: 100%" class="valign-wrapper"></div>
 
   </div>
 
-  <div style="float: left; position: relative; width: 10%; margin-left: 7.5%; margin-top: 10px; height: 100%; text-align: center;">
-    <span style="color: #f8f8f8">Jan</span><br><span id="year" style="font-size: 2em; color: #f8f8f8">2005</span>
-    <div id="time_slider" style="display: block; margin-left: auto; margin-right: auto; margin-top: 20px; height: 75%">
+  <div id="time-slider-wrapper" style="visibility: hidden; position: absolute; left: 45%; width: 10%; margin-top: 10px; height: 100%; text-align: center;">
+    <div id="time" style="color: #f8f8f8">Jan<br><span id="year" style="font-size: 2em;">2005</span></div>
+    <div id="time-slider" style="display: block; margin-left: auto; margin-right: auto; margin-top: 20px; height: 75%">
       <div id="slider-progress" class="d3-slider d3-slider-vertical" style="position: absolute; top: 0px; left: 0px; height: 0%; width: 100%; background: #f8f8f8"></div>
 <!--       <div class="time_point" style="top: 30%"></div>
       <div class="time_point" style="top: 60%"></div>
@@ -237,7 +268,7 @@
   </div>
 
 
-  <div style="float: right; position: relative; width: 45%; height: 100%">
+  <div style="position: absolute; right: 0px; width: 45%; height: 100%">
     <div id="map" style="height: 100%"></div>
   </div>
 
@@ -250,20 +281,36 @@
 
 <script type="text/javascript">
 
-  var startColor = '#9e9e9e';
+  var barChartSize = d3.select('#bar_chart').node().getBoundingClientRect();
+  var timeChartSize = d3.select('#time_chart').node().getBoundingClientRect();
+  var mapSize = d3.select('#map').node().getBoundingClientRect();
 
+  var slidedUp = false;
+  var scroll_speed = 0.05;
+
+  // if (['#sale-price', '#number-of-sales', '#foreclosures', '#sold-for-loss'].indexOf(parent.location.hash) == -1) {
+  //   parent.location.hash = '';
+  //   d3.select('#content')
+  //     .style('top', '60%');
+  //   d3.select('#content-overlay')
+  //     .style('top', '60%');
+  //   d3.select('#front-header')
+  //     .style('top', '0px');
+  //   var slidedUp = false;
+  // }
+
+  var startColor = '#9e9e9e';
 
   var slider;
 
   function updateYear(sliderValue) {
     d3.select('#year')
       .text(Math.round(2005+(100-sliderValue)/100*10));
-    console.log(d3.select('#time_slider').style('height'));
     d3.select('#slider-progress')
       .style('height', (100-sliderValue + '%'));
   }
 
-  d3.select('#time_slider').call(
+  d3.select('#time-slider').call(
     slider = d3.slider()
       .orientation("vertical")
       .value(100)
@@ -271,22 +318,15 @@
         updateYear(value);
       }));
 
-  var scroll_speed = 0.1;
-  $(document).on('mousewheel', function(evt) {
-    var new_value = Math.max(0, Math.min(100, slider.value() - scroll_speed * event.deltaY));
-    slider.value(new_value);
-    updateYear(new_value);
-  });
-
 
 
 </script>
 
 <script type="text/javascript">
-  var size = d3.select('#bar_chart').node().getBoundingClientRect();
+  
   var bar_chart = c3.generate({
     bindto: '#bar_chart',
-    size: size,
+    size: barChartSize,
     data: {
       x: 'neighborhoods',
       columns: [
@@ -319,11 +359,9 @@
 </script>
 
 <script type="text/javascript">
-  var size = d3.select('#time_chart').node().getBoundingClientRect();
-
   var time_chart = c3.generate({
     bindto: '#time_chart',
-    size: size, 
+    size: timeChartSize, 
     data: {
       x: 'years',
       columns: [
@@ -365,7 +403,10 @@
 <script type="text/javascript">
 
   function updateVisualizations(map_color, chart_color) {
-    // TODO: Make visualizations grey while data is loading
+    // TODO: Make visualizations grey while data is loading, maybe even by using a small transition
+
+    d3.select('#content-overlay')
+      .style('visibility', 'visible');
 
     colorScale.range(['#f8f8f8', map_color]);
     var map_values = {};
@@ -383,7 +424,7 @@
     bar_chart.load({
       columns: [
         ['neighborhoods', 'La Jolla', 'Pacific Beach', 'Old Town', 'Balboa Park', 'Ocean Beach', 'Mission Bay'],
-        ['data1', 200, 30, 150, 100, 300, 100]
+        ['data1', Math.random(), Math.random(), Math.random(), Math.random(), Math.random(), Math.random()]
       ]
     });
 
@@ -400,6 +441,19 @@
       ]
     });
 
+    // TODO: Do this a little bit more elegant than just making it visible at once
+    d3.select('#time-slider-wrapper')
+      .style('visibility', 'visible');
+
+    $(document).on('mousewheel', function(evt) {
+      var new_value = Math.max(0, Math.min(100, slider.value() - scroll_speed * event.deltaY));
+      slider.value(new_value);
+      updateYear(new_value);
+    });
+
+    d3.select('#content-overlay')
+      .style('visibility', 'hidden');
+
     // TODO: Anyhow, the line chart becomes smaller when loading data
     // if resized directly, it goes back to its original size, but the line is shorter
     // After further tests, this only seems to appear when the maximum y value is different than before
@@ -413,6 +467,22 @@
 
   // var active = 1;
 
+  function slideUp() {
+    if (!slidedUp) {
+      d3.select('#front-header')
+        .transition()
+        .duration(1000)
+        .style('top', '-300px');
+
+      d3.select('#content')
+        .transition()
+        .duration(1000)
+        .style('top', '60px');
+
+      slidedUp = true;
+    }
+  }
+  
   
 
   d3.select('#title')
@@ -429,8 +499,8 @@
         .style('visibility', 'hidden');
     })
     .on('click', function() {
+      slideUp();
       updateVisualizations('#f44336', '#ef5350');
-      parent.location.hash = '#sale-price';
     });
 
   d3.select('#title2')
@@ -443,8 +513,8 @@
         .style('visibility', 'hidden');
     })
     .on('click', function() {
+      slideUp();
       updateVisualizations('#00bcd4', '#00bcd4');
-      parent.location.hash = 'number-of-sales';
     });
 
   d3.select('#title3')
@@ -457,8 +527,8 @@
         .style('visibility', 'hidden');
     })
     .on('click', function() {
+      slideUp();
       updateVisualizations('#8bc34a', '#8bc34a');
-      parent.location.hash = 'foreclosures';
     });
 
   d3.select('#title4')
@@ -471,15 +541,13 @@
         .style('visibility', 'hidden');
     })
     .on('click', function() {
+      slideUp();
       updateVisualizations('#ffb300', '#ffb300');
-      parent.location.hash = 'sold-for-loss';
     });
 
 </script>
 
 <script>
-  var size = d3.select('#map').node().getBoundingClientRect();
-
   var colorScale = d3.scale.linear()
     .domain([0, 1]);
     // range will be added during 'updateVisualizations'
@@ -508,7 +576,7 @@
       var projection = d3.geo.mercator()
     		.center([-117.1063889, 32.8152778])
     		.scale(38000)
-        .translate([size.width / 2, size.height / 2]);
+        .translate([mapSize.width / 2, mapSize.height / 2]);
 		
        var path = d3.geo.path().projection(projection);
        return {path: path, projection: projection};
@@ -526,36 +594,5 @@
 
 </script>
 
-<script type="text/javascript">
-  console.log(parent.location.hash);
-  switch (parent.location.hash) {
-    case '#sale-price':
-      window.setTimeout(function() {
-        updateVisualizations('#f44336', '#ef5350');
-      }, 1000);
-      break;
-    case '#number-of-sales':
-      window.setTimeout(function() {
-        updateVisualizations('#00bcd4', '#00bcd4');
-      }, 1000);
-      break;
-    case '#foreclosures':
-      window.setTimeout(function() {
-        updateVisualizations('#8bc34a', '#8bc34a');
-      }, 1000);
-      break;
-    case '#sold-for-loss':
-      window.setTimeout(function() {
-        updateVisualizations('#ffb300', '#ffb300');
-      }, 1000);
-      break;
-    default:
-      window.setTimeout(function() {
-        updateVisualizations('#f44336', '#ef5350');
-      }, 1000);
-  }
-
-
-</script>
 </body>
 </html>
