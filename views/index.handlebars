@@ -250,6 +250,9 @@
 
 <script type="text/javascript">
 
+  var startColor = '#9e9e9e';
+
+
   var slider;
 
   function updateYear(sliderValue) {
@@ -288,10 +291,10 @@
       x: 'neighborhoods',
       columns: [
         ['neighborhoods', ' ', ' ', ' ', ' ', ' ', ' '],
-        ['data1', 1, 1, 1, 1, 1, 1]
+        ['data1', 30, 200, 100, 400, 150, 250]
       ],  // real data is loaded in 'updateVisualizations'
       colors: {
-        data1: '#ef5350'
+        data1: startColor
       },
       type: 'bar'
       // labels: {
@@ -329,8 +332,8 @@
         ['data2', 300, 300, 300, 300]
       ],  // real data is loaded in 'updateVisualizations'
       colors: {
-        data1: '#f8f8f8',
-        data2: '#ef5350'
+        data1: startColor,
+        data2: startColor
       }
     },
     padding: {
@@ -362,6 +365,7 @@
 <script type="text/javascript">
 
   function updateVisualizations(map_color, chart_color) {
+    // TODO: Make visualizations grey while data is loading
 
     colorScale.range(['#f8f8f8', map_color]);
     var map_values = {};
@@ -379,7 +383,7 @@
     bar_chart.load({
       columns: [
         ['neighborhoods', 'La Jolla', 'Pacific Beach', 'Old Town', 'Balboa Park', 'Ocean Beach', 'Mission Bay'],
-        ['data1', 30, 200, 100, 400, 150, 250]
+        ['data1', 200, 30, 150, 100, 300, 100]
       ]
     });
 
@@ -409,6 +413,7 @@
 
   // var active = 1;
 
+  
 
   d3.select('#title')
     .on('mouseover', function() {
@@ -425,6 +430,7 @@
     })
     .on('click', function() {
       updateVisualizations('#f44336', '#ef5350');
+      parent.location.hash = '#sale-price';
     });
 
   d3.select('#title2')
@@ -438,6 +444,7 @@
     })
     .on('click', function() {
       updateVisualizations('#00bcd4', '#00bcd4');
+      parent.location.hash = 'number-of-sales';
     });
 
   d3.select('#title3')
@@ -451,6 +458,7 @@
     })
     .on('click', function() {
       updateVisualizations('#8bc34a', '#8bc34a');
+      parent.location.hash = 'foreclosures';
     });
 
   d3.select('#title4')
@@ -464,6 +472,7 @@
     })
     .on('click', function() {
       updateVisualizations('#ffb300', '#ffb300');
+      parent.location.hash = 'sold-for-loss';
     });
 
 </script>
@@ -493,7 +502,7 @@
     },
     scope: 'SanDiego',
     fills: {
-      defaultFill: '#f8f8f8'
+      defaultFill: startColor
     }, 
     setProjection: function(element) {
       var projection = d3.geo.mercator()
@@ -508,13 +517,43 @@
 
 
   // TODO: updateChoropleth does anyhow only work after map was loaded
-  window.setTimeout(function() {
-    updateVisualizations('#f44336', '#ef5350');
-  }, 1000);
+  
 
   window.addEventListener('resize', function() {
     map.resize();
   });
+
+
+</script>
+
+<script type="text/javascript">
+  console.log(parent.location.hash);
+  switch (parent.location.hash) {
+    case '#sale-price':
+      window.setTimeout(function() {
+        updateVisualizations('#f44336', '#ef5350');
+      }, 1000);
+      break;
+    case '#number-of-sales':
+      window.setTimeout(function() {
+        updateVisualizations('#00bcd4', '#00bcd4');
+      }, 1000);
+      break;
+    case '#foreclosures':
+      window.setTimeout(function() {
+        updateVisualizations('#8bc34a', '#8bc34a');
+      }, 1000);
+      break;
+    case '#sold-for-loss':
+      window.setTimeout(function() {
+        updateVisualizations('#ffb300', '#ffb300');
+      }, 1000);
+      break;
+    default:
+      window.setTimeout(function() {
+        updateVisualizations('#f44336', '#ef5350');
+      }, 1000);
+  }
 
 
 </script>
