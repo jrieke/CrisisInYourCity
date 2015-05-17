@@ -287,6 +287,7 @@
 
   var slidedUp = false;
   var scroll_speed = 0.05;
+  var startColor = '#9e9e9e';
 
   // if (['#sale-price', '#number-of-sales', '#foreclosures', '#sold-for-loss'].indexOf(parent.location.hash) == -1) {
   //   parent.location.hash = '';
@@ -299,15 +300,48 @@
   //   var slidedUp = false;
   // }
 
-  var startColor = '#9e9e9e';
+
+
+  var data = {
+    months: ['2005-01', '2006-01', '2007-01', '2008-01', '2009-01', '2010-01']
+  };
+
+  var areas = ['Amphitheater And Water Park', 'Bella Lago', 'Bonita Long Canyon', 'East Lake', 'Eastlake Trails', 'Eastlake Vistas', 'Eastlake Woods', 'Estlake Greens', 'Fenton St', 'Golf Course', 'Lynwood Hills', 'Northwest', 'Otay Ranch', 'Paseo Ranchoero', 'Rancho Del Rey', 'Rolling Hills Ranch', 'Southwest', 'Sunbow', 'Terra Nova', 'Thomy Locust Pl', 'Village Center', 'Yosemite Dr', 'Allied Gardens', 'Alta Vista', 'Balboa Park', 'Bario Logan', 'Bay Ho', 'Bay Park', 'Bay Terrace', 'Bird Land', 'Carmel Mountain', 'Carmel Valley', 'Chollas View', 'City Heights East', 'City Heights West', 'Clairemont Mesa', 'College Area', 'Columbia', 'Core', 'Cortez Hill', 'Darnall', 'Del Cerro', 'Del Mar Heights', 'East Village', 'Egger Highlands', 'El Cerritos', 'Emerald Hills', 'Encanto', 'Gaslamp Quarter', 'Gateway', 'Grant Hill', 'Grantville', 'Horton Plaza', 'Jomacha-Lomita', 'Kearny Mesa', 'Kensington', 'La Jolla', 'La Jolla Village', 'Lake Murray', 'Lincoln Park', 'Linda Vista', 'Little Italy', 'Loma Portal', 'Marina', 'Memorial', 'Midtown', 'Midtown District', 'Mira Mesa', 'Miramar', 'Mission Bay', 'Mission Valley', 'Moreno Mission', 'Mount Hope', 'Mountain View', 'Nestor', 'Normal Heights', 'North City', 'North Clairemont', 'North Hills', 'Oak Park', 'Ocean Beach', 'Old Town', 'Pacific Beach', 'Palm City', 'Paradise Hills', 'Park West', 'Rancho Bernadino', 'Rancho Penasquitos', 'Rolando', 'Roseville', 'Sabre Springs', 'San Carlos', 'San Ysidro', 'Scripps Ranch', 'Serra Mesa', 'Sky Line', 'Sorrento Valley', 'South Park', 'Southcrest', 'Talmadge', 'Tierrasanta', 'Tijuana River Valley', 'Torrey Pines', 'University City', 'Valencia Park', 'Webster', 'West University Heights', 'Wooded Area'];
+
+  for (var i = 0; i < areas.length; i++) {
+    data[areas[i]] = [Math.random(), Math.random(), Math.random(), Math.random(), Math.random(), Math.random()];
+  }
+
+  var neighborhoodsForBarChart = ['La Jolla', 'Pacific Beach', 'Old Town', 'Balboa Park', 'Ocean Beach', 'Mission Bay'];
+
+
+  function updateSelectedTime(timePointIndex) {
+    // TODO: If scrolling through time quickly, the visualizations do not update in a smooth way because this function still executes while it is called again
+    // Possible solutions: Make all data conversion outside this function in the background; "stop" this function in some way (only possible from the inside) when it is called again; if scrolling quickly, only call this function at some points
+    bar_chart.load({
+      json: {
+        values: neighborhoodsForBarChart.map(function(neighborhood) { return data[neighborhood][timePointIndex]; })
+      }
+    });
+    var map_values = {};
+    for (var area in data) {
+      // datamaps cannot deal with spaces in the keys, so we remove them
+      map_values[area.split(' ').join('')] = colorScale(data[area][timePointIndex]);
+    }
+    // 'map_values' also contains the 'months' field, but that is simply ignored by datamaps
+    map.updateChoropleth(map_values);
+  } 
+
 
   var slider;
 
   function updateYear(sliderValue) {
     d3.select('#year')
-      .text(Math.round(2005+(100-sliderValue)/100*10));
+      .text(Math.round(2005+(100-sliderValue)/100*5));
     d3.select('#slider-progress')
       .style('height', (100-sliderValue + '%'));
+
+    updateSelectedTime(Math.round((100-sliderValue)/100*5));
   }
 
   d3.select('#time-slider').call(
@@ -329,12 +363,12 @@
     size: barChartSize,
     data: {
       x: 'neighborhoods',
-      columns: [
-        ['neighborhoods', ' ', ' ', ' ', ' ', ' ', ' '],
-        ['data1', 30, 200, 100, 400, 150, 250]
-      ],  // real data is loaded in 'updateVisualizations'
+      json: {
+        neighborhoods: [' ', ' ', ' ', ' ', ' ', ' '],
+        values: [30, 200, 100, 400, 150, 250]
+      },  // real data is loaded in 'updateDataSet'
       colors: {
-        data1: startColor
+        values: startColor
       },
       type: 'bar'
       // labels: {
@@ -364,14 +398,17 @@
     size: timeChartSize, 
     data: {
       x: 'years',
-      columns: [
-        ['years', 2005, 2006, 2007, 2008],
-        ['data1', 300, 300, 300, 300], 
-        ['data2', 300, 300, 300, 300]
-      ],  // real data is loaded in 'updateVisualizations'
+      json: {
+        years: [2005, 2006, 2007, 2008, 2009, 2010],
+        average: [300, 300, 300, 300, 300, 300], 
+        neighborhood: [300, 300, 300, 300, 300, 300]
+      },  // real data is loaded in 'updateDataSet'
       colors: {
-        data1: startColor,
-        data2: startColor
+        average: startColor,
+        neighborhood: startColor
+      },
+      names: {
+        'average': 'San Diego (average)'
       }
     },
     padding: {
@@ -402,7 +439,7 @@
 
 <script type="text/javascript">
 
-  function updateVisualizations(map_color, chart_color) {
+  function updateDataSet(map_color, chart_color) {
     // TODO: Make visualizations grey while data is loading, maybe even by using a small transition
 
     d3.select('#content-overlay')
@@ -410,36 +447,43 @@
 
     colorScale.range(['#f8f8f8', map_color]);
     var map_values = {};
-    ids.map(function(id) {
-      // TODO: Insert values from real data here
-      map_values[id] = colorScale(Math.random());
-    });
-    // can currently not deal with spaces in an area ID, see https://github.com/markmarkoh/datamaps/issues/127
-    // example: 'La Jolla': ... will not work
+    for (var area in data) {
+      // datamaps cannot deal with spaces in the keys, so we remove them
+      map_values[area.split(' ').join('')] = colorScale(data[area][0]);
+    }
+    // 'map_values' also contains the 'months' field, but that is simply ignored by datamaps
     map.updateChoropleth(map_values);
 
+
+  
     bar_chart.data.colors({
-      data1: chart_color
+      values: chart_color
     });
     bar_chart.load({
-      columns: [
-        ['neighborhoods', 'La Jolla', 'Pacific Beach', 'Old Town', 'Balboa Park', 'Ocean Beach', 'Mission Bay'],
-        ['data1', Math.random(), Math.random(), Math.random(), Math.random(), Math.random(), Math.random()]
-      ]
+      json: {
+        neighborhoods: neighborhoodsForBarChart,
+        values: neighborhoodsForBarChart.map(function(neighborhood) { return data[neighborhood][0]; })
+      }
     });
+
+    console.log(bar_chart.data);
 
     time_chart.data.colors({
-      data1: '#f8f8f8',
-      data2: chart_color
+      average: '#f8f8f8',
+      neighborhood: chart_color
+    });
+    time_chart.data.names({
+      neighborhood: 'La Jolla'
     });
     time_chart.load({
-      columns: [
-        ['years', 2005, 2006, 2007, 2008],
-        ['data1', 50, 70, 10, 30], 
-        ['data2', 30, 200, 150, 300]
-
-      ]
+      json: {
+        // ['years', 2005, 2006, 2007, 2008],
+        average: [50, 70, 10, 30, 20, 60], 
+        neighborhood: [30, 200, 150, 300, 200, 230]
+      }
     });
+
+
 
     // TODO: Do this a little bit more elegant than just making it visible at once
     d3.select('#time-slider-wrapper')
@@ -500,7 +544,7 @@
     })
     .on('click', function() {
       slideUp();
-      updateVisualizations('#f44336', '#ef5350');
+      updateDataSet('#f44336', '#ef5350');
     });
 
   d3.select('#title2')
@@ -514,7 +558,7 @@
     })
     .on('click', function() {
       slideUp();
-      updateVisualizations('#00bcd4', '#00bcd4');
+      updateDataSet('#00bcd4', '#00bcd4');
     });
 
   d3.select('#title3')
@@ -528,7 +572,7 @@
     })
     .on('click', function() {
       slideUp();
-      updateVisualizations('#8bc34a', '#8bc34a');
+      updateDataSet('#8bc34a', '#8bc34a');
     });
 
   d3.select('#title4')
@@ -542,7 +586,7 @@
     })
     .on('click', function() {
       slideUp();
-      updateVisualizations('#ffb300', '#ffb300');
+      updateDataSet('#ffb300', '#ffb300');
     });
 
 </script>
@@ -550,10 +594,9 @@
 <script>
   var colorScale = d3.scale.linear()
     .domain([0, 1]);
-    // range will be added during 'updateVisualizations'
+    // range will be added during 'updateDataSet'
 
-  var ids = ['AmphitheaterAndWaterPark', 'BellaLago', 'BonitaLongCanyon', 'EastLake', 'EastlakeTrails', 'EastlakeVistas', 'EastlakeWoods', 'EstlakeGreens', 'FentonSt', 'GolfCourse', 'LynwoodHills', 'Northwest', 'OtayRanch', 'PaseoRanchoero', 'RanchoDelRey', 'RollingHillsRanch', 'Southwest', 'Sunbow', 'TerraNova', 'ThomyLocustPl', 'VillageCenter', 'YosemiteDr', 'AlliedGardens', 'AltaVista', 'BalboaPark', 'BarioLogan', 'BayHo', 'BayPark', 'BayTerrace', 'BirdLand', 'CarmelMountain', 'CarmelValley', 'ChollasView', 'CityHeightsEast', 'CityHeightsWest', 'ClairemontMesa', 'CollegeArea', 'Columbia', 'Core', 'CortezHill', 'Darnall', 'DelCerro', 'DelMarHeights', 'EastVillage', 'EggerHighlands', 'ElCerritos', 'EmeraldHills', 'Encanto', 'GaslampQuarter', 'Gateway', 'GrantHill', 'Grantville', 'HortonPlaza', 'Jomacha-Lomita', 'KearnyMesa', 'Kensington', 'LaJolla', 'LaJollaVillage', 'LakeMurray', 'LincolnPark', 'LindaVista', 'LittleItaly', 'LomaPortal', 'Marina', 'Memorial', 'Midtown', 'MidtownDistrict', 'MiraMesa', 'Miramar', 'MissionBay', 'MissionValley', 'MorenoMission', 'MountHope', 'MountainView', 'Nestor', 'NormalHeights', 'NorthCity', 'NorthClairemont', 'NorthHills', 'OakPark', 'OceanBeach', 'OldTown', 'PacificBeach', 'PalmCity', 'ParadiseHills', 'ParkWest', 'RanchoBernadino', 'RanchoPenasquitos', 'Rolando', 'Roseville', 'SabreSprings', 'SanCarlos', 'SanYsidro', 'ScrippsRanch', 'SerraMesa', 'SkyLine', 'SorrentoValley', 'SouthPark', 'Southcrest', 'Talmadge', 'Tierrasanta', 'TijuanaRiverValley', 'TorreyPines', 'UniversityCity', 'ValenciaPark', 'Webster', 'WestUniversityHeights', 'WoodedArea'];
-
+  
   var map = new Datamap({
     element: document.getElementById('map'),
     responsive: true,
