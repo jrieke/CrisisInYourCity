@@ -66,10 +66,10 @@
     top: 380px;
     height: calc(100% - 160px);
     margin: 0 auto;
-    width: 850px;
+    width: 800px;
   }
 
-  @media (max-width: 850px) {
+  @media (max-width: 800px) {
     #content, #content-overlay {
       width: 100%;
     }
@@ -88,13 +88,16 @@
     /*stroke-linejoin: round;*/
   }
 
+  /*#time-chart .c3-axis-y {
+    display: none;
+  }
 
   #time-chart .c3-axis-y .domain {
     visibility: hidden
   }
   #time-chart .c3-axis-y .tick {
     visibility: hidden
-  }
+  }*/
 
 
   #time-chart .c3-axis-x line {
@@ -224,7 +227,7 @@
 
 <div id="content">
 
-  <div style="position: absolute; left: 0px; width: 35%; height: 100%">
+  <div style="position: absolute; left: 25px; width: 32.5%; height: 100%">
 
 <!--   <div class="center-align">
     <div class="row">
@@ -298,7 +301,7 @@
   </div>
 
 
-  <div id="map-wrapper" style="position: absolute; right: 0px; width: 45%; height: 100%">
+  <div id="map-wrapper" style="position: absolute; right: 25px; width: 32.5%; height: 100%">
     <div id="map" style="width: 100%; height: 100%"></div>
   </div>
 
@@ -340,7 +343,7 @@
 
 
   var data = {
-    months: ['2005-01', '2006-01', '2007-01', '2008-01', '2009-01', '2010-01']
+    months: ['2005-01-15', '2006-01-15', '2007-01-15', '2008-01-15', '2009-01-15', '2010-01-15']
   };
 
   var areas = ['Amphitheater And Water Park', 'Bella Lago', 'Bonita Long Canyon', 'East Lake', 'Eastlake Trails', 'Eastlake Vistas', 'Eastlake Woods', 'Estlake Greens', 'Fenton St', 'Golf Course', 'Lynwood Hills', 'Northwest', 'Otay Ranch', 'Paseo Ranchoero', 'Rancho Del Rey', 'Rolling Hills Ranch', 'Southwest', 'Sunbow', 'Terra Nova', 'Thomy Locust Pl', 'Village Center', 'Yosemite Dr', 'Allied Gardens', 'Alta Vista', 'Balboa Park', 'Bario Logan', 'Bay Ho', 'Bay Park', 'Bay Terrace', 'Bird Land', 'Carmel Mountain', 'Carmel Valley', 'Chollas View', 'City Heights East', 'City Heights West', 'Clairemont Mesa', 'College Area', 'Columbia', 'Core', 'Cortez Hill', 'Darnall', 'Del Cerro', 'Del Mar Heights', 'East Village', 'Egger Highlands', 'El Cerritos', 'Emerald Hills', 'Encanto', 'Gaslamp Quarter', 'Gateway', 'Grant Hill', 'Grantville', 'Horton Plaza', 'Jomacha-Lomita', 'Kearny Mesa', 'Kensington', 'La Jolla', 'La Jolla Village', 'Lake Murray', 'Lincoln Park', 'Linda Vista', 'Little Italy', 'Loma Portal', 'Marina', 'Memorial', 'Midtown', 'Midtown District', 'Mira Mesa', 'Miramar', 'Mission Bay', 'Mission Valley', 'Moreno Mission', 'Mount Hope', 'Mountain View', 'Nestor', 'Normal Heights', 'North City', 'North Clairemont', 'North Hills', 'Oak Park', 'Ocean Beach', 'Old Town', 'Pacific Beach', 'Palm City', 'Paradise Hills', 'Park West', 'Rancho Bernadino', 'Rancho Penasquitos', 'Rolando', 'Roseville', 'Sabre Springs', 'San Carlos', 'San Ysidro', 'Scripps Ranch', 'Serra Mesa', 'Sky Line', 'Sorrento Valley', 'South Park', 'Southcrest', 'Talmadge', 'Tierrasanta', 'Tijuana River Valley', 'Torrey Pines', 'University City', 'Valencia Park', 'Webster', 'West University Heights', 'Wooded Area'];
@@ -465,6 +468,9 @@
     axis: {
       x: {
         type: 'category'  // needed to show string labels
+      },
+      y: {
+        show: false
       }
     }
     // tooltip: {show: false}
@@ -480,9 +486,9 @@
     data: {
       x: 'years',
       json: {
-        years: [2005, 2006, 2007, 2008, 2009, 2010],
-        average: [300, 300, 300, 300, 300, 300], 
-        neighborhood: [300, 300, 300, 300, 300, 300]
+        years: data['months'],//[2005, 2006, 2007, 2008, 2009, 2010],
+        average: [1, 1, 1, 1, 1, 1], 
+        neighborhood: [1, 1, 1, 1, 1, 1]
       },  // real data is loaded in 'updateDataSet'
       colors: {
         average: startColor,
@@ -493,6 +499,7 @@
       }
     },
     padding: {
+      left: 10,
       right: 10
     },    
     point: {show: false},
@@ -502,8 +509,16 @@
       // lines: [{value: 0}]
     }},
     axis: {
+      x: {
+        type: 'timeseries',
+        tick: {
+          format: '%y'
+        }
+      },
       y: {
+        show: false,
         min: 0, 
+        max: 1,  // TODO: Adapt this to the max value of all data
         padding: {bottom: 0}, 
         tick: {
           count: 4
@@ -527,7 +542,7 @@
     var map_values = {};
     for (var area in data) {
       // datamaps cannot deal with spaces in the keys, so we remove them
-      map_values[area.split(' ').join('')] = colorScale(data[area][0]);
+      map_values[area.split(' ').join('')] = colorScale(data[area][selectedTimeIndex]);
     }
     // 'map_values' also contains the 'months' field, but that is simply ignored by datamaps
     map.updateChoropleth(map_values);
@@ -540,7 +555,7 @@
     bar_chart.load({
       json: {
         neighborhoods: neighborhoodsForBarChart,
-        values: neighborhoodsForBarChart.map(function(neighborhood) { return data[neighborhood][0]; })
+        values: neighborhoodsForBarChart.map(function(neighborhood) { return data[neighborhood][selectedTimeIndex]; })
       }
     });
 
@@ -556,8 +571,8 @@
     time_chart.load({
       json: {
         // ['years', 2005, 2006, 2007, 2008],
-        average: [50, 70, 10, 30, 20, 60], 
-        neighborhood: [30, 200, 150, 300, 200, 230]
+        average: [0.50, 0.70, 0.8, 0.30, 0.1, 0.60], 
+        neighborhood: data['La Jolla']
       }
     });
 
