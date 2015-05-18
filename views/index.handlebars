@@ -20,7 +20,20 @@
     overflow: hidden;
   }
 
-  #navbar div {
+  #front-header {
+    position: absolute; 
+    top: 0px; 
+    width: 100%; 
+    height: 400px
+  }
+
+  @media (max-height: 400px) {
+    #front-header {
+      height: 100%;
+    }
+  }
+
+  .nav-title {
     color: #f8f8f8;
     padding-left: 25px;
     padding-right: 25px;
@@ -30,38 +43,26 @@
     display: inline-block;
   }
 
-  /*#title {border-bottom: 3px solid #ef5350; margin-left: 1px;}
-  #title2 {border-bottom: 3px solid #00bcd4; margin-left: 1px;}
-  #title3 {border-bottom: 3px solid #8bc34a; margin-left: 1px;}
-  #title4 {border-bottom: 3px solid #ffb300; margin-left: 1px;}*/
-
-  #title:hover {background: #ef5350}
-  #title2:hover {background: #00bcd4}
-  #title3:hover {background: #8bc34a}
-  #title4:hover {background: #ffb300}
+  #nav-title-1:hover, #nav-title-1.active {background: #ef5350;} /*{border-bottom: 3px solid #ef5350; color: #ef5350;}*/
+  #nav-title-2:hover, #nav-title-2.active {background: #00bcd4;} /*{border-bottom: 3px solid #00bcd4; color: #00bcd4;}*/
+  #nav-title-3:hover, #nav-title-3.active {background: #8bc34a;} /*{border-bottom: 3px solid #8bc34a; color: #8bc34a;}*/
+  #nav-title-4:hover, #nav-title-4.active {background: #ffb300;} /*{border-bottom: 3px solid #ffb300; color: #ffb300;}*/
 
 
-  #description {
+  .description {
     position: absolute; 
     bottom: 0px; 
     height: 50px; 
     line-height: 50px;  /* vertical alignment */
     width: 100%; 
     z-index: 1; 
-    /*visibility: hidden; */
     font-size: 0.9em; 
     color: #f8f8f8;
     text-align: center;
-  }
-
-  #description div {
-    position: absolute;
-    width: 100%;
-    height: 100%;
     visibility: hidden;
   }
 
-  #content, #content-overlay {
+  #content {
     position: relative;
     top: 380px;
     height: calc(100% - 160px);
@@ -70,13 +71,9 @@
   }
 
   @media (max-width: 900px) {
-    #content, #content-overlay {
+    #content {
       width: 100%;
     }
-  }
-
-  #content-overlay {    
-    z-index: 1;
   }
 
 
@@ -192,7 +189,7 @@
 <script src="js/datamaps.none.min.js"></script>
 <script src="js/d3.slider.js"></script>
 
-<div id="front-header" style="position: absolute; top: 0px; width: 100%; height: 400px">
+<div id="front-header">
 
   <div id="navbar-wrapper" class="grey darken-3" style="position: absolute; bottom: 50px; width: 100%; top: 0px">
 
@@ -200,125 +197,82 @@
       <h3>Some description</h3>
     </div>
 
-    <div id="navbar" class="center-align" style="position: absolute; bottom: 0px; height: 50px; width: 100%">
-      <div id="title">Sale Price</div><!--
-      --><div id="title2">Number of Sales</div><!--
-      --><div id="title3">Foreclosures</div><!--
-      --><div id="title4">Sold for Loss</div>
+    <!-- TODO: Change this to nav (currently, materialize alters the style of that) -->
+    <div id="navbar" style="position: absolute; bottom: 0px; height: 50px; width: 100%; text-align: center">
+      <div id="nav-title-1" class="nav-title">Sale Price</div><!--
+      --><div id="nav-title-2" class="nav-title">Number of Sales</div><!--
+      --><div id="nav-title-3" class="nav-title">Foreclosures</div><!--
+      --><div id="nav-title-4" class="nav-title">Sold for Loss</div>
     </div>
 
   </div>
 
-  <div id="description">
-    <div id="description1" style="background-color: rgba(239, 83, 80, 1);">
-      Median sale price for all homes sold on Zillow in one month
-    </div>
-    <div id="description2" style="background-color: rgba(0, 188, 212, 1);">
-      Number of homes sold on Zillow in one month
-    </div>
-    <div id="description3" style="background-color: rgba(139, 195, 74, 1);">
-      Number of homes foreclosed in one month
-    </div>
-    <div id="description4" style="background-color: rgba(255, 179, 0, 1);">
-      Percentage of homes sold on Zillow in one month for less than acquired
-    </div>
+  <div id="description-1" class="description" style="background-color: rgba(239, 83, 80, 1);">
+    Median sale price for all homes sold on Zillow in one month
+  </div>
+  <div id="description-2" class="description" style="background-color: rgba(0, 188, 212, 1);">
+    Number of homes sold on Zillow in one month
+  </div>
+  <div id="description-3" class="description" style="background-color: rgba(139, 195, 74, 1);">
+    Number of homes foreclosed in one month
+  </div>
+  <div id="description-4" class="description" style="background-color: rgba(255, 179, 0, 1);">
+    Percentage of homes sold on Zillow in one month for less than acquired
   </div>
 
 </div>
 
 
-<!-- <div id="content-overlay"></div> -->
 
 <div id="content">
 
-  <div style="position: absolute; left: 25px; width: 29%; height: 100%">
+  <div id="content-overlay" style="position: absolute; width: 100%; height: 100%; z-index: 1;"></div>
 
-<!--   <div class="center-align">
-    <div class="row">
-      <div class="col s4"><p class="teal-text text-lighten-2">Sale Price</p></div>
-      <div class="col s4"><p class="red-text text-lighten-1">Number of Sales</p></div>
-      <div class="col s4"><p class="amber-text">Foreclosures</p></div>
-    </div>
-    <div class="row">
-      <div class="col s4"><p class="light-green-text">Median Sale Price</p></div>
-      <div class="col s4"><p class="light-blue-text">Median Sale Price</p></div>
-      <div class="col s4"><p class="pink-text">Median Sale Price</p></div>
-    </div>
-  </div>
- -->
+  <div style="position: absolute; width: 100%; height: 100%;">
 
-  <!-- <div class="row center-align">
+    <div style="position: absolute; left: 25px; width: 29%; height: 100%">
 
-    <div class="col s6" style="padding-right: 0px;">
-      <ul class="collection" style="border-style: none">
-        <li class="collection-item active">Sale Price</li>
-        <li class="collection-item">Sales</li>
-        <li class="collection-item">Foreclosures</li>
-      </ul>
-    </div>
-    <div class="col s6" style="padding-left: 0px;">
-      <ul class="collection" style="border-style: none">
-        <li class="collection-item">Sold for Loss</li>
-        <li class="collection-item">Decreasing Value</li>
-        <li class="collection-item">Crime</li>
-      </ul>
-    </div>
-
-  </div> -->
-    <!-- <ul class="collapsible grey lighten-2" data-collapsible="accordion" style="box-shadow: none;">
-      <li>
-        <div class="collapsible-header active"><i class="mdi-image-filter-drama"></i>Median Sale Price</div>
-        <div class="collapsible-body"><p>Lorem ipsum dolor sit amet.</p></div>
-      </li>
-      <li>
-        <div class="collapsible-header"><i class="mdi-maps-place"></i>Number of Sales</div>
-        <div class="collapsible-body"><p>Lorem ipsum dolor sit amet.</p></div>
-      </li>
-      <li>
-        <div class="collapsible-header"><i class="mdi-social-whatshot"></i>Foreclosures</div>
-        <div class="collapsible-body"><p>Lorem ipsum dolor sit amet.</p></div>
-      </li>
-    </ul> -->
-
-    <div id="bar-chart-wrapper" style="position: absolute; top: 0px; height: calc(50% - 35px); width: 100%;">
-      <div id="bar-chart"></div>
-    </div>
-    <div id="time-chart-wrapper" style="position: absolute; bottom: 0px; height: calc(50% - 35px); width: 100%;">
-      <div id="time-chart"></div>
-    </div>
-
-  </div>
-
-  <div id="time-slider-wrapper" style="display: flex; flex-direction: column; visibility: hidden; position: absolute; top: 20px; left: 37.5%; width: 25%; bottom: 20px; text-align: center;">
-
-    <div style="color: #f8f8f8">
-      Jan<br>
-      <span id="year" style="font-size: 2em;">2005</span><br>
-      <i id="time-play-pause" class="mdi-av-play-circle-fill" style="color: #f8f8f8; font-size: 2.7rem; cursor: pointer"></i>
-    </div>
-
-    <div style="flex: 1; margin-top: 20px; position: relative">
-      <div style="position: absolute; height: 100%; left: 0px; width: calc(50% - 15px)">
-        <p class="time-text" style="position: absolute; top: 0%; font-size: 0.75rem; color: #f8f8f8; text-align: right; line-height: 1.3"><span style="font-weight: bold;">Sep 08</span><br>Lehman Brothers files bankruptcy</p>
-        <p class="time-text" style="position: absolute; top: 50%; font-size: 0.75rem; color: #9e9e9e; text-align: right; line-height: 1.3"><span style="font-weight: bold;">Sep 08</span><br>Lehman Brothers files bankruptcy</p>
+      <div id="bar-chart-wrapper" style="position: absolute; top: 0px; height: calc(50% - 35px); width: 100%;">
+        <div id="bar-chart"></div>
       </div>
-      <div id="time-slider" style="cursor: pointer; position: absolute; height: 100%; left: 50%">
-        <div id="slider-progress" class="d3-slider d3-slider-vertical" style="position: absolute; top: 0px; left: 0px; height: 0%; width: 100%; background: #f8f8f8"></div>
-  <!--       <div class="time_point" style="top: 30%"></div>
-        <div class="time_point" style="top: 60%"></div>
-   -->
+      <div id="time-chart-wrapper" style="position: absolute; bottom: 0px; height: calc(50% - 35px); width: 100%;">
+        <div id="time-chart"></div>
       </div>
-      <div style="position: absolute; height: 100%; right: 0px; width: calc(50% - 15px)">
-        <p class="time-text" style="position: absolute; top: 25%; font-size: 0.75rem; color: #9e9e9e; text-align: left; line-height: 1.3"><span style="font-weight: bold;">Sep 08</span><br>Lehman Brothers files bankruptcy</p>
-        <p class="time-text" style="position: absolute; top: 75%; font-size: 0.75rem; color: #9e9e9e; text-align: left; line-height: 1.3"><span style="font-weight: bold;">Sep 08</span><br>Lehman Brothers files bankruptcy</p>
-      </div>
+
     </div>
 
-  </div>
+    <div id="time-slider-wrapper" style="display: flex; flex-direction: column; visibility: hidden; position: absolute; top: 20px; left: 37.5%; width: 25%; bottom: 20px; text-align: center;">
+
+      <div style="color: #f8f8f8">
+        Jan<br>
+        <span id="year" style="font-size: 2em;">2005</span><br>
+        <i id="time-play-pause" class="mdi-av-play-circle-fill" style="color: #f8f8f8; font-size: 2.7rem; cursor: pointer"></i>
+      </div>
+
+      <div style="flex: 1; margin-top: 20px; position: relative">
+        <div style="position: absolute; height: 100%; left: 0px; width: calc(50% - 15px)">
+          <p class="time-text" style="position: absolute; top: 0%; font-size: 0.75rem; color: #f8f8f8; text-align: right; line-height: 1.3"><span style="font-weight: bold;">Sep 08</span><br>Lehman Brothers files bankruptcy</p>
+          <p class="time-text" style="position: absolute; top: 50%; font-size: 0.75rem; color: #9e9e9e; text-align: right; line-height: 1.3"><span style="font-weight: bold;">Sep 08</span><br>Lehman Brothers files bankruptcy</p>
+        </div>
+        <div id="time-slider" style="cursor: pointer; position: absolute; height: 100%; left: 50%">
+          <div id="slider-progress" class="d3-slider d3-slider-vertical" style="position: absolute; top: 0px; left: 0px; height: 0%; width: 100%; background: #f8f8f8"></div>
+    <!--       <div class="time_point" style="top: 30%"></div>
+          <div class="time_point" style="top: 60%"></div>
+     -->
+        </div>
+        <div style="position: absolute; height: 100%; right: 0px; width: calc(50% - 15px)">
+          <p class="time-text" style="position: absolute; top: 25%; font-size: 0.75rem; color: #9e9e9e; text-align: left; line-height: 1.3"><span style="font-weight: bold;">Sep 08</span><br>Lehman Brothers files bankruptcy</p>
+          <p class="time-text" style="position: absolute; top: 75%; font-size: 0.75rem; color: #9e9e9e; text-align: left; line-height: 1.3"><span style="font-weight: bold;">Sep 08</span><br>Lehman Brothers files bankruptcy</p>
+        </div>
+      </div>
+
+    </div>
 
 
-  <div id="map-wrapper" style="position: absolute; right: 25px; width: 29%; height: 100%">
-    <div id="map" style="width: 100%; height: 100%"></div>
+    <div id="map-wrapper" style="position: absolute; right: 25px; width: 29%; height: 100%">
+      <div id="map" style="width: 100%; height: 100%"></div>
+    </div>
+
   </div>
 
 </div>
@@ -671,75 +625,27 @@
         .duration(1000)
         .style('top', '80px');
 
-      d3.select('#content-overlay')
-        .transition()
-        .duration(1000)
-        .style('top', '80px');
-
       slidedUp = true;
     }
   }
   
-  
-
-  d3.select('#title')
-    .on('mouseover', function() {
-      d3.select('#description1')
-        .style('visibility', 'visible');
-      // d3.select('#title').style('background', '#ef5350');
-      // d3.select('#title2').style('background', 'none');
-      // d3.select('#title3').style('background', 'none');
-      // d3.select('#title4').style('background', 'none');
+  var selectedTitle = -1;
+  var colors = [['#f44336', '#ef5350'], ['#00bcd4', '#00bcd4'], ['#8bc34a', '#8bc34a'], ['#ffb300', '#ffb300']];
+  d3.selectAll('.nav-title')
+    .on('mouseover', function(d, i) {
+      d3.select(d3.selectAll('.description')[0][i]).style('visibility', 'visible');
+      d3.selectAll('.nav-title').classed('active', false);
     })
     .on('mouseout', function() {
-      d3.select('#description1')
-        .style('visibility', 'hidden');
+      d3.selectAll('.description').style('visibility', 'hidden');
+        d3.select(d3.selectAll('.nav-title')[0][selectedTitle]).classed('active', 'true');
     })
-    .on('click', function() {
+    .on('click', function(d, i) {
       slideUp();
-      updateDataSet('#f44336', '#ef5350');
-    });
-
-  d3.select('#title2')
-    .on('mouseover', function() {
-      d3.select('#description2')
-        .style('visibility', 'visible');
-    })
-    .on('mouseout', function() {
-      d3.select('#description2')
-        .style('visibility', 'hidden');
-    })
-    .on('click', function() {
-      slideUp();
-      updateDataSet('#00bcd4', '#00bcd4');
-    });
-
-  d3.select('#title3')
-    .on('mouseover', function() {
-      d3.select('#description3')
-        .style('visibility', 'visible');
-    })
-    .on('mouseout', function() {
-      d3.select('#description3')
-        .style('visibility', 'hidden');
-    })
-    .on('click', function() {
-      slideUp();
-      updateDataSet('#8bc34a', '#8bc34a');
-    });
-
-  d3.select('#title4')
-    .on('mouseover', function() {
-      d3.select('#description4')
-        .style('visibility', 'visible');
-    })
-    .on('mouseout', function() {
-      d3.select('#description4')
-        .style('visibility', 'hidden');
-    })
-    .on('click', function() {
-      slideUp();
-      updateDataSet('#ffb300', '#ffb300');
+      updateDataSet(colors[i][0], colors[i][1]);
+      d3.selectAll('.nav-title').classed('active', false);
+      d3.select(this).classed('active', true);
+      selectedTitle = i;
     });
 
 </script>
