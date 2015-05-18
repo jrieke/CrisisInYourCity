@@ -1,0 +1,160 @@
+html, body {
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+}
+/* TODO: Minify */
+
+#front-header {
+  position: absolute; 
+  top: 0px; 
+  width: 100%; 
+  height: 400px
+}
+
+@media (max-height: 400px) {
+  #front-header {
+    height: 100%;
+  }
+}
+
+.nav-title {
+  color: #f8f8f8;
+  padding-left: 25px;
+  padding-right: 25px;
+  cursor: pointer;
+  height: 50px;
+  line-height: 50px;  /* vertical alignment */
+  display: inline-block;
+}
+
+#nav-title-1:hover, #nav-title-1.active {background: #ef5350;} /*{border-bottom: 3px solid #ef5350; color: #ef5350;}*/
+#nav-title-2:hover, #nav-title-2.active {background: #00bcd4;} /*{border-bottom: 3px solid #00bcd4; color: #00bcd4;}*/
+#nav-title-3:hover, #nav-title-3.active {background: #8bc34a;} /*{border-bottom: 3px solid #8bc34a; color: #8bc34a;}*/
+#nav-title-4:hover, #nav-title-4.active {background: #ffb300;} /*{border-bottom: 3px solid #ffb300; color: #ffb300;}*/
+
+
+.description {
+  position: absolute; 
+  bottom: 0px; 
+  height: 50px; 
+  line-height: 50px;  /* vertical alignment */
+  width: 100%; 
+  z-index: 1; 
+  font-size: 0.9em; 
+  color: #f8f8f8;
+  text-align: center;
+  visibility: hidden;
+}
+
+#content {
+  position: relative;
+  top: 380px;
+  height: calc(100% - 160px);
+  margin: 0 auto;
+  width: 900px;
+}
+
+@media (max-width: 900px) {
+  #content {
+    width: 100%;
+  }
+}
+
+
+
+/* time chart */
+#time-chart .c3-line {
+  stroke-width: 3px;
+  stroke-linecap: round;
+  /*stroke-linejoin: round;*/
+}
+
+/*#time-chart .c3-axis-y {
+  display: none;
+}
+
+#time-chart .c3-axis-y .domain {
+  visibility: hidden
+}
+#time-chart .c3-axis-y .tick {
+  visibility: hidden
+}*/
+
+
+#time-chart .c3-axis-x line {
+  visibility: hidden
+}
+#time-chart .c3-axis-x .domain {
+  visibility: hidden
+}
+#time-chart .c3-axis-x text {
+  fill: #f8f8f8;
+}
+
+
+#time-chart .c3-ygrid {
+  /*stroke-dasharray: 0;*/
+  stroke-width: 1.5px;
+}
+
+/* bar chart */
+#bar-chart .c3-axis-y .domain {
+  visibility: hidden
+}
+#bar-chart .c3-axis-y .tick {
+  visibility: hidden
+}
+
+#bar-chart .c3-axis-x line {
+  visibility: hidden
+}
+#bar-chart .c3-axis-x .domain {
+  visibility: hidden
+}
+#bar-chart .c3-axis-x text {
+  fill: #f8f8f8;
+}
+
+#bar-chart .c3-text {
+  fill: #9e9e9e !important;
+}
+
+
+.d3-slider {
+  background: #9e9e9e;
+  border-style: none;    
+  border-radius: 0.125em;
+}
+
+.d3-slider-vertical {
+  width: 0.25em;
+}
+
+.d3-slider-handle {
+  border-radius: 1em;
+  background: #f8f8f8;
+  border-style: none;
+}
+
+.d3-slider-handle:hover {
+  /*border: 10px solid #bdbdbd;*/
+  border-style: none;
+}
+
+.d3-slider-vertical .d3-slider-handle {
+  width: 1.1em;
+  height: 1.1em;
+  left: -0.45em; 
+}
+
+.time_point {
+  background: #bdbdbd;
+  position: absolute;
+  width: 0.8em;
+  height: 0.8em;
+  left: -0.27em;
+  border-radius: 1em;
+}
