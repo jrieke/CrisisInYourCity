@@ -1,4 +1,318 @@
-// TODO: Divide this into different files
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Financial Crisis in San Diego</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.96.1/css/materialize.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.css">
+
+  <link rel="stylesheet" href="css/d3.slider.css">
+
+  <style type="text/css">
+
+html, body {
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+}
+/* TODO: Minify */
+
+#front-header {
+  position: absolute; 
+  top: 0px; 
+  width: 100%; 
+  height: 400px
+}
+
+@media (max-height: 400px) {
+  #front-header {
+    height: 100%;
+  }
+}
+
+.nav-title {
+  color: #f8f8f8;
+  padding-left: 25px;
+  padding-right: 25px;
+  cursor: pointer;
+  height: 50px;
+  line-height: 50px;  /* vertical alignment */
+  display: inline-block;
+}
+
+#nav-title-1:hover, #nav-title-1.active {background: #ef5350;} /*{border-bottom: 3px solid #ef5350; color: #ef5350;}*/
+#nav-title-2:hover, #nav-title-2.active {background: #00bcd4;} /*{border-bottom: 3px solid #00bcd4; color: #00bcd4;}*/
+#nav-title-3:hover, #nav-title-3.active {background: #8bc34a;} /*{border-bottom: 3px solid #8bc34a; color: #8bc34a;}*/
+#nav-title-4:hover, #nav-title-4.active {background: #ffb300;} /*{border-bottom: 3px solid #ffb300; color: #ffb300;}*/
+
+
+.description {
+  position: absolute; 
+  bottom: 0px; 
+  height: 50px; 
+  line-height: 50px;  /* vertical alignment */
+  width: 100%; 
+  z-index: 1; 
+  font-size: 0.9em; 
+  color: #f8f8f8;
+  text-align: center;
+  visibility: hidden;
+}
+
+#content {
+  position: relative;
+  top: 380px;
+  height: calc(100% - 160px);
+  margin: 0 auto;
+  width: 900px;
+}
+
+@media (max-width: 900px) {
+  #content {
+    width: 100%;
+  }
+}
+
+
+
+/* time chart */
+#time-chart .c3-line {
+  stroke-width: 3px;
+  stroke-linecap: round;
+  /*stroke-linejoin: round;*/
+}
+
+/*#time-chart .c3-axis-y {
+  display: none;
+}*/
+
+#time-chart .c3-axis-y line {
+  visibility: hidden
+}
+#time-chart .c3-axis-y .domain {
+  visibility: hidden
+}
+#time-chart .c3-axis-y text {
+  /* Labels for time chart y axis */
+  fill: #9e9e9e;
+}
+#time-chart:hover .c3-axis-y text {
+  /* Labels for time chart y axis on hover */
+  fill: #f8f8f8;
+}
+
+
+#time-chart .c3-axis-x line {
+  visibility: hidden
+}
+#time-chart .c3-axis-x .domain {
+  visibility: hidden
+}
+#time-chart .c3-axis-x text {
+  fill: #f8f8f8;
+}
+
+
+#time-chart .c3-ygrid {
+  /*stroke-dasharray: 0;*/
+  stroke-width: 1.5px;
+}
+
+/*#time-chart .c3-legend-item {
+
+}
+#time-chart .c3-legend-item-average {
+  transform: translate(100px,-50px);
+  fill: #f8f8f8;
+}*/
+
+/* bar chart */
+#bar-chart .c3-axis-y .domain {
+  visibility: hidden
+}
+#bar-chart .c3-axis-y .tick {
+  visibility: hidden
+}
+
+#bar-chart .c3-axis-x line {
+  visibility: hidden
+}
+#bar-chart .c3-axis-x .domain {
+  visibility: hidden
+}
+#bar-chart .c3-axis-x text {
+  fill: #f8f8f8;
+}
+
+#bar-chart .c3-text {
+  /* Labels for bar values */
+  fill: #9e9e9e !important;
+}
+#bar-chart:hover .c3-text {
+  /* Labels for bar values on hover */
+  fill: #f8f8f8 !important;
+}
+
+
+.d3-slider {
+  background: #9e9e9e;
+  border-style: none;    
+  border-radius: 0.125em;
+}
+
+.d3-slider-vertical {
+  width: 0.25em;
+}
+
+.d3-slider-handle {
+  border-radius: 1em;
+  background: #f8f8f8;
+  border-style: none;
+}
+
+.d3-slider-handle:hover {
+  /*border: 10px solid #bdbdbd;*/
+  border-style: none;
+}
+
+.d3-slider-vertical .d3-slider-handle {
+  width: 1.1em;
+  height: 1.1em;
+  left: -0.45em; 
+}
+
+.time_point {
+  background: #bdbdbd;
+  position: absolute;
+  width: 0.8em;
+  height: 0.8em;
+  left: -0.27em;
+  border-radius: 1em;
+}
+
+
+  </style>
+
+  <!--Let browser know website is mobile optimized-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+</head>
+
+
+
+<body class="grey darken-1">
+
+<div id="front-header">
+
+  <div id="navbar-wrapper" class="grey darken-3" style="position: absolute; bottom: 50px; width: 100%; top: 0px">
+
+    <div id="navbar-header" class="center-align" style="padding: 20px; color: #f8f8f8;">
+      <h3>Some description</h3>
+    </div>
+
+    <!-- TODO: Change this to nav (currently, materialize alters the style of that) -->
+    <div id="navbar" style="position: absolute; bottom: 0px; height: 50px; width: 100%; text-align: center">
+      <div id="nav-title-1" class="nav-title">Sale Price</div><!--
+      --><div id="nav-title-2" class="nav-title">Number of Sales</div><!--
+      --><div id="nav-title-3" class="nav-title">Foreclosures</div><!--
+      --><div id="nav-title-4" class="nav-title">Sold for Loss</div>
+    </div>
+
+  </div>
+
+  <div id="description-1" class="description" style="background-color: rgba(239, 83, 80, 1);">
+    Median sale price for all homes sold on Zillow in one month
+  </div>
+  <div id="description-2" class="description" style="background-color: rgba(0, 188, 212, 1);">
+    Number of homes sold on Zillow in one month
+  </div>
+  <div id="description-3" class="description" style="background-color: rgba(139, 195, 74, 1);">
+    Number of homes foreclosed in one month
+  </div>
+  <div id="description-4" class="description" style="background-color: rgba(255, 179, 0, 1);">
+    Percentage of homes sold on Zillow in one month for less than acquired
+  </div>
+
+</div>
+
+
+
+<div id="content">
+
+  <div id="content-overlay" style="position: absolute; width: 100%; height: 100%; z-index: 1;"></div>
+
+  <div style="position: absolute; width: 100%; height: 100%;">
+
+    <div style="position: absolute; left: 25px; width: 29%; height: 100%">
+
+      <div id="bar-chart-wrapper" style="position: absolute; top: 0px; height: calc(50% - 35px); left: 30px; width: calc(100% - 30px);">
+        <div id="bar-chart"></div>
+      </div>
+      <div id="time-chart-wrapper" style="position: absolute; bottom: 10px; height: calc(50% - 35px); width: 100%;">
+        <div id="time-chart"></div>
+        <div style="z-index: 1; position: absolute; top: -5px; right: 10px; font-size: 0.75rem; text-align: right;">
+          <p id="neighborhood-text" style="color: #ef5350; margin: 3px; background-color: #757575; padding-left: 9px">Neighborhood</p>
+          <p style="color: #f8f8f8; margin: 3px">Average</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="time-slider-wrapper" style="display: flex; flex-direction: column; visibility: hidden; position: absolute; top: 20px; left: 37.5%; width: 25%; bottom: 20px; text-align: center;">
+
+      <div style="color: #f8f8f8">
+        Jan<br>
+        <span id="year" style="font-size: 2em;">2005</span><br>
+        <i id="time-play-pause" class="mdi-av-play-circle-fill" style="color: #f8f8f8; font-size: 2.7rem; cursor: pointer"></i>
+      </div>
+
+      <div style="flex: 1; margin-top: 20px; position: relative">
+        <div style="position: absolute; height: 100%; left: 0px; width: calc(50% - 15px)">
+          <p class="time-text" style="position: absolute; top: 0%; font-size: 0.75rem; color: #f8f8f8; text-align: right; line-height: 1.3"><span style="font-weight: bold;">Sep 08</span><br>Lehman Brothers files bankruptcy</p>
+          <p class="time-text" style="position: absolute; top: 50%; font-size: 0.75rem; color: #9e9e9e; text-align: right; line-height: 1.3"><span style="font-weight: bold;">Sep 08</span><br>Lehman Brothers files bankruptcy</p>
+        </div>
+        <div id="time-slider" style="cursor: pointer; position: absolute; height: 100%; left: 50%">
+          <div id="slider-progress" class="d3-slider d3-slider-vertical" style="position: absolute; top: 0px; left: 0px; height: 0%; width: 100%; background: #f8f8f8"></div>
+    <!--       <div class="time_point" style="top: 30%"></div>
+          <div class="time_point" style="top: 60%"></div>
+     -->
+        </div>
+        <div style="position: absolute; height: 100%; right: 0px; width: calc(50% - 15px)">
+          <p class="time-text" style="position: absolute; top: 25%; font-size: 0.75rem; color: #9e9e9e; text-align: left; line-height: 1.3"><span style="font-weight: bold;">Sep 08</span><br>Lehman Brothers files bankruptcy</p>
+          <p class="time-text" style="position: absolute; top: 75%; font-size: 0.75rem; color: #9e9e9e; text-align: left; line-height: 1.3"><span style="font-weight: bold;">Sep 08</span><br>Lehman Brothers files bankruptcy</p>
+        </div>
+      </div>
+
+    </div>
+
+
+    <div id="map-wrapper" style="position: absolute; right: 25px; width: 29%; height: 100%">
+      <div id="map" style="width: 100%; height: 100%"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="center-align grey darken-2 grey-text text-lighten-1" style="position: absolute; bottom: 0px; height: 50px; width: 100%; font-size: 0.9em">
+  <p>&copy; Johannes Rieke, Chris Blum, Sindre Magnussen, Petter Astrup, Nemanja Aksic</p>
+</div>
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.96.1/js/materialize.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.12/jquery.mousewheel.min.js"></script>
+
+<script src="js/datamaps.none.min.js"></script>
+<script src="js/d3.slider.js"></script>
+
+<script type="text/javascript">
+  // TODO: Divide this into different files
 // TODO: Make a minified version
 
 
@@ -267,11 +581,11 @@ var barChart = c3.generate({
     colors: {
       values: startColor
     },
-    type: 'bar'
+    type: 'bar',
     // TODO: If labels are shown, there is a slight space between the bars and the neighborhood names
-    // labels: {
-    //   format: d3.format('.3s')
-    // }
+    labels: {
+      format: d3.format('.2f')
+    }
   },
   legend: {show: false},
   bar: {
@@ -288,10 +602,9 @@ var barChart = c3.generate({
       min: 0,
       max: 1
     }
-  }
-  // tooltip: {show: false}
+  },
+  tooltip: {show: false}
 });
-
 
 var timeChart = c3.generate({
   bindto: '#time-chart',
@@ -315,7 +628,7 @@ var timeChart = c3.generate({
     // }
   },
   padding: {
-    left: 10,
+    // left: 20,
     right: 10
   },    
   point: {show: false},
@@ -333,16 +646,17 @@ var timeChart = c3.generate({
       }
     },
     y: {
-      show: false,
+      // show: false,
       min: 0, 
       max: 1,  // TODO: Adapt this to the max value of all data
-      padding: {bottom: 0}, 
+      padding: {bottom: 0, top: 0}, 
       tick: {
-        count: 4
+        count: 4,
+      format: d3.format('.2f')
       }
     }
-  }
-  // tooltip: {show: false}
+  },
+  tooltip: {show: false}
 });
 
 
@@ -375,10 +689,10 @@ var map = new Datamap({
 
     // var size = mapSize();
     var projection = d3.geo.mercator()
-  		.center([-117.1063889, 32.8152778])
-  		.scale(38000)
+      .center([-117.1063889, 32.8152778])
+      .scale(38000)
       .translate([width / 2, height / 2]);
-	
+  
      var path = d3.geo.path().projection(projection);
      return {path: path, projection: projection};
   },
@@ -399,3 +713,12 @@ window.addEventListener('resize', function() {
   map.resize(mapSize());
 });
 
+
+
+
+
+
+</script>
+
+</body>
+</html>

@@ -29,12 +29,13 @@ app.use(session({ secret: 'keyboard cat',
 app.get('/', index.view);
 
 // TODO: Only for testing, the frontpage will probably be integrated into index later
-app.get('/front', function(req, res) {
-	res.render('front');
-});
 app.get('/hslider', function(req, res) {
 	res.render('index_hslider');
 });
+app.get('/labels', function(req, res) {
+	res.render('index_labels');
+});
+
 
 //set environment ports and start application
 app.set('port', process.env.PORT || 3000);
