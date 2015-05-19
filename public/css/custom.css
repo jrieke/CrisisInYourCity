@@ -100,6 +100,14 @@ body {
   stroke-width: 1.5px;
 }
 
+/*#time-chart .c3-legend-item {
+
+}
+#time-chart .c3-legend-item-average {
+  transform: translate(100px,-50px);
+  fill: #f8f8f8;
+}*/
+
 /* bar chart */
 #bar-chart .c3-axis-y .domain {
   visibility: hidden

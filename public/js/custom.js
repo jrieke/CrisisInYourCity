@@ -74,12 +74,6 @@ for (var i = 0; i < areas.length; i++) {
 
 
 function initVisualizations() {
-  barChart.load({
-    json: {
-      neighborhoods: neighborhoodsForBarChart
-    }
-  });
-
   timeChart.data.colors({
     average: '#f8f8f8'
   });
@@ -87,6 +81,7 @@ function initVisualizations() {
     neighborhood: selectedNeighborhood,
     average: 'Average'
   });
+  d3.select('#neighborhood-text').text(selectedNeighborhood);
 
   // TODO: Do this a little bit more elegant than just making it visible at once, eg by a transition with opacity
   d3.select('#time-slider-wrapper')
@@ -134,6 +129,7 @@ function neighborhood(name) {
         neighborhood: data[name]
       }
     });
+    d3.select('#neighborhood-text').text(name);
 
     // TODO: Update bar chart
 
@@ -160,6 +156,7 @@ function dataset(index) {
   });
   barChart.load({
     json: {
+      neighborhoods: neighborhoodsForBarChart,  // has to be loaded at the same time as values, otherwise the text fields stay empty
       values: neighborhoodsForBarChart.map(function(neighborhood) { return data[neighborhood][selectedTimeIndex]; })
     }
   });
@@ -173,6 +170,7 @@ function dataset(index) {
       neighborhood: data[selectedNeighborhood]
     }
   });
+  d3.select('#neighborhood-text').style('color', datasetColors[index].charts);
 
   d3.select('#content-overlay').style('visibility', 'hidden');
   
@@ -293,8 +291,11 @@ var barChart = c3.generate({
   }
   // tooltip: {show: false}
 });
-
-
+console.log(d3.select('#time-chart'));
+d3.select('#time-chart').select('svg').select('g').append('g').append("circle")
+  .attr("cx", 30)
+  .attr("cy", 30)
+  .attr("r", 20);
 
 var timeChart = c3.generate({
   bindto: '#time-chart',
