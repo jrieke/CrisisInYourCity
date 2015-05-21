@@ -46,11 +46,11 @@ app.get('/labels', function(req, res) {
 
 
 //delphi routes
-app.get("/soldforgainnorm", function (req, res) {
-	delphi.getSoldForGainNorm("San Diego", function(rows){
+app.get("/soldforgain", function (req, res) {
+	delphi.getSoldForGainNorm({county: "San Diego", startYear: 2000, endYear: 2015}, function(rows){
 		var jsonData = {};
 		var currentRegion = rows[0]['RegionName'];
-		var values = {};
+		var values = [];
 
 		var i = 0;
 		for(i = 0; i < rows.length; i++){
@@ -58,10 +58,72 @@ app.get("/soldforgainnorm", function (req, res) {
 			if(row['RegionName'] != currentRegion){
 				jsonData[currentRegion] = values;
 				currentRegion = row['RegionName'];
-				values = {};
+				values = [];
 			}
-			values[row['Year']+"-"+row['Month']] = row['Value'];
+			values.push(row['Value']);
+		}
 
+		return res.json(jsonData);
+	});
+});
+
+app.get("/mediansaleprice",function(req, res){
+	delphi.getMedianListPrice({county: "San Diego", startYear: 2000, endYear: 2015}, function(rows){
+		var jsonData = {};
+		var currentRegion = rows[0]['RegionName'];
+		var values = [];
+
+		var i = 0;
+		for(i = 0; i < rows.length; i++){
+			var row = rows[i];
+			if(row['RegionName'] != currentRegion){
+				jsonData[currentRegion] = values;
+				currentRegion = row['RegionName'];
+				values = [];
+			}
+			values.push(row['Value']);
+		}
+
+		return res.json(jsonData);
+	});
+});
+
+app.get("/soldasforeclosures", function(req, res){
+	delphi.getSoldAsForeclosures({county: "San Diego", startYear: 2000, endYear: 2015}, function(rows){
+		var jsonData = {};
+		var currentRegion = rows[0]['RegionName'];
+		var values = [];
+
+		var i = 0;
+		for(i = 0; i < rows.length; i++){
+			var row = rows[i];
+			if(row['RegionName'] != currentRegion){
+				jsonData[currentRegion] = values;
+				currentRegion = row['RegionName'];
+				values = [];
+			}
+			values.push(row['Value']);
+		}
+
+		return res.json(jsonData);
+	});
+});
+
+app.get("/soldforloss", function(req, res){
+	delphi.getSoldForLoss({county: "San Diego", startYear: 2000, endYear: 2015}, function(rows){
+		var jsonData = {};
+		var currentRegion = rows[0]['RegionName'];
+		var values = [];
+
+		var i = 0;
+		for(i = 0; i < rows.length; i++){
+			var row = rows[i];
+			if(row['RegionName'] != currentRegion){
+				jsonData[currentRegion] = values;
+				currentRegion = row['RegionName'];
+				values = [];
+			}
+			values.push(row['Value']);
 		}
 
 		return res.json(jsonData);

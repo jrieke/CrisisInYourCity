@@ -11,13 +11,36 @@ var postgre = require('pg');
 module.exports = function(connString){
     var module = {};
 
-    module.getSoldForGainNorm = function(city, callback){
+    module.getSoldForGainNorm = function(params, callback){
+        executeYearBoundedCountyQuery({tablename: "zillow_zip_pct_of_homes_selling_for_gain_all_homes_norm"}, params, callback);
+    };
+
+    module.getMedianListPrice = function(params, callback){
+        executeYearBoundedCountyQuery({tablename: "zillow_zip_median_sold_price_all_homes_norm"}, params, callback);
+    };
+
+    module.getSoldAsForeclosures = function(params, callback){
+        executeYearBoundedCountyQuery({tablename: "zillow_zip_homes_sold_as_foreclosures_ratio_all_homes_norm"}, params, callback);
+    };
+
+    module.getNumberOfSales = function(params, callback){
+        executeYearBoundedCountyQuery({tablename: ""}, params, callback);
+    };
+
+    module.getSoldForLoss = function(params, callback){
+        executeYearBoundedCountyQuery({tablename: "zillow_zip_pct_of_homes_selling_for_loss_all_homes_norm"}, params, callback);
+    };
+
+    function executeYearBoundedCountyQuery(config, params, callback){
         postgre.connect(connString, function(err, client, done){
             if(err){
-                console.log("Error fetching client from pool.");
+                console.log("Error fetching client from pool");
             }
-            client.query("SELECT \"RegionName\", \"Year\", \"Month\", \"Value\" FROM zillow_zip_pct_of_homes_selling_for_gain_all_homes_norm WHERE "
-             + "\"State\"='CA' AND \"City\"=\'"+ city +"\' ORDER BY \"RegionName\", \"Year\", \"Month\"",
+            client.query("SELECT \"RegionName\", \"Year\", \"Month\", \"Value\" FROM "
+                + config.tablename +" WHERE "
+                + "\"State\"='CA' AND \"CountyName\"=$1 AND \"Year\">=$2 AND"
+                + " \"Year\"<= $3 ORDER BY \"RegionName\", \"Year\", \"Month\"",
+                [params.county, params.startYear, params.endYear],
                 function(err, result){
                     done();
 
@@ -26,38 +49,10 @@ module.exports = function(connString){
                     }
 
                     callback(result.rows);
-            });
+                });
         });
-    };
+    }
 
-    module.connect = function(setup){
-        var pg_client = new postgre.Client({
-            user: setup.username,
-            password: setup.passw,
-            database: setup.db_name,
-            host: setup.host_url,
-            port: setup.port
-        });
-        pg_client.connect(function(err){
-            if(err){
-                console.log(err);
-                return err;
-            }
-        });
-        return pg_client;
-    };
-
-    module.testquery = function(pg_client){
-        var query = pg_client.query("select distinct \"State\" from zillow_zip_pct_of_homes_selling_for_gain_all_homes_norm",
-            function(err, result){
-                if(err) console.log(err);
-                console.log(result.rows);
-            });
-    };
-
-    module.close = function(pg_client){
-        pg_client.close();
-    };
 
     return module;
 
