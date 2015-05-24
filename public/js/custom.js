@@ -214,6 +214,7 @@ d3.select('#time-slider').call(
     .orientation("vertical")
     .min(0)
     .max(maxSliderValue)
+    .axis(true)
     .value(maxSliderValue)
     .on('slide', function(evt, value) {
       updateSliderElements(value, false);

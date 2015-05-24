@@ -53,8 +53,11 @@ body {
   position: relative;
   top: 380px;
   height: calc(100% - 160px);
-  margin: 0 auto;
-  width: 900px;
+/*  margin: 0 auto;
+  width: 900px;*/
+  margin-left:5%;
+  margin-right:5%;
+  width:90%;
 }
 
 @media (max-width: 900px) {
