@@ -60,13 +60,6 @@ body {
   width:90%;
 }
 
-@media (max-width: 900px) {
-  #content {
-    width: 100%;
-  }
-}
-
-
 
 /* time chart */
 #time-chart .c3-line {
