@@ -41,6 +41,13 @@ function slideUp() {
   }
 }
 
+$("#content").click(function(d,i) {
+  slideUp();
+  if (selectedDataset == -1) { initVisualizations(); }
+  d3.select('.nav-title').classed('active',true);
+  dataset(0);
+});
+
 d3.selectAll('.nav-title')
   .on('mouseover', function(d, i) {
     d3.select(d3.selectAll('.description')[0][i]).style('visibility', 'visible');
