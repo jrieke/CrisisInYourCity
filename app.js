@@ -13,6 +13,7 @@ dotenv.load();
 
 var index = require('./routes/index');
 var delphi = require('./util/delphi')(process.env.DELPHI_CONN_STRING);
+var helpers = require('./util/helpers');
 
 
 //database setup
@@ -47,86 +48,34 @@ app.get('/labels', function(req, res) {
 
 //delphi routes
 app.get("/soldforgain", function (req, res) {
-	delphi.getSoldForGainNorm({county: "San Diego", startYear: 2000, endYear: 2015}, function(rows){
-		var jsonData = {};
-		var currentRegion = rows[0]['RegionName'];
-		var values = [];
-
-		var i = 0;
-		for(i = 0; i < rows.length; i++){
-			var row = rows[i];
-			if(row['RegionName'] != currentRegion){
-				jsonData[currentRegion] = values;
-				currentRegion = row['RegionName'];
-				values = [];
-			}
-			values.push(row['Value']);
-		}
-
-		return res.json(jsonData);
+	delphi.executeYearBoundedCountyQuery({tablename: delphi.TABLE_SOLD_FOR_GAIN},
+		{county: "San Diego", startYear: 2000, endYear: 2015},
+		function(rows){
+			return res.json(helpers.parseRowsByColumn(rows, 'RegionName', 'Value'));
 	});
 });
 
 app.get("/mediansaleprice",function(req, res){
-	delphi.getMedianListPrice({county: "San Diego", startYear: 2000, endYear: 2015}, function(rows){
-		var jsonData = {};
-		var currentRegion = rows[0]['RegionName'];
-		var values = [];
-
-		var i = 0;
-		for(i = 0; i < rows.length; i++){
-			var row = rows[i];
-			if(row['RegionName'] != currentRegion){
-				jsonData[currentRegion] = values;
-				currentRegion = row['RegionName'];
-				values = [];
-			}
-			values.push(row['Value']);
-		}
-
-		return res.json(jsonData);
+	delphi.executeYearBoundedCountyQuery({tablename: delphi.TABLE_MEDIAN_SALE_PRICE},
+		{county: "San Diego", startYear: 2000, endYear: 2015},
+		function(rows){
+			return res.json(helpers.parseRowsByColumn(rows, 'RegionName', 'Value'));
 	});
 });
 
 app.get("/soldasforeclosures", function(req, res){
-	delphi.getSoldAsForeclosures({county: "San Diego", startYear: 2000, endYear: 2015}, function(rows){
-		var jsonData = {};
-		var currentRegion = rows[0]['RegionName'];
-		var values = [];
-
-		var i = 0;
-		for(i = 0; i < rows.length; i++){
-			var row = rows[i];
-			if(row['RegionName'] != currentRegion){
-				jsonData[currentRegion] = values;
-				currentRegion = row['RegionName'];
-				values = [];
-			}
-			values.push(row['Value']);
-		}
-
-		return res.json(jsonData);
+	delphi.executeYearBoundedCountyQuery({tablename: delphi.TABLE_FORECLOSURES},
+		{county: "San Diego", startYear: 2000, endYear: 2015},
+		function(rows){
+			return res.json(helpers.parseRowsByColumn(rows, 'RegionName', 'Value'));
 	});
 });
 
 app.get("/soldforloss", function(req, res){
-	delphi.getSoldForLoss({county: "San Diego", startYear: 2000, endYear: 2015}, function(rows){
-		var jsonData = {};
-		var currentRegion = rows[0]['RegionName'];
-		var values = [];
-
-		var i = 0;
-		for(i = 0; i < rows.length; i++){
-			var row = rows[i];
-			if(row['RegionName'] != currentRegion){
-				jsonData[currentRegion] = values;
-				currentRegion = row['RegionName'];
-				values = [];
-			}
-			values.push(row['Value']);
-		}
-
-		return res.json(jsonData);
+	delphi.executeYearBoundedCountyQuery({tablename: delphi.TABLE_SOLD_FOR_LOSS},
+		{county: "San Diego", startYear: 2000, endYear: 2015},
+		function(rows){
+			return res.json(helpers.parseRowsByColumn(rows, 'RegionName', 'Value'));
 	});
 });
 
