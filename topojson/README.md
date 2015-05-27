@@ -8,7 +8,7 @@
 
 4) In the unzipped folder, run:
 
-	topojson -e city-names.csv -e zillow-properties.csv -p name=Name -p metro=Metro --id-property=ZCTA5CE10 -o complete-us.json tl_2010_06_zcta510.shp
+	topojson -e city-names.csv -e zillow-properties.csv -p name=Name -p metro=Metro --id-property=ZCTA5CE10 -o California.json tl_2010_06_zcta510.shp
 
 This will convert the entire shape file you downloaded to topojson. Additionally, it will add properties from the two CSV files you copied above: The first file (*city-names.csv*) contains names for the ZIP code areas, although these are rather rough, for example most areas in San Diego are simply called "San Diego"). The second one (*zillow-properties.csv*) contains the City/Metro/etc-properties for each ZIP code that Zillow uses. 
 
@@ -16,7 +16,7 @@ The `-e` commands will merge the properties from the CSV files you copied above 
 
 4) Use getmetro.py to extract the metro area you want, for example for San Diego:
 
-	python getmetro.py complete-us.json "San Diego"
+	python getmetro.py California.json "San Diego"
 
 This will create the file *SanDiego.json*. However, this file is pretty big as it still contains most of the raw data of the original file.
 
