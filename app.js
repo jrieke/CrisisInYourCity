@@ -79,6 +79,12 @@ app.get("/soldforloss", function(req, res){
 	});
 });
 
+//Return topojson based on parameter. For example /topojson?city=3 will return the file for Los Angeles
+app.get("/topojson", function(req, res){
+	var city = req.query.city.valueOf().toLowerCase().trim().replace(/\s/g,'');
+	return res.json(helpers.getTopoJson(city));
+});
+
 
 //set environment ports and start application
 app.set('port', process.env.PORT || 3000);
