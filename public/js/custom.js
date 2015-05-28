@@ -41,14 +41,40 @@ function slideUp() {
   }
 }
 
-$("#content").click(function(d,i) {
-  slideUp();
-  if (selectedDataset == -1) { initVisualizations(); }
-  d3.select('.nav-title').classed('active',true);
-  dataset(0);
-});
+var slidecounter = false;
+
+function intro() {
+
+
+if (!slidecounter) {
+
+
 
 d3.selectAll('.nav-title')
+  .on('mouseover', function(d, i) {
+    d3.select(d3.selectAll('.description')[0][i]).style('visibility', 'visible');
+    // d3.selectAll('.nav-title').classed('active', false);
+  })
+  .on('mouseout', function() {
+    d3.selectAll('.description').style('visibility', 'hidden');
+    // d3.select(d3.selectAll('.nav-title')[0][selectedTitle]).classed('active', 'true');
+  })
+  .on('click', function(d, i) {
+    slideUp();
+    slidecounter = true;
+    if (selectedDataset == -1) { initVisualizations(); }  // TODO: See if this causes any problems because the stuff from the dataset needs longer to load
+    dataset(i);
+    d3.selectAll('.nav-title').classed('active', false);
+    d3.select(this).classed('active', true);
+    // selectedTitle = i;
+  });
+
+
+}
+
+else {
+
+  d3.selectAll('.nav-title')
   .on('mouseover', function(d, i) {
     d3.select(d3.selectAll('.description')[0][i]).style('visibility', 'visible');
     // d3.selectAll('.nav-title').classed('active', false);
@@ -65,6 +91,12 @@ d3.selectAll('.nav-title')
     d3.select(this).classed('active', true);
     // selectedTitle = i;
   });
+
+}
+
+}
+
+intro();
 
 
 
@@ -406,4 +438,23 @@ window.addEventListener('resize', function() {
   // map.resize();
   map.resize(mapSize());
 });
+
+
+$("#content").click(function(d,i) {
+
+  if(!slidecounter) {
+
+
+  slideUp();
+  if (selectedDataset == -1) { initVisualizations(); }
+  d3.select('.nav-title').classed('active',true);
+  dataset(0);
+
+  slidecounter = true;
+
+}
+});
+
+
+
 
