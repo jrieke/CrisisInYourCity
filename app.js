@@ -79,6 +79,14 @@ app.get("/soldforloss", function(req, res){
 	});
 });
 
+app.get("/decreasinginvalues", function(req, res){
+	delphi.executeYearBoundedCountyQuery({tablename: delphi.TABLE_DECREASING_VALUES},
+		{county: "San Diego", startYear: 2000, endYear: 2015},
+		function(rows){
+			return res.json(helpers.parseRowsByColumn(rows, 'RegionName', 'Value'));
+	});
+});
+
 //Return topojson based on parameter. For example /topojson?city=3 will return the file for Los Angeles
 app.get("/topojson", function(req, res){
 	var city = req.query.city.valueOf().toLowerCase().trim().replace(/\s/g,'');

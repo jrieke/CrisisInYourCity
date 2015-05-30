@@ -15,6 +15,7 @@ module.exports = function(connString){
     module.TABLE_MEDIAN_SALE_PRICE = "zillow_zip_median_sold_price_all_homes_norm";
     module.TABLE_FORECLOSURES = "zillow_zip_homes_sold_as_foreclosures_ratio_all_homes_norm";
     module.TABLE_SOLD_FOR_LOSS = "zillow_zip_pct_of_homes_selling_for_loss_all_homes_norm";
+    module.TABLE_DECREASING_VALUES = "zillow_zip_pct_of_homes_decreasing_in_values_all_homes_norm";
 
     module.executeYearBoundedCountyQuery = function (config, params, callback){
         postgre.connect(connString, function(err, client, done){

@@ -2,9 +2,9 @@
  * Created by Petter on 20.05.2015.
  */
 
-var toposandiego = require('../public/data/SanDiego.json');
-var toposanfransisco = require('../public/data/SanFrancisco.json');
-var topolosangeles = require('../public/data/LosAngeles.json');
+// var toposandiego = require('../public/data/SanDiego.json');
+// var toposanfransisco = require('../public/data/SanFrancisco.json');
+// var topolosangeles = require('../public/data/LosAngeles.json');
 
 exports.parseRowsByColumn =  function(rows, column, value_column){
     var jsonData = {};
