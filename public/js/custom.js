@@ -30,8 +30,9 @@ var datasetColors = {mediansaleprice: {map: '#f44336', charts: '#ef5350'}, soldf
 var minDataValue = 0;
 var datasetNames = ['mediansaleprice', 'soldforloss', 'decreasinginvalues', 'soldasforeclosures'];
 var maxDataValues = {mediansaleprice: 1000000, soldforloss: 80, decreasinginvalues: 100, soldasforeclosures: 40};
+var axisLabels = {mediansaleprice: 'Median sale price / $', soldforloss: 'Homes sold for loss / %', decreasinginvalues: 'Homes decreasing in value / %', soldasforeclosures: 'Homes foreclosed / %'};
 
-function slideUp() {
+function down() {
   if (!slidedUp) {
     d3.select('#front-header')
       .transition()
@@ -43,9 +44,44 @@ function slideUp() {
       .duration(1000)
       .style('top', '80px');
 
+    d3.select('#up-arrow')
+      .transition()
+      .duration(1000)
+      .style('opacity', 1);
+
+    d3.selectAll('.description')
+      .transition()
+      .delay(1000)
+      .style('visibility', 'hidden');
+
+
     slidedUp = true;
   }
 }
+
+function up() {
+  if (slidedUp) {
+    d3.select('#front-header')
+      .transition()
+      .duration(1000)
+      .style('top', '0px');
+
+    d3.select('#content')
+      .transition()
+      .duration(1000)
+      .style('top', '380px');
+
+    d3.select('#up-arrow')
+      .transition()
+      .duration(1000)
+      .style('opacity', 0);
+
+    // TODO: uninit visualizations when going up
+
+    slidedUp = false;
+  }
+}
+d3.select('#up-arrow').on('click', up);
 
 var slidecounter = false;
 
@@ -66,7 +102,7 @@ d3.selectAll('.nav-title')
     // d3.select(d3.selectAll('.nav-title')[0][selectedTitle]).classed('active', 'true');
   })
   .on('click', function(d, i) {
-    slideUp();
+    down();
     slidecounter = true;
     if (!selectedDataset) { initVisualizations(); }  // TODO: See if this causes any problems because the stuff from the dataset needs longer to load
     dataset(datasetNames[i]);  // TODO: Fix this to work with all datasets
@@ -90,7 +126,7 @@ else {
     // d3.select(d3.selectAll('.nav-title')[0][selectedTitle]).classed('active', 'true');
   })
   .on('click', function(d, i) {
-    slideUp();
+    down();
     if (!selectedDataset) { initVisualizations(); }  // TODO: See if this causes any problems because the stuff from the dataset needs longer to load
     dataset(datasetNames[i]);
     d3.selectAll('.nav-title').classed('active', false);
@@ -120,6 +156,8 @@ var data = {
 var average = [];  // TODO: Get real numbers
 
 
+var numLoaded = 0;
+
 function fetchDataset(name) {
   d3.json('/' + name, function(error, json) {
     if (error) return console.log(error);
@@ -130,6 +168,10 @@ function fetchDataset(name) {
     json.average = json['92101'];  // TODO: The city average should already be in the json file
     data[name] = json;
 
+    numLoaded++;
+    if (numLoaded == datasetNames.length) {
+      d3.select('#loading').text('Done!');
+    }
 
   
   // var firstRun = true;  
@@ -168,14 +210,30 @@ function initVisualizations() {
   });
   timeChart.data.names({
     neighborhood: selectedArea,
-    average: city
+    average: "Metro Average"
   });
+  d3.select('#time-chart-legend').style('visibility', 'visible');
   d3.select('#neighborhood-text').text(selectedArea);
-  d3.select('#city-text').text(city);
+  // d3.select('#city-text').text(Metro Average);
+  d3.select('#time-chart').select('.c3-chart')
+    .on('mouseover', function() {
+      d3.select('#time-chart').selectAll('.c3-line').style('stroke-opacity', '0.5');
+    })
+    .on('mouseout', function() {
+      d3.select('#time-chart').selectAll('.c3-line').style('stroke-opacity', '0.9');
+    });
+
+  d3.select('#bar-chart').selectAll('.c3-text').style('visibility', 'visible'); 
+  // d3.select('#bar-chart').selectAll('.c3-bar')
+  //   .on('mouseover', function() {
+
+  //   })
+  //   .on('mouseout', function() {
+      
+  //   });
 
   // TODO: Do this a little bit more elegant than just making it visible at once, eg by a transition with opacity
-  d3.select('#time-slider-wrapper')
-    .style('visibility', 'visible');
+  d3.select('#time-slider-wrapper').style('visibility', 'visible');
 
   $(document).on('mousewheel', function(evt) {
     var newValue = Math.max(0, Math.min(maxSliderValue, slider.value() - scrollSpeed * event.deltaY));
@@ -186,16 +244,26 @@ function initVisualizations() {
   });
 }
 
+
+
 function time(index) {
   // console.log(index);
   if (index != selectedTimeIndex) {    
     barChart.load({
       json: {
-        values: areasForBarChart.map(function(area) { return data[selectedDataset][area][index]; })
+        values: areasForBarChart.map(function(area) { return data[selectedDataset][area][selectedTimeIndex] === null ? 0 : data[selectedDataset][area][selectedTimeIndex]; })
       }
     });
 
+    d3.select('#time-chart').selectAll('.c3-circle').style('visibility', 'hidden');
+    d3.select('#time-chart').selectAll('.c3-circle-' + index).style('visibility', 'visible');
+
+    d3.select('#time-chart').selectAll('.c3-text').style('visibility', 'hidden');
+    d3.select('#time-chart').selectAll('.c3-text-' + index).style('visibility', 'visible');
+
     // TODO: Maybe integrate this with the same snippet in dataset()
+    map.updateChoropleth(blankMapColors);
+
     var mapColors = {};
     for (var area in data[selectedDataset]) {
       mapColors['zip' + area] = (data[selectedDataset][area][index] === null ? startColor : colorScale(data[selectedDataset][area][index]));
@@ -238,6 +306,8 @@ function dataset(name) {
 
   colorScale.domain([minDataValue, maxDataValues[name]]);
   colorScale.range(['#f8f8f8', datasetColors[name].map]);
+
+  map.updateChoropleth(blankMapColors);
   var mapColors = {};
   for (var area in data[name]) {
     mapColors['zip' + area] = (data[name][area][selectedTimeIndex] === null ? startColor : colorScale(data[name][area][selectedTimeIndex]));
@@ -253,10 +323,11 @@ function dataset(name) {
     values: datasetColors[name].charts
   });
   barChart.axis.max(maxDataValues[name]);
+  barChart.axis.labels({y: axisLabels[name]});
   barChart.load({
     json: {
       neighborhoods: areasForBarChart,  // has to be loaded at the same time as values, otherwise the text fields stay empty
-      values: areasForBarChart.map(function(area) { return data[name][area][selectedTimeIndex]; })
+      values: areasForBarChart.map(function(area) { return data[name][area][selectedTimeIndex] === null ? 0 : data[name][area][selectedTimeIndex]; })
     }
   });
 
@@ -264,6 +335,7 @@ function dataset(name) {
     neighborhood: datasetColors[name].charts
   });
   timeChart.axis.max(maxDataValues[name]);
+  timeChart.axis.labels({y: axisLabels[name]});
   timeChart.load({
     json: {
       years: data.months, // TODO: Remove this, only for testing
@@ -279,6 +351,9 @@ function dataset(name) {
   
 }
 
+
+// var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 
 // TODO: Integrate this with time()
@@ -305,9 +380,10 @@ function updateSliderElements(sliderValue, animate) {
       element.style('color', (pos >= top && pos <= bottom) ? '#f8f8f8' : '#9e9e9e');
     });
 
-  // console.log(sliderValue);
-  d3.select('#year')
-    .text(Math.round(2000 + (maxSliderValue-sliderValue) / 12));  // TODO: Change this once we have actual months for the slider values
+  d3.select('#month').text(monthNames[Math.floor(maxSliderValue-sliderValue) % 12]);
+  d3.select('#year').text(Math.floor(2000 + (maxSliderValue-sliderValue) / 12));  // TODO: Change this once we have actual months for the slider values
+
+  // d3.selectAll('.d3-slider-axis-right').selectAll('line').style('stroke', function() { d3.select(this).top}'#f8f8f8');
   
 }
 
@@ -320,7 +396,7 @@ d3.select('#time-slider').call(
     .orientation("vertical")
     .min(0)
     .max(maxSliderValue)
-    .axis(true)
+    .axis(d3.svg.axis().orient("right").tickSize(9.5).tickValues([24,48,72,96,120,144]))//[12,24,36,48,60,72,84,96,108,120,132,144,156,168]))
     .value(maxSliderValue)
     .on('slide', function(evt, value) {
       updateSliderElements(value, false);
@@ -344,9 +420,11 @@ d3.select('#time-play-pause')
 
         if (newValue === 0) {
           playing = false;
-          d3.select('#time-play-pause')
-            .classed('mdi-av-play-circle-fill', !playing)
-            .classed('mdi-av-pause-circle-fill', playing);
+          // TODO: Ch
+          d3.select('#time-play-pause')        
+            .classed('mdi-av-play-circle-fill', false)
+            .classed('mdi-av-pause-circle-fill', false)
+            .classed('mdi-av-replay', true);  // TODO: Make the replay icon with a circle around the arrow (just like the play/pause icons)
         }
         // console.log(this);
         window.setTimeout(playTime, 100);
@@ -354,6 +432,12 @@ d3.select('#time-play-pause')
     }
 
     if (playing) {
+      if (slider.value() === 0) {
+        slider.value(maxSliderValue);
+        updateSliderElements(maxSliderValue, true);
+        time(0);
+        d3.select('#time-play-pause').classed('mdi-av-replay', false);
+      }
       playTime();
     }
 
@@ -374,11 +458,11 @@ var barChart = c3.generate({
     colors: {
       values: startColor
     },
-    type: 'bar'
+    type: 'bar',
     // TODO: If labels are shown, there is a slight space between the bars and the neighborhood names
-    // labels: {
-    //   format: d3.format('.3s')
-    // }
+    labels: {
+      format: function (v, id, i, j) { return v ? d3.format('.2s')(v) : ''; }
+    }
   },
   legend: {show: false},
   bar: {
@@ -391,12 +475,20 @@ var barChart = c3.generate({
       type: 'category'  // needed to show string labels
     },
     y: {
-      show: false,
+      // show: false,
       min: minDataValue,
-      max: 1
+      max: 1,
+      tick: {
+        format: function(d) {return '';}
+      },
+      label: {
+        text: '',
+        position: 'outer-middle'
+      }
     }
-  }
-  // tooltip: {show: false}
+  },
+  transition: {duration: 150},
+  tooltip: {show: false}
 });
 
 
@@ -413,19 +505,19 @@ var timeChart = c3.generate({
     colors: {
       average: startColor,
       neighborhood: startColor
-    }
-    // labels: {
-    //   format: function (v, id, i, j) { 
-    //     if (i == 4)
-    //       return id; 
-    //   }
+    },
+    // regions: {
+    //   average: [{end: '2005-10-15', style: 'dashed'}]
     // }
+    labels: {
+      format: function (v, id, i, j) { return v === null ? '' : d3.format('.2s')(v); }
+    }
   },
   padding: {
-    left: 10,
+    // left: 10,
     right: 10
   },    
-  point: {show: false},
+  // point: {show: false},
   legend: {show: false},
   grid: {y: {
     show: true
@@ -436,20 +528,26 @@ var timeChart = c3.generate({
       type: 'timeseries',
       tick: {
         format: '%Y',
-        values: ['1998-07-02', '2002-07-02', '2006-07-02', '2010-07-02', '2014-07-02']  // 07-02 is the middle day of the year
+        values: ['2001-07-02', '2005-07-02', '2009-07-02', '2013-07-02']  // 07-02 is the middle day of the year
       }
     },
     y: {
-      show: false,
+      // show: false,
       min: minDataValue, 
-      max: 1,  // TODO: Adapt this to the max value of all data
-      padding: {bottom: 0}, 
+      max: 1,
+      // padding: {bottom: 0}, 
       tick: {
-        count: 4
+        count: 4,
+        format: function(d) {return '';}
+      },
+      label: {
+        text: '',
+        position: 'outer-middle'
       }
     }
-  }
-  // tooltip: {show: false}
+  },
+  // transition: {duration: 150},
+  tooltip: {show: false}
 });
 
 
@@ -458,14 +556,14 @@ var colorScale = d3.scale.linear();
 
 // TODO: Add a legend for the colors
 
-
+var blankMapColors = {};
 var map = new Datamap({
   element: document.getElementById('map'),
   responsive: true,
   geographyConfig: {
     dataUrl: 'data/SanDiego.json',
     borderColor: '#757575', 
-    borderWidth: 0.7,  // 0
+    borderWidth: 0,  // 0.7
     highlightFillColor: 'foo',  // just some random string to keep fill color the same
     highlightBorderColor: 'black',
     highlightBorderWidth: 2,
@@ -473,7 +571,7 @@ var map = new Datamap({
       // TODO: Change this to ZIP codes
       // console.log(geography.id.replace('zip', ''));  // TODO: Remove zip here
       neighborhood(geography.id.replace('zip', ''));
-      return '<div class="hoverinfo"><strong>' + geography.id + '</strong></div>';
+      return '<div class="hoverinfo" style="text-align: center">' + geography.id.replace('zip', '') + (geography.properties.name ? ('<br><span style="font-size: 0.85em">' + geography.properties.name  + '</span>') : '') + '</div>';
     }
   },
   scope: 'tl_2010_06_zcta510',
@@ -484,24 +582,56 @@ var map = new Datamap({
     var width = options.width || element.offsetWidth;
     var height = options.height || element.offsetHeight;
 
+    // console.log(element);
+    // console.log(options);
+
+    // // Create a unit projection.
+    // var projection = d3.geo.mercator()
+    //   .scale(1)
+    //   .translate([0, 0]);
+
+    // // Create a path generator.
+    // var path = d3.geo.path()
+    //   .projection(projection);
+
+    // var areas = topojson.feature(us, us.objects.states)
+
+    // // Compute the bounds of a feature of interest, then derive scale & translate.
+    // var b = path.bounds(element),
+    //     s = 0.95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height),
+    //     t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
+
+    // // Update the projection to use computed scale & translate.
+    // projection
+    //     .scale(s)
+    //     .translate(t);
+
     // var size = mapSize();
     var projection = d3.geo.mercator()
   		.center([-117.0, 33.0])
   		.scale(20000)
       .translate([width / 2, height / 2]);
 	
-     var path = d3.geo.path().projection(projection);
-     return {path: path, projection: projection};
+     return {path: d3.geo.path().projection(projection), projection: projection};
   },
   done: function(datamap) {
     // TODO: Maybe call updateChoropleth for the first time here
 
-    datamap.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
-    //   neighborhood(geography.properties.NAME);
+    
+    blankMapColors = {};
+    var geometries = datamap.customTopo.objects.tl_2010_06_zcta510.geometries;
+    for (var i = 0; i < geometries.length; i++) {
+      blankMapColors[geometries[i].id] = startColor;
+    }
 
+    // datamap.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
+
+    datamap.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
+      // neighborhood(geography.id.replace('zip', ''));
     });
   }
 });
+map.legend();
 
 window.addEventListener('resize', function() {
   barChart.resize(barChartSize());
@@ -516,7 +646,7 @@ $("#content").click(function(d,i) {
   if(!slidecounter) {
 
 
-  slideUp();
+  down();
   if (!selectedDataset) { initVisualizations(); }
   d3.select('.nav-title').classed('active',true);
   dataset('mediansaleprice');
