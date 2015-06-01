@@ -181,6 +181,10 @@ body {
     top: 0;
 }
 
+.datamaps-subunit {
+  cursor: pointer;
+}
+
 
 .d3-slider {
   background: #9e9e9e;

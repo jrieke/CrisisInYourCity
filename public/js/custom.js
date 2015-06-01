@@ -21,7 +21,8 @@ var scrollSpeed = 0.03;
 var playing = false;
 var startColor = '#9e9e9e';
 var city = 'San Diego';
-var selectedArea = '92037';  // TODO: At the beginning, no neighborhood should be selected
+var selectedArea = ''; 
+var clickedArea = '';
 var areasForBarChart = ['92037', '91901', '91902', '91910', '91911', '91913'];
 var selectedTimeIndex = 0;
 var selectedDataset = '';
@@ -209,15 +210,11 @@ function initVisualizations() {
   timeChart.data.colors({
     average: '#f8f8f8'
   });
-  timeChart.data.names({
-    neighborhood: selectedArea,
-    average: "Metro Average"
-  });
   d3.select('#time-chart-legend').style('visibility', 'visible');
-  d3.select('#neighborhood-text').text(selectedArea);
+  // d3.select('#neighborhood-text').text(selectedArea);
   // d3.select('#city-text').text(Metro Average);
-  d3.select('#time-chart').selectAll('.c3-circle-0').style('fill-opacity', 1);
-  d3.select('#time-chart').selectAll('.c3-text-0').style('visibility', 'visible');
+  // d3.select('#time-chart').selectAll('.c3-circle-0').style('fill-opacity', 1);
+  // d3.select('#time-chart').selectAll('.c3-text-0').style('visibility', 'visible');
   d3.select('#time-chart').select('.c3-chart')
     .on('mouseover', function() {
       d3.select('#time-chart').selectAll('.c3-line').style('stroke-opacity', 0.5);      
@@ -272,7 +269,7 @@ function time(index) {
     // d3.select('#time-chart').select('.c3-circles-average').selectAll('.c3-circle').style('opacity', function(d, i) { return (i < index+1) ? 1 : 0.2; });
     // d3.select('#time-chart').select('.c3-circles-neighborhood').selectAll('.c3-circle').style('opacity', function(d, i) { return (i < index+1) ? 1 : 0.2; });
 
-    d3.select('#time-chart').selectAll('.c3-texts-average,.c3-texts-neighborhood').selectAll('.c3-text').style('visibility', function(d, i) {  return (d3.select('#time-chart').select('.c3-circle-' + i).classed('_expanded_') || i == selectedTimeIndex) ? 'visible' : 'hidden';  });
+    d3.select('#time-chart').selectAll('.c3-texts-average,.c3-texts-neighborhood').selectAll('.c3-text').style('visibility', function(d, i) {  return (d3.select('#time-chart').select('.c3-circle-' + i).classed('_expanded_') || i == index) ? 'visible' : 'hidden';  });
     // d3.select('#time-chart').selectAll('.c3-text-' + index).style('visibility', 'visible');
 
     // TODO: Maybe integrate this with the same snippet in dataset()
@@ -290,17 +287,27 @@ function time(index) {
 } 
 
 function neighborhood(name) {
-  // console.log(name);
-  if (name != selectedArea) {
+  console.log(name);
+  if (name != selectedArea) {    
     timeChart.data.names({
       neighborhood: name
     });
-    timeChart.load({
-      json: {
-        neighborhood: data[selectedDataset][name]
-      }
-    });
-    d3.select('#neighborhood-text').text(name);
+    if (name) {
+      // console.log(name);
+      timeChart.load({
+        json: {
+          neighborhood: data[selectedDataset][name]
+        }
+      });
+      d3.select('#neighborhood-text').text(name);
+    } else {  // unselect area
+      timeChart.load({
+        json: {
+          neighborhood: [null]
+        }
+      });
+      d3.select('#neighborhood-text').text('Select an area on the map');
+    }
 
     // TODO: Update bar chart
 
@@ -352,9 +359,9 @@ function dataset(name) {
   timeChart.axis.labels({y: axisLabels[name]});
   timeChart.load({
     json: {
-      years: data.months, // TODO: Remove this, only for testing
-      average: data[name].average,  // TODO: Load actual data here
-      neighborhood: data[name][selectedArea]
+      years: data.months,
+      average: data[name].average,
+      neighborhood: selectedArea ? data[name][selectedArea] : [null]
     }
   });
   d3.select('#neighborhood-text').style('color', datasetColors[name].charts);
@@ -515,10 +522,15 @@ var timeChart = c3.generate({
       // years: data['months'],//[2005, 2006, 2007, 2008, 2009, 2010],
       // average: [1, 1, 1, 1, 1, 1], 
       // neighborhood: [1, 1, 1, 1, 1, 1]
+      // TODO: Shouldn't this have dummy data in the beginning?
     },  // real data is loaded in 'dataset'
     colors: {
       average: startColor,
       neighborhood: startColor
+    },
+    names: {
+      neighborhood: "",
+      average: "Metro Average"
     },
     // regions: {
     //   average: [{end: '2005-10-15', style: 'dashed'}]
@@ -560,7 +572,7 @@ var timeChart = c3.generate({
       }
     }
   },
-  // transition: {duration: 150},
+  // transition: {duration: 0},
   tooltip: {show: false}
 });
 
@@ -578,13 +590,14 @@ var map = new Datamap({
     dataUrl: 'data/SanDiego.json',
     borderColor: '#757575', 
     borderWidth: 0,  // 0.7
-    highlightFillColor: 'foo',  // just some random string to keep fill color the same
-    highlightBorderColor: 'black',
-    highlightBorderWidth: 2,
+    highlightOnHover: false,
+    // highlightFillColor: 'foo',  // just some random string to keep fill color the same
+    // highlightBorderColor: 'black',
+    // highlightBorderWidth: 2,
     popupTemplate: function(geography, data) {
       // TODO: Change this to ZIP codes
       // console.log(geography.id.replace('zip', ''));  // TODO: Remove zip here
-      neighborhood(geography.id.replace('zip', ''));
+
       return '<div class="hoverinfo" style="text-align: center">' + geography.id.replace('zip', '') + (geography.properties.name ? ('<br><span style="font-size: 0.85em">' + geography.properties.name  + '</span>') : '') + '</div>';
     }
   },
@@ -640,9 +653,71 @@ var map = new Datamap({
 
     // datamap.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
 
-    datamap.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
-      // neighborhood(geography.id.replace('zip', ''));
-    });
+    // define drop shadow as here: http://bl.ocks.org/cpbotha/5200394
+    var defs = datamap.svg.append("defs");
+    var filter = defs.append("filter")
+        .attr("id", "drop-shadow")
+        .attr("height", "300%")  // prevent the shadow from being clipped by making the filter area bigger
+        .attr("width", "300%");
+
+    filter.append("feGaussianBlur")
+        .attr("in", "SourceAlpha")
+        .attr("stdDeviation", 4)  // size of the shadow
+        .attr("result", "blur");
+
+    filter.append("feOffset")
+        .attr("in", "blur")
+        // .attr("dx", 5)  // translation in x/y direction
+        // .attr("dy", 5)
+        .attr("result", "offsetBlur");
+
+    var feMerge = filter.append("feMerge");
+
+    feMerge.append("feMergeNode")
+        .attr("in", "offsetBlur");
+    feMerge.append("feMergeNode")
+        .attr("in", "SourceGraphic");
+
+
+    // place svg element on top of all other elements
+    d3.selection.prototype.moveToFront = function() {
+      return this.each(function(){
+        this.parentNode.appendChild(this);
+      });
+    };
+
+
+
+    datamap.svg.selectAll('.datamaps-subunit')
+      // .style("filter", "url(#drop-shadow)")
+      .on('mouseover.custom', function(geography) {      
+        datamap.svg.select('.zip' + clickedArea).moveToFront();  
+        d3.select(this).moveToFront();
+        datamap.svg.selectAll('.datamaps-subunit')
+          .style('filter', function() { return (d3.select(this).classed(geography.id) || d3.select(this).classed('zip' + clickedArea)) ? 'url(#drop-shadow)' : ''; });
+          // .style('stroke', '#000');
+        setTimeout(neighborhood, 0, geography.id.replace('zip', ''));  // load the data async
+      })
+      .on('click', function(geography) {
+        datamap.svg.select('.zip' + clickedArea).style('filter', '');
+        clickedArea = geography.id.replace('zip', '');
+         
+        // d3.select(this).style('stroke-width', '2px').style('stroke', '#f00');
+        // neighborhood(geography.id.replace('zip', ''));
+      });
+
+
+    datamap.svg.select('.datamaps-subunits')
+      .on('mouseout', function(geography) {
+        // TODO: The borders between the areas do not belong to the .datamaps-subunits element. 
+        // Hence, moving the mouse from one area to another triggers this mouseout event. In this case, do NOT load the data of the clickedArea.
+        // Maybe this will solve on the way by loading all data into the time chart up front, and only making the current area visible
+        setTimeout(neighborhood, 0, clickedArea);  // load the data async
+        
+        datamap.svg.select('.zip' + clickedArea).moveToFront();  
+        datamap.svg.selectAll('.datamaps-subunit')
+          .style('filter', function() { return (d3.select(this).classed('zip' + clickedArea)) ? 'url(#drop-shadow)' : ''; });
+      });
   }
 });
 map.legend();
