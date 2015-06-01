@@ -31,6 +31,7 @@ var minDataValue = 0;
 var datasetNames = ['mediansaleprice', 'soldforloss', 'decreasinginvalues', 'soldasforeclosures'];
 var maxDataValues = {mediansaleprice: 1000000, soldforloss: 80, decreasinginvalues: 100, soldasforeclosures: 40};
 var axisLabels = {mediansaleprice: 'Median sale price / $', soldforloss: 'Homes sold for loss / %', decreasinginvalues: 'Homes decreasing in value / %', soldasforeclosures: 'Homes foreclosed / %'};
+var numberFormats = {'': function() { return ''; }, mediansaleprice: d3.format('.3s'), soldforloss: d3.format('.0f'), decreasinginvalues: d3.format('.0f'), soldasforeclosures: d3.format('.0f')};
 
 function down() {
   if (!slidedUp) {
@@ -215,21 +216,28 @@ function initVisualizations() {
   d3.select('#time-chart-legend').style('visibility', 'visible');
   d3.select('#neighborhood-text').text(selectedArea);
   // d3.select('#city-text').text(Metro Average);
+  d3.select('#time-chart').selectAll('.c3-circle-0').style('fill-opacity', 1);
+  d3.select('#time-chart').selectAll('.c3-text-0').style('visibility', 'visible');
   d3.select('#time-chart').select('.c3-chart')
     .on('mouseover', function() {
-      d3.select('#time-chart').selectAll('.c3-line').style('stroke-opacity', '0.5');
+      d3.select('#time-chart').selectAll('.c3-line').style('stroke-opacity', 0.5);      
+    })
+    .on('mousemove', function() {
+      d3.select('#time-chart').selectAll('.c3-texts-average,.c3-texts-neighborhood').selectAll('.c3-text').style('visibility', function(d, i) { return (d3.select('#time-chart').select('.c3-circle-' + i).classed('_expanded_') || i == selectedTimeIndex) ? 'visible' : 'hidden'; });
     })
     .on('mouseout', function() {
-      d3.select('#time-chart').selectAll('.c3-line').style('stroke-opacity', '0.9');
+      d3.select('#time-chart').selectAll('.c3-texts-average,.c3-texts-neighborhood').selectAll('.c3-text').style('visibility', function(d, i) { return (i == selectedTimeIndex) ? 'visible' : 'hidden'; });
+      d3.select('#time-chart').selectAll('.c3-line').style('stroke-opacity', 0.9);
     });
 
-  d3.select('#bar-chart').selectAll('.c3-text').style('visibility', 'visible'); 
+  // d3.select('#bar-chart').selectAll('.c3-text').style('visibility', 'visible');   // Now handled through 'numberFormats'
   // d3.select('#bar-chart').selectAll('.c3-bar')
   //   .on('mouseover', function() {
-
+  //     d3.select('#bar-chart').selectAll('.c3-bar').style('fill-opacity', 0.5);
+  //     d3.select(this).style('fill-opacity', 1);
   //   })
   //   .on('mouseout', function() {
-      
+  //     d3.select('#bar-chart').selectAll('.c3-bar').style('fill-opacity', 1);
   //   });
 
   // TODO: Do this a little bit more elegant than just making it visible at once, eg by a transition with opacity
@@ -255,11 +263,17 @@ function time(index) {
       }
     });
 
-    d3.select('#time-chart').selectAll('.c3-circle').style('visibility', 'hidden');
-    d3.select('#time-chart').selectAll('.c3-circle-' + index).style('visibility', 'visible');
+    // d3.select('#time-chart').selectAll('.c3-circle').style('visibility', 'hidden');
+    d3.select('#time-chart').selectAll('.c3-circle').style('fill-opacity', '0');
+    // d3.select('#time-chart').selectAll('.c3-circle').style('r', '1');
+    // d3.select('#time-chart').selectAll('.c3-circle-' + index).style('visibility', 'visible');
+    d3.select('#time-chart').selectAll('.c3-circle-' + index).style('fill-opacity', '1');
+    // d3.select('#time-chart').selectAll('.c3-circle-' + index).style('r', '5');
+    // d3.select('#time-chart').select('.c3-circles-average').selectAll('.c3-circle').style('opacity', function(d, i) { return (i < index+1) ? 1 : 0.2; });
+    // d3.select('#time-chart').select('.c3-circles-neighborhood').selectAll('.c3-circle').style('opacity', function(d, i) { return (i < index+1) ? 1 : 0.2; });
 
-    d3.select('#time-chart').selectAll('.c3-text').style('visibility', 'hidden');
-    d3.select('#time-chart').selectAll('.c3-text-' + index).style('visibility', 'visible');
+    d3.select('#time-chart').selectAll('.c3-texts-average,.c3-texts-neighborhood').selectAll('.c3-text').style('visibility', function(d, i) {  return (d3.select('#time-chart').select('.c3-circle-' + i).classed('_expanded_') || i == selectedTimeIndex) ? 'visible' : 'hidden';  });
+    // d3.select('#time-chart').selectAll('.c3-text-' + index).style('visibility', 'visible');
 
     // TODO: Maybe integrate this with the same snippet in dataset()
     map.updateChoropleth(blankMapColors);
@@ -461,7 +475,7 @@ var barChart = c3.generate({
     type: 'bar',
     // TODO: If labels are shown, there is a slight space between the bars and the neighborhood names
     labels: {
-      format: function (v, id, i, j) { return v ? d3.format('.2s')(v) : ''; }
+      format: function (value, id, i, j) { return value ? numberFormats[selectedDataset](value) : ''; }
     }
   },
   legend: {show: false},
@@ -510,7 +524,7 @@ var timeChart = c3.generate({
     //   average: [{end: '2005-10-15', style: 'dashed'}]
     // }
     labels: {
-      format: function (v, id, i, j) { return v === null ? '' : d3.format('.2s')(v); }
+      format: function (value, id, i, j) { return value === null ? '' : numberFormats[selectedDataset](value); }
     }
   },
   padding: {
