@@ -657,8 +657,10 @@ var map = new Datamap({
     var defs = datamap.svg.append("defs");
     var filter = defs.append("filter")
         .attr("id", "drop-shadow")
-        .attr("height", "300%")  // prevent the shadow from being clipped by making the filter area bigger
-        .attr("width", "300%");
+        .attr("x", "-50%")
+        .attr("y", "-50%")
+        .attr("height", "200%")  // prevent the shadow from being clipped by making the filter area bigger
+        .attr("width", "200%");
 
     filter.append("feGaussianBlur")
         .attr("in", "SourceAlpha")
