@@ -27,7 +27,8 @@ var selectedDataset = '';
 var datasetColors = {mediansaleprice: {map: '#f44336', charts: '#ef5350'}, soldforloss: {map: '#00bcd4', charts: '#00bcd4'}, decreasinginvalues: {map: '#8bc34a', charts: '#8bc34a'}, soldasforeclosures: {map: '#ffb300', charts: '#ffb300'}};
 var minDataValue = 0;
 var datasetNames = ['mediansaleprice', 'soldforloss', 'decreasinginvalues', 'soldasforeclosures'];
-var maxDataValues = {mediansaleprice: 1000000, soldforloss: 80, decreasinginvalues: 100, soldasforeclosures: 40};
+// TODO: Make these better
+var maxDataValues = {mediansaleprice: 1000000, soldforloss: 100, decreasinginvalues: 100, soldasforeclosures: 50};
 var axisLabels = {mediansaleprice: 'Median sale price / $', soldforloss: 'Homes sold for loss / %', decreasinginvalues: 'Homes decreasing in value / %', soldasforeclosures: 'Homes foreclosed / %'};
 var numberFormats = {'': function() { return ''; }, mediansaleprice: d3.format('.3s'), soldforloss: d3.format('.0f'), decreasinginvalues: d3.format('.0f'), soldasforeclosures: d3.format('.0f')};
 
@@ -245,7 +246,7 @@ function time(index) {
     barChart.load({
       json: {
         values: itemsToShow.map(function(item) { return item[1] === null ? 0 : item[1]; }),
-        neighborhoods: ['1.', '2.', '3.', ' ', '4.', '5.', '6.'] //itemsToShow.map(function(item) { return item[0]; })
+        neighborhoods: ['1.', '2.', '3.', ' ', sortedItems.length-2 + '.', sortedItems.length-1 + '.', sortedItems.length + '.'] //itemsToShow.map(function(item) { return item[0]; })
       },
       done: function() {
 
@@ -444,7 +445,7 @@ function dataset(name) {
   barChart.load({
     json: {
       values: itemsToShow.map(function(item) { return item[1] === null ? 0 : item[1]; }),
-      neighborhoods: ['1.', '2.', '3.', ' ', '4.', '5.', '6.'] //itemsToShow.map(function(item) { return item[0]; })
+      neighborhoods: ['1.', '2.', '3.', ' ', sortedItems.length-2 + '.', sortedItems.length-1 + '.', sortedItems.length + '.'] //itemsToShow.map(function(item) { return item[0]; })
     },
     done: function() {
 
