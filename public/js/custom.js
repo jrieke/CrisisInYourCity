@@ -1,7 +1,4 @@
-// TODO: Divide this into different files
 // TODO: Make a minified version
-
-
 
 
 
@@ -23,7 +20,7 @@ var startColor = '#9e9e9e';
 var city = 'San Diego';
 var selectedArea = ''; 
 var clickedArea = '';
-var areasForBarChart = ['92037', '91901', '91902', '91910', '91911', '91913'];
+var areasForBarChart = ['92037', '91901', '91902', '91910', '91911', '91913', '92037'];
 var selectedTimeIndex = 0;
 var selectedDataset = '';
 
@@ -165,7 +162,6 @@ function fetchDataset(name) {
     if (error) return console.log(error);
 
     console.log('received dataset ' + name);
-    // console.log(json);
 
     json.average = json['92101'];  // TODO: The city average should already be in the json file
     data[name] = json;
@@ -174,27 +170,6 @@ function fetchDataset(name) {
     if (numLoaded == datasetNames.length) {
       d3.select('#loading').text('Done!');
     }
-
-  
-  // var firstRun = true;  
-  // var valuesArr = [];
-  // for (var area in json) {
-  //   var values = [];
-  //   for (var month in json[area]) {
-  //     if (firstRun) {
-  //       data.months.push(month + '-15');
-  //     }
-  //     values.push(json[area][month]);
-  //   }
-  //   valuesArr.push(values);
-  // }
-
-  // average = valuesArr[Math.floor(Math.random() * valuesArr.length)];
-  // for (var i = 0; i < areas.length; i++) {
-  //   data[areas[i]] = valuesArr[Math.floor(Math.random() * valuesArr.length)];
-  // }
-
-  // console.log(data);
 
   });
 }
@@ -227,16 +202,7 @@ function initVisualizations() {
       d3.select('#time-chart').selectAll('.c3-line').style('stroke-opacity', 0.9);
     });
 
-  // d3.select('#bar-chart').selectAll('.c3-text').style('visibility', 'visible');   // Now handled through 'numberFormats'
-  // d3.select('#bar-chart').selectAll('.c3-bar')
-  //   .on('mouseover', function() {
-  //     d3.select('#bar-chart').selectAll('.c3-bar').style('fill-opacity', 0.5);
-  //     d3.select(this).style('fill-opacity', 1);
-  //   })
-  //   .on('mouseout', function() {
-  //     d3.select('#bar-chart').selectAll('.c3-bar').style('fill-opacity', 1);
-  //   });
-
+  // TODO: Hide time slider in the beginning at all?
   // TODO: Do this a little bit more elegant than just making it visible at once, eg by a transition with opacity
   d3.select('#time-slider-wrapper').style('visibility', 'visible');
 
@@ -250,15 +216,69 @@ function initVisualizations() {
 }
 
 
+var sortedItems;
 
 function time(index) {
   // console.log(index);
-  if (index != selectedTimeIndex) {    
+  if (index != selectedTimeIndex) {
+
+    // Sort areas by value
+    sortedItems = Object.keys(data[selectedDataset])
+      .filter(function(area) {
+        return data[selectedDataset][area][index] !== null; 
+      })
+      .map(function(area) {
+        return [area, data[selectedDataset][area][index]];
+      });
+
+    sortedItems.sort(function(first, second) {
+      return second[1] - first[1];
+    });
+
+    // Select the top 3 and bottom 3 areas to show on the bar chart
+    var itemsToShow = sortedItems.slice(0, 3);
+    itemsToShow.push([' ', null]);
+    itemsToShow = itemsToShow.concat(sortedItems.slice(sortedItems.length-3, sortedItems.length));
+
+    areasForBarChart = itemsToShow.map(function(item) { return item[0]; });
+
     barChart.load({
       json: {
-        values: areasForBarChart.map(function(area) { return data[selectedDataset][area][selectedTimeIndex] === null ? 0 : data[selectedDataset][area][selectedTimeIndex]; })
+        values: itemsToShow.map(function(item) { return item[1] === null ? 0 : item[1]; }),
+        neighborhoods: ['1.', '2.', '3.', ' ', '4.', '5.', '6.'] //itemsToShow.map(function(item) { return item[0]; })
+      },
+      done: function() {
+
+        if (areasForBarChart.indexOf(selectedArea) != -1) {
+          d3.select('#bar-chart').selectAll('.c3-bar').classed('not-highlighted', function(d, i) { return areasForBarChart[i] != selectedArea; });
+          d3.select('#bar-chart').selectAll('.c3-text').classed('highlighted', function(d, i) { return areasForBarChart[i-1] == selectedArea; });
+        } else {
+          d3.select('#bar-chart').selectAll('.c3-bar').classed('not-highlighted', false);
+          d3.select('#bar-chart').selectAll('.c3-text').classed('highlighted', false);
+        }
+
+        // TODO: Could this be done once in initVisulizations?
+        d3.select('#bar-chart').selectAll('.c3-event-rect')
+          .data(areasForBarChart)
+          .on('mouseover', function(d, i) {  // TODO: Make function in done method of datamaps in the same fashion
+            if (d != ' ') {
+              neighborhood(d);
+            }
+          })
+          .on('mouseout', function(d, i) {
+            if (d != ' ') {
+              neighborhood(clickedArea);
+            }
+          })
+          .on('click', function() {
+            lockNeighborhood();
+          });
+
       }
     });
+
+    
+
 
     // d3.select('#time-chart').selectAll('.c3-circle').style('visibility', 'hidden');
     d3.select('#time-chart').selectAll('.c3-circle').style('fill-opacity', '0');
@@ -286,21 +306,83 @@ function time(index) {
   }
 } 
 
+
+function lockNeighborhood() {
+  d3.select('#map').select('.zip' + clickedArea).style('filter', '');
+
+  // TODO: Johannes is working on this
+
+  // var i = 0;
+  // while (i < sortedItems.length) {
+  //   console.log(sortedItems[i][0]);
+  //   console.log(selectedArea);
+  //   if (sortedItems[i][0] == selectedArea) {
+  //     break;
+  //   }
+  //   i++;
+  // }
+
+  // console.log(i);
+
+  // // TODO: Change if i is first or last
+  // var itemsToShow = [sortedItems[0], [' ', null], sortedItems[i-1], sortedItems[i], sortedItems[i+1], [' ', null], sortedItems[sortedItems.length-1]];
+  // console.log(itemsToShow);
+
+  // areasForBarChart = itemsToShow.map(function(item) { return item[0]; });
+
+  // barChart.load({
+  //   json: {
+  //     values: itemsToShow.map(function(item) { return item[1] === null ? 0 : item[1]; }),
+  //     neighborhoods: ['1.', ' ', i-1 + '.', i + '.', i+1 + '.', ' ', sortedItems.length + '.'] //itemsToShow.map(function(item) { return item[0]; })
+  //   }
+  // });
+
+  // d3.select('#bar-chart').selectAll('.c3-bar')
+  //   .style('opacity', function(d, i) { return (i == selectedArea) ? 1 : 0.3; });
+  // d3.select('#bar-chart').selectAll('.c3-text')
+  //   .style('fill', function(d, i) { return (i == selectedArea) ? '#f8f8f8' : startColor; });
+
+
+  clickedArea = selectedArea;
+}
+
 function neighborhood(name) {
   console.log(name);
   if (name != selectedArea) {    
     timeChart.data.names({
       neighborhood: name
     });
+
     if (name) {
-      // console.log(name);
+      if (areasForBarChart.indexOf(name) != -1) {
+        d3.select('#bar-chart').selectAll('.c3-bar').classed('not-highlighted', function(d, i) { return areasForBarChart[i] != name; });
+        d3.select('#bar-chart').selectAll('.c3-text').classed('highlighted', function(d, i) { return areasForBarChart[i-1] == name; });
+      } else {
+        d3.select('#bar-chart').selectAll('.c3-bar').classed('not-highlighted', false);
+        d3.select('#bar-chart').selectAll('.c3-text').classed('highlighted', false);
+      }
+
+      d3.select('#map').selectAll('.zip' + clickedArea + ',.zip' + name).moveToFront();
+      // TODO: Pull this over from datamaps done method
+      d3.select('#map').selectAll('.datamaps-subunit')
+        .style('filter', function() { return (d3.select(this).classed('zip' + name) || d3.select(this).classed('zip' + clickedArea)) ? 'url(#drop-shadow)' : ''; });
+      
+
       timeChart.load({
         json: {
           neighborhood: data[selectedDataset][name]
         }
       });
       d3.select('#neighborhood-text').text(name);
-    } else {  // unselect area
+
+    } else {  // unselect all areas
+
+      d3.select('#bar-chart').selectAll('.c3-bar').classed('not-highlighted', false);
+      d3.select('#bar-chart').selectAll('.c3-text').classed('highlighted', false);
+
+      d3.select('#map').selectAll('.datamaps-subunit')
+        .style('filter', '');
+
       timeChart.load({
         json: {
           neighborhood: [null]
@@ -308,8 +390,6 @@ function neighborhood(name) {
       });
       d3.select('#neighborhood-text').text('Select an area on the map');
     }
-
-    // TODO: Update bar chart
 
     selectedArea = name;
   }
@@ -320,8 +400,6 @@ function dataset(name) {
   selectedDataset = name;
 
   // TODO: Make visualizations grey while data is loading, maybe even by using a small transition
-  // TODO: Just a short fix to make this work. Change the frontend to work with the dataset names instead of indices and remove this
-  var index = 0;
 
   d3.select('#content-overlay').style('visibility', 'visible');
 
@@ -334,10 +412,6 @@ function dataset(name) {
     mapColors['zip' + area] = (data[name][area][selectedTimeIndex] === null ? startColor : colorScale(data[name][area][selectedTimeIndex]));
   }
   // 'mapColors' also contains the 'months' field, but that is simply ignored by datamaps
-  // console.log(mapColors);
-  // mapColors2 = {'92037': '#00ff00'};
-  // console.log(mapColors2);
-  // map.updateChoropleth(mapColors2);
   map.updateChoropleth(mapColors);
 
   barChart.data.colors({
@@ -345,12 +419,66 @@ function dataset(name) {
   });
   barChart.axis.max(maxDataValues[name]);
   barChart.axis.labels({y: axisLabels[name]});
+
+  // TODO: Integrate this with the same snippet in time()
+  // Sort areas by value
+  sortedItems = Object.keys(data[selectedDataset])
+    .filter(function(area) {
+      return data[selectedDataset][area][selectedTimeIndex] !== null; 
+    })
+    .map(function(area) {
+      return [area, data[selectedDataset][area][selectedTimeIndex]];
+    });
+
+  sortedItems.sort(function(first, second) {
+    return second[1] - first[1];
+  });
+
+  // Select the top 3 and bottom 3 areas to show on the bar chart
+  var itemsToShow = sortedItems.slice(0, 3);
+  itemsToShow.push([' ', null]);
+  itemsToShow = itemsToShow.concat(sortedItems.slice(sortedItems.length-3, sortedItems.length));
+
+  areasForBarChart = itemsToShow.map(function(item) { return item[0]; });
+
   barChart.load({
     json: {
-      neighborhoods: areasForBarChart,  // has to be loaded at the same time as values, otherwise the text fields stay empty
-      values: areasForBarChart.map(function(area) { return data[name][area][selectedTimeIndex] === null ? 0 : data[name][area][selectedTimeIndex]; })
+      values: itemsToShow.map(function(item) { return item[1] === null ? 0 : item[1]; }),
+      neighborhoods: ['1.', '2.', '3.', ' ', '4.', '5.', '6.'] //itemsToShow.map(function(item) { return item[0]; })
+    },
+    done: function() {
+
+      if (areasForBarChart.indexOf(selectedArea) != -1) {
+        d3.select('#bar-chart').selectAll('.c3-bar').classed('not-highlighted', function(d, i) { return areasForBarChart[i] != selectedArea; });
+        d3.select('#bar-chart').selectAll('.c3-text').classed('highlighted', function(d, i) { return areasForBarChart[i-1] == selectedArea; });
+      } else {
+        d3.select('#bar-chart').selectAll('.c3-bar').classed('not-highlighted', false);
+        d3.select('#bar-chart').selectAll('.c3-text').classed('highlighted', false);
+      }
+
+      // TODO: Could this be done once in initVisulizations?
+      d3.select('#bar-chart').selectAll('.c3-event-rect')
+        .data(areasForBarChart)
+        .on('mouseover', function(d, i) {
+          if (d != ' ') {
+            neighborhood(d);
+          }
+        })
+        .on('mouseout', function(d, i) {
+          if (d != ' ') {
+            neighborhood(clickedArea);
+          }
+        })
+        .on('click', function() {
+          lockNeighborhood();
+        });
+
     }
   });
+
+
+
+
 
   timeChart.data.colors({
     neighborhood: datasetColors[name].charts
@@ -473,14 +601,15 @@ var barChart = c3.generate({
   data: {
     x: 'neighborhoods',
     json: {
-      neighborhoods: [' ', ' ', ' ', ' ', ' ', ' '],
-      values: [0.3, 0.7, 1, 0.3, 0.15, 0.4]
+      // TODO: Rename this to 'area'
+      neighborhoods: [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+      values: [0.3, 0.7, 1, 0.3, 0.15, 0.4, 0.3]
     },  // real data is loaded in 'dataset'
     colors: {
       values: startColor
     },
     type: 'bar',
-    // TODO: If labels are shown, there is a slight space between the bars and the neighborhood names
+    // TODO: If labels are shown, there is a slight space between the bars and the neighborhood names. Fix this
     labels: {
       format: function (value, id, i, j) { return value ? numberFormats[selectedDataset](value) : ''; }
     }
@@ -493,7 +622,7 @@ var barChart = c3.generate({
   },
   axis: {
     x: {
-      type: 'category'  // needed to show string labels
+      type: 'category'  // required to show string labels
     },
     y: {
       // show: false,
@@ -511,6 +640,8 @@ var barChart = c3.generate({
   transition: {duration: 150},
   tooltip: {show: false}
 });
+
+
 
 
 var timeChart = c3.generate({
@@ -532,9 +663,6 @@ var timeChart = c3.generate({
       neighborhood: "",
       average: "Metro Average"
     },
-    // regions: {
-    //   average: [{end: '2005-10-15', style: 'dashed'}]
-    // }
     labels: {
       format: function (value, id, i, j) { return value === null ? '' : numberFormats[selectedDataset](value); }
     }
@@ -577,8 +705,7 @@ var timeChart = c3.generate({
 });
 
 
-var colorScale = d3.scale.linear();
-  // range will be added during 'dataset'
+var colorScale = d3.scale.linear();  // range will be added during 'dataset'
 
 // TODO: Add a legend for the colors
 
@@ -595,10 +722,13 @@ var map = new Datamap({
     // highlightBorderColor: 'black',
     // highlightBorderWidth: 2,
     popupTemplate: function(geography, data) {
-      // TODO: Change this to ZIP codes
-      // console.log(geography.id.replace('zip', ''));  // TODO: Remove zip here
-
-      return '<div class="hoverinfo" style="text-align: center">' + geography.id.replace('zip', '') + (geography.properties.name ? ('<br><span style="font-size: 0.85em">' + geography.properties.name  + '</span>') : '') + '</div>';
+      var s = '<div class="hoverinfo" style="text-align: center">' + geography.id.replace('zip', '');
+      if (geography.properties.name)
+        s += '<br><span style="font-size: 0.85em">' + geography.properties.name  + '</span>';
+      if (clickedArea === '')
+        s += '<br><span style="font-size: 0.85em; color: red; font-weight: bold">Click to Select</span>';
+      s += '</div>';
+      return s;
     }
   },
   scope: 'tl_2010_06_zcta510',
@@ -643,15 +773,12 @@ var map = new Datamap({
   },
   done: function(datamap) {
     // TODO: Maybe call updateChoropleth for the first time here
-
     
     blankMapColors = {};
     var geometries = datamap.customTopo.objects.tl_2010_06_zcta510.geometries;
     for (var i = 0; i < geometries.length; i++) {
       blankMapColors[geometries[i].id] = startColor;
     }
-
-    // datamap.svg.selectAll('.datamaps-subunit').on('click', function(geography) {
 
     // define drop shadow as here: http://bl.ocks.org/cpbotha/5200394
     var defs = datamap.svg.append("defs");
@@ -681,31 +808,19 @@ var map = new Datamap({
         .attr("in", "SourceGraphic");
 
 
-    // place svg element on top of all other elements
+    // Function to place svg element on top of all other elements
     d3.selection.prototype.moveToFront = function() {
       return this.each(function(){
         this.parentNode.appendChild(this);
       });
     };
 
-
-
     datamap.svg.selectAll('.datamaps-subunit')
-      // .style("filter", "url(#drop-shadow)")
       .on('mouseover.custom', function(geography) {      
-        datamap.svg.select('.zip' + clickedArea).moveToFront();  
-        d3.select(this).moveToFront();
-        datamap.svg.selectAll('.datamaps-subunit')
-          .style('filter', function() { return (d3.select(this).classed(geography.id) || d3.select(this).classed('zip' + clickedArea)) ? 'url(#drop-shadow)' : ''; });
-          // .style('stroke', '#000');
-        setTimeout(neighborhood, 0, geography.id.replace('zip', ''));  // load the data async
+        neighborhood(geography.id.replace('zip', ''));
       })
       .on('click', function(geography) {
-        datamap.svg.select('.zip' + clickedArea).style('filter', '');
-        clickedArea = geography.id.replace('zip', '');
-         
-        // d3.select(this).style('stroke-width', '2px').style('stroke', '#f00');
-        // neighborhood(geography.id.replace('zip', ''));
+        lockNeighborhood();
       });
 
 
@@ -714,11 +829,8 @@ var map = new Datamap({
         // TODO: The borders between the areas do not belong to the .datamaps-subunits element. 
         // Hence, moving the mouse from one area to another triggers this mouseout event. In this case, do NOT load the data of the clickedArea.
         // Maybe this will solve on the way by loading all data into the time chart up front, and only making the current area visible
-        setTimeout(neighborhood, 0, clickedArea);  // load the data async
+        neighborhood(clickedArea);
         
-        datamap.svg.select('.zip' + clickedArea).moveToFront();  
-        datamap.svg.selectAll('.datamaps-subunit')
-          .style('filter', function() { return (d3.select(this).classed('zip' + clickedArea)) ? 'url(#drop-shadow)' : ''; });
       });
   }
 });

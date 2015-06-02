@@ -162,15 +162,30 @@ body {
   fill: #9e9e9e !important;
 }*/
 
+
+
 #bar-chart .c3-text {
   /* Labels for bar values */
   fill: #9e9e9e !important;
   /*visibility: hidden;*/
   transform: translate(0, -3px);
 }
-#bar-chart:hover .c3-text {
-  /* Labels for bar values on hover */
+
+#bar-chart .c3-text.highlighted {
   fill: #f8f8f8 !important;
+}
+
+#bar-chart .c3-bar.not-highlighted {
+  opacity: 0.5 !important;
+}
+
+/*#bar-chart:hover .c3-text {
+   Labels for bar values on hover 
+  fill: #f8f8f8 !important;
+}
+*/
+#bar-chart .c3-event-rect {
+  cursor: pointer;
 }
 
 
