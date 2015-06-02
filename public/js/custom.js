@@ -1,7 +1,6 @@
 // TODO: Make a minified version
 
 
-
 function barChartSize() {
   return d3.select('#bar-chart-wrapper').node().getBoundingClientRect();
 }
@@ -13,7 +12,7 @@ function mapSize() {
 }
 
 var slidedUp = false;
-var maxSliderValue = 180;
+var maxSliderValue = 132;
 var scrollSpeed = 0.03;
 var playing = false;
 var startColor = '#9e9e9e';
@@ -142,18 +141,16 @@ intro();
 
 
 
+var months = [//'2000-01-15', '2000-02-15', '2000-03-15', '2000-04-15', '2000-05-15', '2000-06-15', '2000-07-15', '2000-08-15', '2000-09-15', '2000-10-15', '2000-11-15', '2000-12-15', '2001-01-15', '2001-02-15', '2001-03-15', '2001-04-15', '2001-05-15', '2001-06-15', '2001-07-15', '2001-08-15', '2001-09-15', '2001-10-15', '2001-11-15', '2001-12-15', '2002-01-15', '2002-02-15', '2002-03-15', '2002-04-15', '2002-05-15', '2002-06-15', '2002-07-15', '2002-08-15', '2002-09-15', '2002-10-15', '2002-11-15', '2002-12-15', '2003-01-15', '2003-02-15', '2003-03-15', '2003-04-15', '2003-05-15', '2003-06-15', '2003-07-15', '2003-08-15', '2003-09-15', '2003-10-15', '2003-11-15', '2003-12-15', 
+'2004-01-15', '2004-02-15', '2004-03-15', '2004-04-15', '2004-05-15', '2004-06-15', '2004-07-15', '2004-08-15', '2004-09-15', '2004-10-15', '2004-11-15', '2004-12-15', 
+'2005-01-15', '2005-02-15', '2005-03-15', '2005-04-15', '2005-05-15', '2005-06-15', '2005-07-15', '2005-08-15', '2005-09-15', '2005-10-15', '2005-11-15', '2005-12-15', '2006-01-15', '2006-02-15', '2006-03-15', '2006-04-15', '2006-05-15', '2006-06-15', '2006-07-15', '2006-08-15', '2006-09-15', '2006-10-15', '2006-11-15', '2006-12-15', '2007-01-15', '2007-02-15', '2007-03-15', '2007-04-15', '2007-05-15', '2007-06-15', '2007-07-15', '2007-08-15', '2007-09-15', '2007-10-15', '2007-11-15', '2007-12-15', '2008-01-15', '2008-02-15', '2008-03-15', '2008-04-15', '2008-05-15', '2008-06-15', '2008-07-15', '2008-08-15', '2008-09-15', '2008-10-15', '2008-11-15', '2008-12-15', '2009-01-15', '2009-02-15', '2009-03-15', '2009-04-15', '2009-05-15', '2009-06-15', '2009-07-15', '2009-08-15', '2009-09-15', '2009-10-15', '2009-11-15', '2009-12-15', '2010-01-15', '2010-02-15', '2010-03-15', '2010-04-15', '2010-05-15', '2010-06-15', '2010-07-15', '2010-08-15', '2010-09-15', '2010-10-15', '2010-11-15', '2010-12-15', '2011-01-15', '2011-02-15', '2011-03-15', '2011-04-15', '2011-05-15', '2011-06-15', '2011-07-15', '2011-08-15', '2011-09-15', '2011-10-15', '2011-11-15', '2011-12-15', '2012-01-15', '2012-02-15', '2012-03-15', '2012-04-15', '2012-05-15', '2012-06-15', '2012-07-15', '2012-08-15', '2012-09-15', '2012-10-15', '2012-11-15', '2012-12-15', '2013-01-15', '2013-02-15', '2013-03-15', '2013-04-15', '2013-05-15', '2013-06-15', '2013-07-15', '2013-08-15', '2013-09-15', '2013-10-15', '2013-11-15', '2013-12-15', '2014-01-15', '2014-02-15', '2014-03-15', '2014-04-15', '2014-05-15', '2014-06-15', '2014-07-15', '2014-08-15', '2014-09-15', '2014-10-15', '2014-11-15', '2014-12-15', '2015-01-15']
 
-
-var data = {
-  // months: ['2005-01-15', '2006-01-15', '2007-01-15', '2008-01-15', '2009-01-15', '2010-01-15']
-  months: ['2000-01-15', '2000-02-15', '2000-03-15', '2000-04-15', '2000-05-15', '2000-06-15', '2000-07-15', '2000-08-15', '2000-09-15', '2000-10-15', '2000-11-15', '2000-12-15', '2001-01-15', '2001-02-15', '2001-03-15', '2001-04-15', '2001-05-15', '2001-06-15', '2001-07-15', '2001-08-15', '2001-09-15', '2001-10-15', '2001-11-15', '2001-12-15', '2002-01-15', '2002-02-15', '2002-03-15', '2002-04-15', '2002-05-15', '2002-06-15', '2002-07-15', '2002-08-15', '2002-09-15', '2002-10-15', '2002-11-15', '2002-12-15', '2003-01-15', '2003-02-15', '2003-03-15', '2003-04-15', '2003-05-15', '2003-06-15', '2003-07-15', '2003-08-15', '2003-09-15', '2003-10-15', '2003-11-15', '2003-12-15', '2004-01-15', '2004-02-15', '2004-03-15', '2004-04-15', '2004-05-15', '2004-06-15', '2004-07-15', '2004-08-15', '2004-09-15', '2004-10-15', '2004-11-15', '2004-12-15', 
-  '2005-01-15', '2005-02-15', '2005-03-15', '2005-04-15', '2005-05-15', '2005-06-15', '2005-07-15', '2005-08-15', '2005-09-15', '2005-10-15', '2005-11-15', '2005-12-15', '2006-01-15', '2006-02-15', '2006-03-15', '2006-04-15', '2006-05-15', '2006-06-15', '2006-07-15', '2006-08-15', '2006-09-15', '2006-10-15', '2006-11-15', '2006-12-15', '2007-01-15', '2007-02-15', '2007-03-15', '2007-04-15', '2007-05-15', '2007-06-15', '2007-07-15', '2007-08-15', '2007-09-15', '2007-10-15', '2007-11-15', '2007-12-15', '2008-01-15', '2008-02-15', '2008-03-15', '2008-04-15', '2008-05-15', '2008-06-15', '2008-07-15', '2008-08-15', '2008-09-15', '2008-10-15', '2008-11-15', '2008-12-15', '2009-01-15', '2009-02-15', '2009-03-15', '2009-04-15', '2009-05-15', '2009-06-15', '2009-07-15', '2009-08-15', '2009-09-15', '2009-10-15', '2009-11-15', '2009-12-15', '2010-01-15', '2010-02-15', '2010-03-15', '2010-04-15', '2010-05-15', '2010-06-15', '2010-07-15', '2010-08-15', '2010-09-15', '2010-10-15', '2010-11-15', '2010-12-15', '2011-01-15', '2011-02-15', '2011-03-15', '2011-04-15', '2011-05-15', '2011-06-15', '2011-07-15', '2011-08-15', '2011-09-15', '2011-10-15', '2011-11-15', '2011-12-15', '2012-01-15', '2012-02-15', '2012-03-15', '2012-04-15', '2012-05-15', '2012-06-15', '2012-07-15', '2012-08-15', '2012-09-15', '2012-10-15', '2012-11-15', '2012-12-15', '2013-01-15', '2013-02-15', '2013-03-15', '2013-04-15', '2013-05-15', '2013-06-15', '2013-07-15', '2013-08-15', '2013-09-15', '2013-10-15', '2013-11-15', '2013-12-15', '2014-01-15', '2014-02-15', '2014-03-15', '2014-04-15', '2014-05-15', '2014-06-15', '2014-07-15', '2014-08-15', '2014-09-15', '2014-10-15', '2014-11-15', '2014-12-15', '2015-01-15']
-};
+var data = {};
 // var areas = ['Amphitheater And Water Park', 'Bella Lago', 'Bonita Long Canyon', 'East Lake', 'Eastlake Trails', 'Eastlake Vistas', 'Eastlake Woods', 'Estlake Greens', 'Fenton St', 'Golf Course', 'Lynwood Hills', 'Northwest', 'Otay Ranch', 'Paseo Ranchoero', 'Rancho Del Rey', 'Rolling Hills Ranch', 'Southwest', 'Sunbow', 'Terra Nova', 'Thomy Locust Pl', 'Village Center', 'Yosemite Dr', 'Allied Gardens', 'Alta Vista', 'Balboa Park', 'Bario Logan', 'Bay Ho', 'Bay Park', 'Bay Terrace', 'Bird Land', 'Carmel Mountain', 'Carmel Valley', 'Chollas View', 'City Heights East', 'City Heights West', 'Clairemont Mesa', 'College Area', 'Columbia', 'Core', 'Cortez Hill', 'Darnall', 'Del Cerro', 'Del Mar Heights', 'East Village', 'Egger Highlands', 'El Cerritos', 'Emerald Hills', 'Encanto', 'Gaslamp Quarter', 'Gateway', 'Grant Hill', 'Grantville', 'Horton Plaza', 'Jomacha-Lomita', 'Kearny Mesa', 'Kensington', 'La Jolla', 'La Jolla Village', 'Lake Murray', 'Lincoln Park', 'Linda Vista', 'Little Italy', 'Loma Portal', 'Marina', 'Memorial', 'Midtown', 'Midtown District', 'Mira Mesa', 'Miramar', 'Mission Bay', 'Mission Valley', 'Moreno Mission', 'Mount Hope', 'Mountain View', 'Nestor', 'Normal Heights', 'North City', 'North Clairemont', 'North Hills', 'Oak Park', 'Ocean Beach', 'Old Town', 'Pacific Beach', 'Palm City', 'Paradise Hills', 'Park West', 'Rancho Bernadino', 'Rancho Penasquitos', 'Rolando', 'Roseville', 'Sabre Springs', 'San Carlos', 'San Ysidro', 'Scripps Ranch', 'Serra Mesa', 'Sky Line', 'Sorrento Valley', 'South Park', 'Southcrest', 'Talmadge', 'Tierrasanta', 'Tijuana River Valley', 'Torrey Pines', 'University City', 'Valencia Park', 'Webster', 'West University Heights', 'Wooded Area'];
 // for (var i = 0; i < areas.length; i++) {
 //   data[areas[i]] = [Math.random(), Math.random(), Math.random(), Math.random(), Math.random(), Math.random()];
 // }
-var average = [];  // TODO: Get real numbers
+// var average = [];  // TODO: Get real numbers
 
 
 var numLoaded = 0;
@@ -164,8 +161,9 @@ function fetchDataset(name) {
 
     console.log('received dataset ' + name);
 
-    json.average = json['92101'];  // TODO: The city average should already be in the json file
-    data[name] = json;
+    data[name] = json.values;
+    var average = json.average[Object.keys(json.average)[0]];
+    data[name].average = average ? average : Array.apply(null, new Array(months.length)).map(function() { return null; });
 
     numLoaded++;
     if (numLoaded == datasetNames.length) {
@@ -186,6 +184,12 @@ function initVisualizations() {
   timeChart.data.colors({
     average: '#f8f8f8'
   });
+  // console.log(data.months);
+  // timeChart.load({
+  //   json: {
+  //     months: data.months
+  //   }
+  // });
   d3.select('#time-chart-legend').style('visibility', 'visible');
   // d3.select('#neighborhood-text').text(selectedArea);
   // d3.select('#city-text').text(Metro Average);
@@ -259,20 +263,25 @@ function time(index) {
         }
 
         // TODO: Could this be done once in initVisulizations?
+        // TODO: At least the functions could be defined once, so that they do not have to be reconstructed every time
         d3.select('#bar-chart').selectAll('.c3-event-rect')
           .data(areasForBarChart)
           .on('mouseover', function(d, i) {  // TODO: Make function in done method of datamaps in the same fashion
             if (d != ' ') {
               neighborhood(d);
-            }
-          })
-          .on('mouseout', function(d, i) {
-            if (d != ' ') {
+            } else {
               neighborhood(clickedArea);
             }
           })
+          
           .on('click', function() {
             lockNeighborhood();
+          });
+
+        // TODO: At least this does not have to be done every time
+        d3.select('#bar-chart').select('.c3-event-rects')
+          .on('mouseout', function(d, i) {
+            neighborhood(clickedArea);
           });
 
       }
@@ -349,7 +358,8 @@ function lockNeighborhood() {
 
 function neighborhood(name) {
   console.log(name);
-  if (name != selectedArea) {    
+  if (name != selectedArea) {
+    // TODO: Needed? Data name is never shown
     timeChart.data.names({
       neighborhood: name
     });
@@ -363,17 +373,25 @@ function neighborhood(name) {
         d3.select('#bar-chart').selectAll('.c3-text').classed('highlighted', false);
       }
 
+
+      // TODO: Maybe do not make these function calls on elements, but just the one that is selected. Then, make one other function unselectNeighborhood that is called on mouseout events
       d3.select('#map').selectAll('.zip' + clickedArea + ',.zip' + name).moveToFront();
       // TODO: Pull this over from datamaps done method
       d3.select('#map').selectAll('.datamaps-subunit')
         .style('filter', function() { return (d3.select(this).classed('zip' + name) || d3.select(this).classed('zip' + clickedArea)) ? 'url(#drop-shadow)' : ''; });
       
 
-      timeChart.load({
-        json: {
-          neighborhood: data[selectedDataset][name]
+      setTimeout(function() {
+        // Only load the data in the time chart if the area is still selected
+        if (name == selectedArea) {
+          // console.log('loading: ' + name + ', ' + selectedArea);
+          timeChart.load({
+            json: {
+              neighborhood: data[selectedDataset][name]
+            }
+          });
         }
-      });
+      }, 100);
       d3.select('#neighborhood-text').text(name);
 
     } else {  // unselect all areas
@@ -458,20 +476,25 @@ function dataset(name) {
       }
 
       // TODO: Could this be done once in initVisulizations?
+      // TODO: At least the functions could be defined once, so that they do not have to be reconstructed every time
       d3.select('#bar-chart').selectAll('.c3-event-rect')
         .data(areasForBarChart)
-        .on('mouseover', function(d, i) {
+        .on('mouseover', function(d, i) {  // TODO: Make function in done method of datamaps in the same fashion
           if (d != ' ') {
             neighborhood(d);
-          }
-        })
-        .on('mouseout', function(d, i) {
-          if (d != ' ') {
+          } else {
             neighborhood(clickedArea);
           }
         })
+        
         .on('click', function() {
           lockNeighborhood();
+        });
+
+      // TODO: At least this does not have to be done every time
+      d3.select('#bar-chart').select('.c3-event-rects')
+        .on('mouseout', function(d, i) {
+          neighborhood(clickedArea);
         });
 
     }
@@ -486,13 +509,18 @@ function dataset(name) {
   });
   timeChart.axis.max(maxDataValues[name]);
   timeChart.axis.labels({y: axisLabels[name]});
+  // data[name].months = months; // TODO: dirty fix. make this nicer, data should not contain months
   timeChart.load({
     json: {
-      years: data.months,
+      months: months,
       average: data[name].average,
       neighborhood: selectedArea ? data[name][selectedArea] : [null]
     }
   });
+  // d3.select('#time-chart').selectAll('.c3-line').style('visibility', 'hidden');
+  // d3.select('#time-chart').selectAll('.c3-circle').style('visibility', 'hidden');
+  // d3.select('#time-chart').selectAll('.c3-text').style('visibility', 'hidden');
+
   d3.select('#neighborhood-text').style('color', datasetColors[name].charts);
 
   d3.select('#content-overlay').style('visibility', 'hidden');
@@ -531,7 +559,7 @@ function updateSliderElements(sliderValue, animate) {
     });
 
   d3.select('#month').text(monthNames[Math.floor(maxSliderValue-sliderValue) % 12]);
-  d3.select('#year').text(Math.floor(2000 + (maxSliderValue-sliderValue) / 12));  // TODO: Change this once we have actual months for the slider values
+  d3.select('#year').text(Math.floor(2004 + (maxSliderValue-sliderValue) / 12));  // TODO: Change this once we have actual months for the slider values
 
   // d3.selectAll('.d3-slider-axis-right').selectAll('line').style('stroke', function() { d3.select(this).top}'#f8f8f8');
   
@@ -546,7 +574,7 @@ d3.select('#time-slider').call(
     .orientation("vertical")
     .min(0)
     .max(maxSliderValue)
-    .axis(d3.svg.axis().orient("right").tickSize(9.5).tickValues([24,48,72,96,120,144]))//[12,24,36,48,60,72,84,96,108,120,132,144,156,168]))
+    .axis(d3.svg.axis().orient("right").tickSize(9.5).tickValues([24,48,72,96,120]))//[12,24,36,48,60,72,84,96,108,120,132,144,156,168]))
     .value(maxSliderValue)
     .on('slide', function(evt, value) {
       updateSliderElements(value, false);
@@ -560,6 +588,7 @@ d3.select('#time-play-pause')
       .classed('mdi-av-play-circle-fill', !playing)
       .classed('mdi-av-pause-circle-fill', playing);
 
+    // TODO: Some time, this does not pause on click properly
     function playTime() {
       if (playing) {
         var newValue = Math.max(0, Math.round(slider.value()) - 1);
@@ -572,9 +601,9 @@ d3.select('#time-play-pause')
           playing = false;
           // TODO: Ch
           d3.select('#time-play-pause')        
-            .classed('mdi-av-play-circle-fill', false)
-            .classed('mdi-av-pause-circle-fill', false)
-            .classed('mdi-av-replay', true);  // TODO: Make the replay icon with a circle around the arrow (just like the play/pause icons)
+            .classed('mdi-av-play-circle-fill', true)
+            .classed('mdi-av-pause-circle-fill', false);
+            // .classed('mdi-av-replay', true);  // TODO: Make the replay icon with a circle around the arrow (just like the play/pause icons)
         }
         // console.log(this);
         window.setTimeout(playTime, 100);
@@ -649,8 +678,9 @@ var timeChart = c3.generate({
   bindto: '#time-chart',
   size: timeChartSize(), 
   data: {
-    x: 'years',
+    x: 'months',
     json: {
+      months: months
       // years: data['months'],//[2005, 2006, 2007, 2008, 2009, 2010],
       // average: [1, 1, 1, 1, 1, 1], 
       // neighborhood: [1, 1, 1, 1, 1, 1]

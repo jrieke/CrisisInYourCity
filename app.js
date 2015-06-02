@@ -65,7 +65,7 @@ app.get("/soldasforeclosures", function(req, res){
 			delphi.executeYearBoundedQuery({tablename: delphi.METRO_TABLE_FORECLOSURES, metro: true},
 				{metro: "San Diego, CA", startYear: 2004, endYear: 2015},
 				function(rows2){
-					return res.json({values: helpers.parseRowsByColumn(rows1, 'RegionName', 'Value'), avarage: helpers.parseRowsByColumn(rows2, 'RegionName', 'Value')});
+					return res.json({values: helpers.parseRowsByColumn(rows1, 'RegionName', 'Value'), average: helpers.parseRowsByColumn(rows2, 'RegionName', 'Value')});
 				});
 	});
 });
@@ -74,7 +74,7 @@ app.get("/soldforloss", function(req, res){
 	delphi.executeYearBoundedQuery({tablename: delphi.TABLE_SOLD_FOR_LOSS, metro: false},
 		{metro: "San Diego", startYear: 2004, endYear: 2015},
 		function(rows){
-			return res.json({values: helpers.parseRowsByColumn(rows, 'RegionName', 'Value'), avarage: ""});
+			return res.json({values: helpers.parseRowsByColumn(rows, 'RegionName', 'Value'), average: ""});
 	});
 });
 
@@ -85,7 +85,7 @@ app.get("/decreasinginvalues", function(req, res){
 			delphi.executeYearBoundedQuery({tablename: delphi.METRO_TABLE_DECREASING_VALUES, metro: true},
 				{metro: "San Diego, CA", startYear: 2004, endYear: 2015},
 				function(rows2){
-					return res.json({values: helpers.parseRowsByColumn(rows1, 'RegionName', 'Value'), avarage: helpers.parseRowsByColumn(rows2, 'RegionName', 'Value')});
+					return res.json({values: helpers.parseRowsByColumn(rows1, 'RegionName', 'Value'), average: helpers.parseRowsByColumn(rows2, 'RegionName', 'Value')});
 				});
 	});
 });
