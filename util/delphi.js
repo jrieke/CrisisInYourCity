@@ -17,16 +17,32 @@ module.exports = function(connString){
     module.TABLE_SOLD_FOR_LOSS = "zillow_zip_pct_of_homes_selling_for_loss_all_homes_norm";
     module.TABLE_DECREASING_VALUES = "zillow_zip_pct_of_homes_decreasing_in_values_all_homes_norm";
 
-    module.executeYearBoundedCountyQuery = function (config, params, callback){
+    module.METRO_TABLE_MEDIAN_SALE_PRICE = " zillow_metro_median_sold_price_per_sqft_all_homes_norm";
+    module.METRO_TABLE_FORECLOSURES = "zillow_metro_homes_sold_as_foreclosures_ratio_all_homes_norm";
+    module.METRO_TABLE_SOLD_FOR_LOSS = "";
+    module.METRO_TABLE_DECREASING_VALUES = "zillow_metro_pct_of_homes_decreasing_in_values_all_homes_norm";
+
+    module.executeYearBoundedQuery = function (config, params, callback){
         postgre.connect(connString, function(err, client, done){
             if(err){
                 console.log("Error fetching client from pool");
             }
-            client.query("SELECT \"RegionName\", \"Year\", \"Month\", \"Value\" FROM "
+
+            var queryString;
+            if(!config.metro){
+                queryString = "SELECT \"RegionName\", \"Year\", \"Month\", \"Value\" FROM "
                 + config.tablename +" WHERE "
-                + "\"State\"='CA' AND \"CountyName\"=$1 AND \"Year\">=$2 AND"
-                + " \"Year\"<= $3 ORDER BY \"RegionName\", \"Year\", \"Month\"",
-                [params.county, params.startYear, params.endYear],
+                + "\"State\"='CA' AND \"Metro\"=$1 AND \"Year\">=$2 AND"
+                + " \"Year\"<= $3 ORDER BY \"RegionName\", \"Year\", \"Month\"";
+            } else{
+              queryString = "SELECT \"RegionName\", \"Year\", \"Month\", \"Value\" FROM "
+                  + config.tablename +" WHERE "
+                  + "\"RegionName\"=$1 AND \"Year\">=$2 AND"
+                  + " \"Year\"<= $3 ORDER BY \"RegionName\", \"Year\", \"Month\"";
+            }
+
+            client.query( queryString,
+                [params.metro, params.startYear, params.endYear],
                 function(err, result){
                     done();
 

@@ -11,10 +11,12 @@ exports.parseRowsByColumn =  function(rows, column, value_column){
     var currentRegion = rows[0][column];
     var values = [];
 
+    jsonData[currentRegion] = values;
+
     var i = 0;
     for(i = 0; i < rows.length; i++){
         var row = rows[i];
-        if(row[column] != currentRegion){
+        if(row[column].replace(/\s+/g, '').toLowerCase() != currentRegion.replace(/\s+/g, '').toLowerCase()){
             jsonData[currentRegion] = values;
             currentRegion = row[column];
             values = [];
@@ -24,6 +26,7 @@ exports.parseRowsByColumn =  function(rows, column, value_column){
 
     return jsonData;
 };
+
 exports.getTopoJson= function(city){
     if (city== 'sandiego'){
         return toposandiego;

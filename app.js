@@ -16,11 +16,6 @@ var delphi = require('./util/delphi')(process.env.DELPHI_CONN_STRING);
 var helpers = require('./util/helpers');
 
 
-//database setup
-// var mongoose = require('mongoose');
-// mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/projecttest');
-
-
 //Configures the Template engine
 app.engine('handlebars', handlebars());//{defaultLayout: 'layout'}));
 app.set('view engine', 'handlebars');
@@ -48,42 +43,50 @@ app.get('/labels', function(req, res) {
 
 //delphi routes
 app.get("/soldforgain", function (req, res) {
-	delphi.executeYearBoundedCountyQuery({tablename: delphi.TABLE_SOLD_FOR_GAIN},
-		{county: "San Diego", startYear: 2000, endYear: 2015},
+	delphi.executeYearBoundedQuery({tablename: delphi.TABLE_SOLD_FOR_GAIN},
+		{metro: "San Diego", startYear: 2004, endYear: 2015},
 		function(rows){
 			return res.json(helpers.parseRowsByColumn(rows, 'RegionName', 'Value'));
 	});
 });
 
 app.get("/mediansaleprice",function(req, res){
-	delphi.executeYearBoundedCountyQuery({tablename: delphi.TABLE_MEDIAN_SALE_PRICE},
-		{county: "San Diego", startYear: 2000, endYear: 2015},
+	delphi.executeYearBoundedQuery({tablename: delphi.TABLE_MEDIAN_SALE_PRICE, metro: false},
+		{metro: "San Diego", startYear: 2004, endYear: 2015},
 		function(rows){
-			return res.json(helpers.parseRowsByColumn(rows, 'RegionName', 'Value'));
+			return res.json({values: helpers.parseRowsByColumn(rows, 'RegionName', 'Value'), average: ""});
 	});
 });
 
 app.get("/soldasforeclosures", function(req, res){
-	delphi.executeYearBoundedCountyQuery({tablename: delphi.TABLE_FORECLOSURES},
-		{county: "San Diego", startYear: 2000, endYear: 2015},
-		function(rows){
-			return res.json(helpers.parseRowsByColumn(rows, 'RegionName', 'Value'));
+	delphi.executeYearBoundedQuery({tablename: delphi.TABLE_FORECLOSURES, metro: false},
+		{metro: "San Diego", startYear: 2004, endYear: 2015},
+		function(rows1){
+			delphi.executeYearBoundedQuery({tablename: delphi.METRO_TABLE_FORECLOSURES, metro: true},
+				{metro: "San Diego, CA", startYear: 2004, endYear: 2015},
+				function(rows2){
+					return res.json({values: helpers.parseRowsByColumn(rows1, 'RegionName', 'Value'), avarage: helpers.parseRowsByColumn(rows2, 'RegionName', 'Value')});
+				});
 	});
 });
 
 app.get("/soldforloss", function(req, res){
-	delphi.executeYearBoundedCountyQuery({tablename: delphi.TABLE_SOLD_FOR_LOSS},
-		{county: "San Diego", startYear: 2000, endYear: 2015},
+	delphi.executeYearBoundedQuery({tablename: delphi.TABLE_SOLD_FOR_LOSS, metro: false},
+		{metro: "San Diego", startYear: 2004, endYear: 2015},
 		function(rows){
-			return res.json(helpers.parseRowsByColumn(rows, 'RegionName', 'Value'));
+			return res.json({values: helpers.parseRowsByColumn(rows, 'RegionName', 'Value'), avarage: ""});
 	});
 });
 
 app.get("/decreasinginvalues", function(req, res){
-	delphi.executeYearBoundedCountyQuery({tablename: delphi.TABLE_DECREASING_VALUES},
-		{county: "San Diego", startYear: 2000, endYear: 2015},
-		function(rows){
-			return res.json(helpers.parseRowsByColumn(rows, 'RegionName', 'Value'));
+	delphi.executeYearBoundedQuery({tablename: delphi.TABLE_DECREASING_VALUES, metro: false},
+		{metro: "San Diego", startYear: 2004, endYear: 2015},
+		function(rows1){
+			delphi.executeYearBoundedQuery({tablename: delphi.METRO_TABLE_DECREASING_VALUES, metro: true},
+				{metro: "San Diego, CA", startYear: 2004, endYear: 2015},
+				function(rows2){
+					return res.json({values: helpers.parseRowsByColumn(rows1, 'RegionName', 'Value'), avarage: helpers.parseRowsByColumn(rows2, 'RegionName', 'Value')});
+				});
 	});
 });
 
