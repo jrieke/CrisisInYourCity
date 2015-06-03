@@ -85,7 +85,7 @@ body {
   visibility: hidden
 }*/
 
-#time-chart .c3-axis-x.hidden {
+#time-chart .c3-axis-x {
   visibility: hidden !important;  /* only in the beginning */
 }
 #time-chart .c3-axis-x line {
@@ -151,7 +151,9 @@ body {
   fill: #f8f8f8;
 }
 
-
+#bar-chart .c3-axis-x {
+  visibility: hidden !important;  /* only in the beginning */
+}
 #bar-chart .c3-axis-x line {
   visibility: hidden
 }

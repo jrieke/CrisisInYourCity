@@ -163,19 +163,19 @@ function fetchDataset(name) {
 
     console.log('received dataset ' + name);
 
-    data[name] = json.values;
+    var datasetValues = json.values;
     var average = json.average[Object.keys(json.average)[0]];
-    data[name].average = average ? average : nullArr;
+    datasetValues.average = average ? average : nullArr;
 
 
     // var nullCount = 0;
     // test with 3 months average
-    for (var key in data[name]) {
+    for (var key in datasetValues) {
       // console.log(key);
-      if (data[name][key]) {
+      if (datasetValues[key]) {
         var newArr = [];
-        for (var i = 0; i < data[name][key].length-1; i+=3) {
-          var values = data[name][key].slice(i, i+3);
+        for (var i = 0; i < datasetValues[key].length-1; i+=3) {
+          var values = datasetValues[key].slice(i, i+3);
           var sum = 0;
           var num = 0;
           for (var j = 0; j < 3; j++) {
@@ -190,14 +190,14 @@ function fetchDataset(name) {
             newArr.push(sum / num);
         }
         // console.log(newArr);
-        data[name][key] = newArr;
+        datasetValues[key] = newArr;
       }
 
 
       // TODO: Keep this and run again as soon as we have all metro averages
-      // if (data[name][key]) {
+      // if (datasetValues[key]) {
       //   for (var i = 0; i < data[name][key].length; i++) {
-      //     if (data[name][key][i] === null)
+      //     if (datasetValues[key][i] === null)
       //       nullCount++;
       //   }
       // }
@@ -205,6 +205,8 @@ function fetchDataset(name) {
     }
 
     // console.log(name + ': ' + nullCount);
+
+    data[name] = datasetValues;
 
     numLoaded++;
     if (numLoaded == datasetNames.length) {
@@ -241,7 +243,9 @@ function initVisualizations() {
   // d3.select('#city-text').text(Metro Average);
   // d3.select('#time-chart').selectAll('.c3-circle-0').style('fill-opacity', 1);
   // d3.select('#time-chart').selectAll('.c3-text-0').style('visibility', 'visible');
-  d3.select('#time-chart').select('.c3-axis-x').classed('hidden', false);
+  d3.select('#time-chart').select('.c3-axis-x').style('visibility', 'visible', 'important');
+  d3.select('#bar-chart').select('.c3-axis-x').style('visibility', 'visible', 'important');
+
   d3.select('#time-chart').select('.c3-chart')
     .on('mouseover', function() {
       d3.select('#time-chart').selectAll('.c3-line').style('stroke-opacity', 0.5);      
@@ -296,8 +300,8 @@ function time(index) {
 
     barChart.load({
       json: {
-        values: itemsToShow.map(function(item) { return item[1] === null ? 0 : item[1]; }),
-        neighborhoods: ['1.', '2.', '3.', ' ', sortedItems.length-2 + '.', sortedItems.length-1 + '.', sortedItems.length + '.'] //itemsToShow.map(function(item) { return item[0]; })
+        values: itemsToShow.map(function(item) { return item[1] === null ? 0 : item[1]; })
+        // neighborhoods: [' ', 'Max', ' ', ' ', ' ', 'Min', ' ']//['1.', '2.', '3.', ' ', sortedItems.length-2 + '.', sortedItems.length-1 + '.', sortedItems.length + '.'] //itemsToShow.map(function(item) { return item[0]; })
       },
       done: function() {
 
@@ -467,15 +471,14 @@ function neighborhood(name) {
   }
 }
 
-function dataset(name) {
-
-  
+function dataset(name) {  
 
   // TODO: Make visualizations grey while data is loading, maybe even by using a small transition
 
   d3.select('#content-overlay').style('visibility', 'visible');
   d3.select('#time-slider-wrapper').style('visibility', 'hidden');
-  d3.select('#loading-spinner').classed(name, true);
+  // TODO: .classed does not update the color immediately
+  d3.select('#loading-spinner').classed(datasetNames.join(' '), false).classed(name, true);
   d3.select('#loading-spinner-wrapper').style('display', 'block');
 
 
@@ -526,8 +529,8 @@ function dataset(name) {
 
     barChart.load({
       json: {
-        values: itemsToShow.map(function(item) { return item[1] === null ? 0 : item[1]; }),
-        neighborhoods: ['1.', '2.', '3.', ' ', sortedItems.length-2 + '.', sortedItems.length-1 + '.', sortedItems.length + '.'] //itemsToShow.map(function(item) { return item[0]; })
+        values: itemsToShow.map(function(item) { return item[1] === null ? 0 : item[1]; })
+        // neighborhoods: [' ', 'Top', ' ', ' ', ' ', 'Bottom', ' ']//['1.', '2.', '3.', ' ', sortedItems.length-2 + '.', sortedItems.length-1 + '.', sortedItems.length + '.'] //itemsToShow.map(function(item) { return item[0]; })
       },
       done: function() {
 
@@ -696,11 +699,11 @@ var barChart = c3.generate({
   bindto: '#bar-chart',
   size: barChartSize(),
   data: {
-    x: 'neighborhoods',
+    // x: 'neighborhoods',
     json: {
       // TODO: Rename this to 'area'
-      neighborhoods: [' ', ' ', ' ', ' ', ' ', ' ', ' '],
-      values: [0.3, 0.7, 1, 0.3, 0.15, 0.4, 0.3]
+      // neighborhoods: [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+      values: [1, 0.9, 0.8, null, 0.3, 0.2, 0.1]
     },  // real data is loaded in 'dataset'
     colors: {
       values: startColor
@@ -719,7 +722,16 @@ var barChart = c3.generate({
   },
   axis: {
     x: {
-      type: 'category'  // required to show string labels
+      // type: 'category',  // required to show string labels
+      tick: {
+        format: function(x) {
+          switch (x) {
+            case 1: return 'Highest';
+            // case 3: return '.  .  .';
+            case 5: return 'Lowest';
+          }
+        }
+      }
     },
     y: {
       // show: false,
