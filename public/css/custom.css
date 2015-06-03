@@ -85,7 +85,9 @@ body {
   visibility: hidden
 }*/
 
-
+#time-chart .c3-axis-x.hidden {
+  visibility: hidden !important;  /* only in the beginning */
+}
 #time-chart .c3-axis-x line {
   visibility: hidden
 }
@@ -122,6 +124,8 @@ body {
 #time-chart .c3-text-0 {
   visibility: visible;
 }
+
+
 /*#time-chart:hover .c3-text {
   fill: #f8f8f8 !important;
 }*/
@@ -269,3 +273,25 @@ body {
   left: -0.27em;
   border-radius: 0.1em;
 }*/
+
+
+/* loading spinner */
+#loading-spinner-wrapper {
+  margin: auto;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+}
+
+/* TODO: Get the dataset colors in here */
+#loading-spinner.mediansaleprice {
+  border-color: #ef5350;
+}
+#loading-spinner.soldforloss {
+  border-color: #00bcd4;
+}
+#loading-spinner.decreasinginvalues {
+  border-color: #8bc34a;
+}
+#loading-spinner.soldasforeclosures {
+  border-color: #ffb300;
+}
