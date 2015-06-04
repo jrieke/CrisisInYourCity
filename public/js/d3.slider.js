@@ -265,6 +265,7 @@ return function module() {
         oldPos = formatPercent(scale(stepValue(currentValue))),
         newPos = formatPercent(scale(stepValue(newValue))),
         position = (orientation === "horizontal") ? "left" : "bottom";
+        console.log('currentValue: ' + currentValue + ' - oldPos:' + oldPos + ' - newPos: ' + newPos);
     if (oldPos !== newPos) {
 
       if (toType(value) == "array" && value.length == 2) {
@@ -288,6 +289,11 @@ return function module() {
           handle1.transition()
               .styleTween(position, function() { return d3.interpolate(oldPos, newPos); })
               .duration((typeof animate === "number") ? animate : 250);
+          // TODO: Move this out from here
+          d3.select('.d3-slider-progress')
+            .transition()
+            .styleTween('bottom', function() { return d3.interpolate(oldPos, newPos); })
+            .duration(250);
         } else {
           handle1.style(position, newPos);
         }
