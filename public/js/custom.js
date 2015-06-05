@@ -223,6 +223,7 @@ function initVisualizations() {
   d3.select('#time-chart-legend').style('visibility', 'visible');
   d3.select('#time-chart').select('.c3-axis-x').style('visibility', 'visible', 'important');
   d3.select('#bar-chart').select('.c3-axis-x').style('visibility', 'visible', 'important');
+  d3.select('#map').select('.map-legend').style('visibility', 'visible');
 
   d3.select('#time-chart').select('.c3-chart')
     .on('mouseover', function() {
@@ -825,16 +826,14 @@ var map = new Datamap({
       }  
     }
 
-    mapLegend.append('text')
+    mapLegendTextName = mapLegend.append('text')
       // .attr("class","legendText")
       .attr("text-anchor", "middle")
       .attr("x", 70)
-      .attr("y", 10)
-      // .attr("dy",0)
-      .text('Median Sale Price / $');
+      .attr("y", 10);
 
     mapLegendRect = mapLegend.append("rect")
-      .attr("fill","url(#gradient-mediansaleprice)")
+      .attr("fill", startColor)
       .attr("x", 0)
       .attr("y", 20)
       .attr("width", 140)
@@ -844,7 +843,7 @@ var map = new Datamap({
       .attr('fill', startColor)
       .attr('x', 155)
       .attr('y', 20)
-      .attr('width', 35)
+      .attr('width', 37)
       .attr('height', 10);
 
     mapLegend.append('text')
@@ -852,33 +851,25 @@ var map = new Datamap({
       .attr("text-anchor", "start")
       .attr("x", 155)
       .attr("y", 43)
-      // .attr("dy",0)
-      .text('No data');
+      .text('No Data');
 
     mapLegendTextMin = mapLegend.append('text')
       // .attr("class","legendText")
       .attr("text-anchor", "start")
       .attr("x", 0)
-      .attr("y", 43)
-      // .attr("dy",0)
-      .text(0);
+      .attr("y", 43);
 
     mapLegendTextMiddle = mapLegend.append('text')
       // .attr("class","legendText")
       .attr("text-anchor", "middle")
       .attr("x", 70)
-      .attr("y", 43)
-      // .attr("dy",0)
-      .text(numberFormats.mediansaleprice(maxDataValues.mediansaleprice / 2));
+      .attr("y", 43);
 
     mapLegendTextMax = mapLegend.append('text')
       // .attr("class","legendText")
       .attr("text-anchor", "end")
       .attr("x", 140)
-      .attr("y", 43)
-
-      // .attr("dy",0)
-      .text(numberFormats.mediansaleprice(maxDataValues.mediansaleprice));
+      .attr("y", 43);
 
 
 
@@ -949,10 +940,12 @@ var map = new Datamap({
 
 
 // map.legend();
-var mapLegend, mapLegendRect, mapLegendTextMin, mapLegendTextMiddle, mapLegendTextMax;
+var mapLegend, mapLegendRect, mapLegendTextName, mapLegendTextMin, mapLegendTextMiddle, mapLegendTextMax;
 
 function showDatasetInMapLegend(name) {
   mapLegendRect.attr('fill', 'url(#gradient-' + name + ')');
+  mapLegendTextName.text(axisLabels[name]);
+  mapLegendTextMin.text(0);
   mapLegendTextMiddle.text(numberFormats[name](maxDataValues[name] / 2));
   mapLegendTextMax.text(numberFormats[name](maxDataValues[name]));  // TODO: Make clear that the rightmost color also encompasses values > max value
 }

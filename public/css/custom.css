@@ -191,6 +191,7 @@ body {
 
 .map-legend {
   font: 10px sans-serif;
+  visibility: hidden;
 }
 
 .map-legend text {  
