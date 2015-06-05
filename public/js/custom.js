@@ -129,7 +129,7 @@ var selectDatasetWhenLoaded = '';
 var datasetColors = {mediansaleprice: {map: '#f44336', charts: '#ef5350'}, soldforloss: {map: '#00bcd4', charts: '#00bcd4'}, decreasinginvalues: {map: '#8bc34a', charts: '#8bc34a'}, soldasforeclosures: {map: '#ffb300', charts: '#ffb300'}};
 var minDataValue = 0;
 // TODO: Make these better
-var maxDataValues = {mediansaleprice: 1000000, soldforloss: 100, decreasinginvalues: 100, soldasforeclosures: 50};
+var maxDataValues = {mediansaleprice: 1000000, soldforloss: 100, decreasinginvalues: 100, soldasforeclosures: 70};
 var axisLabels = {mediansaleprice: 'Median sale price / $', soldforloss: 'Homes sold for loss / %', decreasinginvalues: 'Homes decreasing in value / %', soldasforeclosures: 'Homes foreclosed / %'};
 var numberFormats = {'': function() { return ''; }, mediansaleprice: d3.format('.3s'), soldforloss: d3.format('.0f'), decreasinginvalues: d3.format('.0f'), soldasforeclosures: d3.format('.0f')};
 
@@ -349,6 +349,11 @@ function showValuesInBarChart(ranks) {
   });
 }
 
+function highlightSelectedTimeInTimeChart() {  
+  d3.select('#time-chart').selectAll('.c3-circle').style('fill-opacity', '0');
+  d3.select('#time-chart').selectAll('.c3-circle-' + selectedTimeIndex).style('fill-opacity', '1');
+  d3.select('#time-chart').selectAll('.c3-texts-average,.c3-texts-area').selectAll('.c3-text').style('visibility', function(d, i) {  return (d3.select('#time-chart').select('.c3-circle-' + i).classed('_expanded_') || i == selectedTimeIndex) ? 'visible' : 'hidden';  });
+}
 
 
 
@@ -372,6 +377,7 @@ function dataset(name) {
 
     colorScale.domain([minDataValue, maxDataValues[selectedDataset]]);
     colorScale.range(['#f8f8f8', datasetColors[selectedDataset].map]);
+    showDatasetInMapLegend(selectedDataset);
     showCurrentValuesInMap();
 
     barChart.data.colors({ values: datasetColors[selectedDataset].charts });
@@ -392,7 +398,7 @@ function dataset(name) {
         area: selectedArea ? data[selectedDataset].values[selectedArea] : nullArr
       }
     });
-
+    highlightSelectedTimeInTimeChart();
 
     d3.select('#loading-spinner-wrapper').style('display', 'none');
     d3.select('#content-overlay').style('visibility', 'hidden');
@@ -404,16 +410,14 @@ function dataset(name) {
 function time(index) {
   // console.log(index);
   if (index != selectedTimeIndex) {
-
     selectedTimeIndex = index;
 
     sortAreasByValue();
+    // TODO: If there are just going to be top/bottom values in the bar chart, integrate all of this stuff into one method
     showTopBottomValuesInBarChart();
     highlightSelectedAreaInBarChart();
 
-    d3.select('#time-chart').selectAll('.c3-circle').style('fill-opacity', '0');
-    d3.select('#time-chart').selectAll('.c3-circle-' + index).style('fill-opacity', '1');
-    d3.select('#time-chart').selectAll('.c3-texts-average,.c3-texts-area').selectAll('.c3-text').style('visibility', function(d, i) {  return (d3.select('#time-chart').select('.c3-circle-' + i).classed('_expanded_') || i == index) ? 'visible' : 'hidden';  });
+    highlightSelectedTimeInTimeChart();
 
     showCurrentValuesInMap();
   }
@@ -421,39 +425,21 @@ function time(index) {
 
 function area(name) {
   if (name != selectedArea) {
-    if (name) {
-      setTimeout(function() {
-        // Only load the data in the time chart if the area is still selected
-        if (name == selectedArea) {
-          timeChart.load({
-            json: {
-              area: data[selectedDataset].values[name]
-            }
-          });          
-          d3.select('#area-text').text(name);
-        }
-      }, 50);
+    // console.log(name);
+    setTimeout(function() {
+      if (name == selectedArea) {  // only load data into the time chart if the area is still selected
+        timeChart.load({
+          json: {
+            area: name ? data[selectedDataset].values[name] : nullArr
+          }
+        });
+        d3.select('#area-text').text(name ? name : 'Select an area on the map');
+      }
+    }, 50);
 
-      selectedArea = name;
-      highlightSelectedAreaInBarChart();
-      highlightSelectedAreaInMap();
-    } else {  // unselect all areas
-      setTimeout(function() {
-        // Only load the data in the time chart if the area is still selected
-        if (name == selectedArea) {
-          timeChart.load({
-            json: {
-              area: nullArr
-            }
-          });          
-          d3.select('#area-text').text('Select an area on the map');
-        }
-      }, 50);
-
-      selectedArea = name;
-      highlightSelectedAreaInBarChart();
-      highlightSelectedAreaInMap();      
-    }
+    selectedArea = name;
+    highlightSelectedAreaInBarChart();
+    highlightSelectedAreaInMap();
   }
 }
 
@@ -745,7 +731,7 @@ var timeChart = c3.generate({
 /* ------------------------------------------- Map ------------------------------------------------------- */
 
 // TODO: Add a legend for the colors
-var colorScale = d3.scale.linear();  // range will be added during 'dataset'
+var colorScale = d3.scale.linear().clamp(true);  // range will be added during 'dataset'
 var blankMapColors = {};
 var map = new Datamap({
   element: document.getElementById('map'),
@@ -809,6 +795,95 @@ var map = new Datamap({
      return {path: d3.geo.path().projection(projection), projection: projection};
   },
   done: function(datamap) {
+
+    mapLegend = datamap.svg.append('g')
+      // .attr('transform', 'translate(20, 300)')
+      .classed('map-legend', true);
+
+    // Make legend with color gradient, see https://gist.github.com/nowherenearithaca/4449376
+    // and http://bl.ocks.org/mbostock/1086421
+
+    var numStops = 10;
+    for (var datasetName in datasetColors) {
+      var gradient = mapLegend.append("defs")
+        .append("linearGradient")
+        .attr("id",'gradient-' + datasetName)
+        .attr("x1","0%")
+        .attr("x2","100%")
+        .attr("y1","0%")
+        .attr("y2","0%");
+
+      var scale = d3.scale.linear()
+        .domain([0, numStops-1])
+        .range(['#f8f8f8', datasetColors[datasetName].map]);
+
+      for (var i = 0; i < numStops; i++) {
+        // console.log(i + ' - ' + i/(numStops-1) + ' - ' + scale(i));
+        gradient.append("stop")
+          .attr("offset", i / (numStops - 1))
+          .attr("stop-color", scale(i));
+      }  
+    }
+
+    mapLegend.append('text')
+      // .attr("class","legendText")
+      .attr("text-anchor", "middle")
+      .attr("x", 70)
+      .attr("y", 10)
+      // .attr("dy",0)
+      .text('Median Sale Price / $');
+
+    mapLegendRect = mapLegend.append("rect")
+      .attr("fill","url(#gradient-mediansaleprice)")
+      .attr("x", 0)
+      .attr("y", 20)
+      .attr("width", 140)
+      .attr("height", 10);
+
+    mapLegend.append('rect')
+      .attr('fill', startColor)
+      .attr('x', 155)
+      .attr('y', 20)
+      .attr('width', 35)
+      .attr('height', 10);
+
+    mapLegend.append('text')
+      // .attr("class","legendText")
+      .attr("text-anchor", "start")
+      .attr("x", 155)
+      .attr("y", 43)
+      // .attr("dy",0)
+      .text('No data');
+
+    mapLegendTextMin = mapLegend.append('text')
+      // .attr("class","legendText")
+      .attr("text-anchor", "start")
+      .attr("x", 0)
+      .attr("y", 43)
+      // .attr("dy",0)
+      .text(0);
+
+    mapLegendTextMiddle = mapLegend.append('text')
+      // .attr("class","legendText")
+      .attr("text-anchor", "middle")
+      .attr("x", 70)
+      .attr("y", 43)
+      // .attr("dy",0)
+      .text(numberFormats.mediansaleprice(maxDataValues.mediansaleprice / 2));
+
+    mapLegendTextMax = mapLegend.append('text')
+      // .attr("class","legendText")
+      .attr("text-anchor", "end")
+      .attr("x", 140)
+      .attr("y", 43)
+
+      // .attr("dy",0)
+      .text(numberFormats.mediansaleprice(maxDataValues.mediansaleprice));
+
+
+
+
+
     // TODO: Make sure to select dataset only once map is loaded
     blankMapColors = {};
     var geometries = datamap.customTopo.objects.tl_2010_06_zcta510.geometries;
@@ -871,13 +946,16 @@ var map = new Datamap({
       });
   }
 });
-map.legend();
 
 
+// map.legend();
+var mapLegend, mapLegendRect, mapLegendTextMin, mapLegendTextMiddle, mapLegendTextMax;
 
-
-
-
+function showDatasetInMapLegend(name) {
+  mapLegendRect.attr('fill', 'url(#gradient-' + name + ')');
+  mapLegendTextMiddle.text(numberFormats[name](maxDataValues[name] / 2));
+  mapLegendTextMax.text(numberFormats[name](maxDataValues[name]));  // TODO: Make clear that the rightmost color also encompasses values > max value
+}
 
 
 /* ------------------------------------------- Resizing --------------------------------------------------- */

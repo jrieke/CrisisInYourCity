@@ -189,6 +189,14 @@ body {
   cursor: pointer;
 }
 
+.map-legend {
+  font: 10px sans-serif;
+}
+
+.map-legend text {  
+  fill: #f8f8f8;
+}
+
 
 
 
