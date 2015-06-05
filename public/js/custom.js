@@ -731,12 +731,11 @@ var timeChart = c3.generate({
 
 /* ------------------------------------------- Map ------------------------------------------------------- */
 
-// TODO: Add a legend for the colors
 var colorScale = d3.scale.linear().clamp(true);  // range will be added during 'dataset'
 var blankMapColors = {};
 var map = new Datamap({
   element: document.getElementById('map'),
-  responsive: true,
+  // responsive: true,
   geographyConfig: {
     dataUrl: 'data/SanDiego.json',
     borderColor: '#757575', 
@@ -763,6 +762,8 @@ var map = new Datamap({
     var width = options.width || element.offsetWidth;
     var height = options.height || element.offsetHeight;
 
+    // console.log('w: ' + width + ' h:' + height);
+
     // console.log(element);
     // console.log(options);
 
@@ -787,18 +788,23 @@ var map = new Datamap({
     //     .scale(s)
     //     .translate(t);
 
-    // var size = mapSize();
+
     var projection = d3.geo.mercator()
   		.center([-117.0, 33.0])
-  		.scale(20000)
+  		.scale(20000) //* width);
       .translate([width / 2, height / 2]);
 	
      return {path: d3.geo.path().projection(projection), projection: projection};
   },
-  done: function(datamap) {
+  done: function(datamap) {    
+
+    originalSubunitsSize = datamap.svg.select('.datamaps-subunits').node().getBoundingClientRect();
+    clipMapToContainer();
+
+    console.log('translate(' + (mapSize().width / 2 - 100) + 'px, ' + (mapSize().height - 50) + 'px)');
 
     mapLegend = datamap.svg.append('g')
-      // .attr('transform', 'translate(20, 300)')
+      .style('transform', 'translate(' + (mapSize().width / 2 - 96) + 'px, ' + (mapSize().height - 65) + 'px)')
       .classed('map-legend', true);
 
     // Make legend with color gradient, see https://gist.github.com/nowherenearithaca/4449376
@@ -938,8 +944,21 @@ var map = new Datamap({
   }
 });
 
+var originalSubunitsSize;
+function clipMapToContainer() {
+  var subunits = d3.select('#map').select('.datamaps-subunits');
 
-// map.legend();
+  var divSize = mapSize();
+  var scaleFactor = Math.min(divSize.width / originalSubunitsSize.width, divSize.height / originalSubunitsSize.height);
+
+  // apply scale and measure again for translation values
+  subunits.style('transform', 'scale(' + scaleFactor + ')');
+  var newSubunitsSize = subunits.node().getBoundingClientRect();
+
+  // apply final scale and translation
+  subunits.style('transform', 'translate(' + (divSize.left - newSubunitsSize.left + divSize.width / 2 - newSubunitsSize.width / 2) + 'px, ' + (divSize.top - newSubunitsSize.top + divSize.height / 2 - newSubunitsSize.height / 2) + 'px) scale(' + scaleFactor + ')');
+}
+
 var mapLegend, mapLegendRect, mapLegendTextName, mapLegendTextMin, mapLegendTextMiddle, mapLegendTextMax;
 
 function showDatasetInMapLegend(name) {
@@ -960,14 +979,18 @@ function timeChartSize() {
   return d3.select('#time-chart-wrapper').node().getBoundingClientRect();
 }
 function mapSize() {
-  return d3.select('#map-wrapper').node().getBoundingClientRect();
+  return d3.select('#map').node().getBoundingClientRect();
 }
+
+// var originalMapSize = mapSize();  // TODO: Do this in done method of datamaps
+// var originalSubunitsSize = d3.select('#map').select('.datamaps-subunits').node().getBoundingClientRect();
+// d3.select('#map').select('.datamaps-subunits').style('-webkit-transform', function() {
+//     return 'scale(' + Math.min(originalMapSize.width / originalSubunitsSize.width, originalMapSize.height / originalSubunitsSize.height) + ')';
+//   });
 
 window.addEventListener('resize', function() {
   barChart.resize(barChartSize());
   attachMouseListenersToBarChart();
   timeChart.resize(timeChartSize());
-  // map.resize();
-  // TODO: The map does not work properly on resizing. Fix this
-  map.resize(mapSize());
+  clipMapToContainer();
 });

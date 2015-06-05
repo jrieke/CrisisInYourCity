@@ -265,7 +265,7 @@ return function module() {
         oldPos = formatPercent(scale(stepValue(currentValue))),
         newPos = formatPercent(scale(stepValue(newValue))),
         position = (orientation === "horizontal") ? "left" : "bottom";
-        console.log('currentValue: ' + currentValue + ' - oldPos:' + oldPos + ' - newPos: ' + newPos);
+        // console.log('currentValue: ' + currentValue + ' - oldPos:' + oldPos + ' - newPos: ' + newPos);
     if (oldPos !== newPos) {
 
       if (toType(value) == "array" && value.length == 2) {

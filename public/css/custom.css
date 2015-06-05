@@ -67,12 +67,12 @@ body {
 /*  margin: 0 auto;
   width: 900px;*/
   margin: 0 auto;
-  width: calc(100% - 200px);
+  width: calc(100% - 170px);
 }
 
 @media (max-width: 1000px) {
   #content {
-    width: calc(100% - 20px);
+    width: calc(100% - 30px);
   }
 }
 
@@ -184,7 +184,12 @@ body {
 
 
 /* ------------------------------------------ Map ------------------------------------------------ */
-
+#map {
+  overflow: hidden;
+}
+.datamap {
+  overflow: visible !important;
+}
 .datamaps-subunit {
   cursor: pointer;
 }
