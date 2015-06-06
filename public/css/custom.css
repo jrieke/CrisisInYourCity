@@ -19,18 +19,18 @@ a:hover {
 /* ------------------------------------------ Nav bar and front page ------------------------------------------------ */
 
 /* TODO: Rename */
-#front-header {
+/*#header {
   position: absolute; 
   top: 0px; 
   width: 100%; 
-  height: 400px
-}
+  height: 100%;
+}*/
 
-@media (max-height: 400px) {
+/*@media (max-height: 400px) {
   #front-header {
     height: 100%;
   }
-}
+}*/
 
 .nav-title {
   color: #f8f8f8;
@@ -48,14 +48,23 @@ a:hover {
 #nav-title-3:hover, #nav-title-3.active {background: #8bc34a;} /*{border-bottom: 3px solid #8bc34a; color: #8bc34a;}*/
 #nav-title-4:hover, #nav-title-4.active {background: #ffb300;} /*{border-bottom: 3px solid #ffb300; color: #ffb300;}*/
 
+#descriptions {
+  position: absolute; 
+  width: 100%;
+  height: 50px; 
+  top: 350px;
+  /*display: none;*/
+  visibility: hidden;
+  z-index: 10; 
+}
 
 .description {
-  position: absolute; 
-  bottom: 0px; 
-  height: 50px; 
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  height: 100%;
   line-height: 50px;  /* vertical alignment */
   width: 100%; 
-  z-index: 10; 
   font-size: 0.9em; 
   color: #f8f8f8;
   text-align: center;
@@ -67,10 +76,18 @@ a:hover {
 
 /* ------------------------------------------ Content page ------------------------------------------------ */
 
+#content-pane {
+  position: absolute;
+  top: calc(100% - 50px);
+  width: 100%;
+  height: calc(100% - 100px);
+  visibility: hidden;
+}
+
 #content {
   position: relative;
-  top: 380px;
-  height: calc(100% - 160px);
+  top: 40px;
+  height: calc(100% - 60px);
 /*  margin: 0 auto;
   width: 900px;*/
   margin: 0 auto;

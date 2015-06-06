@@ -17,28 +17,31 @@
 
 
 
-<body class="grey darken-1">
+<body class="grey darken-3">
 
-<div id="front-header">
 
-  <div id="navbar-wrapper" class="grey darken-3" style="position: absolute; bottom: 50px; width: 100%; top: 0px">
+<div id="header" class="center-align" style="padding: 20px; color: #f8f8f8;">
+  <h3>Some description</h3>
+  <p id="loading">Loading datasets...</p>
+  <p id="choose-san-diego">San Diego</p>
+</div>
 
-    <div id="navbar-header" class="center-align" style="padding: 20px; color: #f8f8f8;">
-      <h3>Some description</h3>
-      <p id="loading">Loading datasets...</p>
-    </div>
 
-    <!-- TODO: Change this to nav (currently, materialize alters the style of that) -->
-    <div id="navbar" style="position: absolute; bottom: 0px; height: 50px; width: 100%; text-align: center">
-      <a href="/"><div style="position: absolute; left: 10px; height: 50px; line-height: 50px; color: #bdbdbd">Back</div></a>
-      <div id="nav-title-1" class="nav-title mediansaleprice">Sale Price</div><!--
-      --><div id="nav-title-2" class="nav-title soldforloss ">Sold for Loss</div><!--
-      --><div id="nav-title-3" class="nav-title decreasinginvalues">Decreasing Values</div><!--
-      --><div id="nav-title-4" class="nav-title soldasforeclosures">Foreclosures</div>
-    </div>
 
-  </div>
+<!-- TODO: Change this to nav (currently, materialize alters the style of that) -->
+<div id="navbar" style="position: absolute; top: calc(100% - 100px); height: 50px; width: 100%; text-align: center; opacity: 0; visibility: hidden">
+  <a href="/"><div style="position: absolute; left: 10px; height: 50px; line-height: 50px; color: #bdbdbd">Back</div></a>
+  <div id="nav-title-1" class="nav-title mediansaleprice">Sale Price</div><!--
+  --><div id="nav-title-2" class="nav-title soldforloss ">Sold for Loss</div><!--
+  --><div id="nav-title-3" class="nav-title decreasinginvalues">Decreasing Values</div><!--
+  --><div id="nav-title-4" class="nav-title soldasforeclosures">Foreclosures</div>
+</div>
 
+  
+
+</div>
+
+<div id="descriptions">
   <div id="description-1" class="description mediansaleprice" style="background-color: rgba(239, 83, 80, 1);">
     Median sale price for all homes sold in one month
   </div>
@@ -51,10 +54,9 @@
   <div id="description-4" class="description soldasforeclosures" style="background-color: rgba(255, 179, 0, 1);">
     Number of homes per 10 000 that were foreclosed in one month
   </div>
-
 </div>
 
-
+<div id="content-pane" class="grey darken-1">
 <div id="content">
 
   <div id="content-overlay" style="position: absolute; width: 100%; height: 100%; z-index: 2;">
@@ -72,6 +74,8 @@
     </div>
 
   </div>
+
+
 
   <div style="position: absolute; width: 100%; height: 100%;">
 
@@ -91,7 +95,7 @@
 
     </div>
 
-    <div id="time-slider-wrapper" style="display: flex; flex-direction: column; visibility: hidden; position: absolute; top: 20px; left: 37.5%; width: 25%; bottom: 20px; text-align: center;">
+    <div id="time-slider-wrapper" style="display: flex; flex-direction: column; visibility: hidden; position: absolute; top: 10px; left: 37.5%; width: 25%; bottom: 25px; text-align: center;">
 
       <div style="color: #f8f8f8;">
         <span id="month">Jan - Mar</span><br>
@@ -129,12 +133,19 @@
   </div>
 
 </div>
+</div>
 
-<div class="center-align grey darken-2 grey-text text-lighten-1" style="z-index: 2; position: absolute; bottom: 0px; height: 50px; width: 100%; font-size: 0.9em; line-height: 50px">
+<div id="footer" class="center-align grey-text text-lighten-1" style="background-color: #424242; z-index: 2; position: absolute; bottom: 0px; height: 50px; width: 100%; font-size: 0.9em; line-height: 50px">
   &copy; <a href="https://github.com/jrieke">Johannes Rieke</a>, <a href="https://github.com/sindrma">Sindre Magnussen</a>, <a href="https://github.com/chrisblum">Chris Blum</a>, <a href="https://github.com/petteas">Petter Astrup</a>, <a href="https://github.com/nemanjaaks">Nemanja Aksic</a>
 </div>
 
-
+<script type="text/javascript">
+  var metros = [
+    {{#each metros}}
+    { metro: "{{metro}}", state: "{{state}}" }, 
+    {{/each}}
+  ];
+</script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.96.1/js/materialize.min.js"></script>

@@ -41,14 +41,6 @@ app.get('/labels', function(req, res) {
 });
 
 
-app.get("/metro", function(res, req){
-	return res.json([
-		{metro: "San Diego", state: "CA"},
-		{metro: "Los Angeles", state: "CA"},
-		{metro: "San Francisco", state: "CA"}
-	]);
-});
-
 //delphi routes
 app.post("/soldforgain", function (req, res) {
 	console.log(req);

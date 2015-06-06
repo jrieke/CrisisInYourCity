@@ -8,98 +8,102 @@
 var months = ['2004-02-15', '2004-05-15', '2004-08-15', '2004-11-15', '2005-02-15', '2005-05-15', '2005-08-15', '2005-11-15', '2006-02-15', '2006-05-15', '2006-08-15', '2006-11-15', '2007-02-15', '2007-05-15', '2007-08-15', '2007-11-15', '2008-02-15', '2008-05-15', '2008-08-15', '2008-11-15', '2009-02-15', '2009-05-15', '2009-08-15', '2009-11-15', '2010-02-15', '2010-05-15', '2010-08-15', '2010-11-15', '2011-02-15', '2011-05-15', '2011-08-15', '2011-11-15', '2012-02-15', '2012-05-15', '2012-08-15', '2012-11-15', '2013-02-15', '2013-05-15', '2013-08-15', '2013-11-15', '2014-02-15', '2014-05-15', '2014-08-15', '2014-11-15'];
 var nullArr = Array.apply(null, new Array(months.length)).map(function() { return null; });
 
+var datasetNames = ['mediansaleprice', 'soldforloss', 'decreasinginvalues', 'soldasforeclosures'];
+
 var data = {};
 var numLoaded = 0;
 
-function fetchDataset(name) {
-  d3.json('/' + name, function(error, json) {
-    if (error) return console.warn(error);
-
-    console.log('received dataset ' + name);
-
-    var average = json.average[Object.keys(json.average)[0]];
-    json.average = average ? average : nullArr;
-
-    if (json.average) {
-      var newArr = [];
-      for (var i = 0; i < json.average.length-1; i+=3) {
-        var values = json.average.slice(i, i+3);
-        var sum = 0;
-        var num = 0;
-        for (var j = 0; j < 3; j++) {
-          if (values[j] !== null) {
-            sum += values[j];
-            num++;
-          }
-        }
-        if (num === 0)
-          newArr.push(null);
-        else
-          newArr.push(sum / num);
-      }
-      // console.log(newArr);
-      json.average = newArr;
-    }
+console.log(metros);
 
 
-    // var nullCount = 0;
-    // TODO: Do this in backend
-    for (var key in json.values) {
-      // console.log(key);
-      if (json.values[key]) {
-        var newArr = [];
-        for (var i = 0; i < json.values[key].length-1; i+=3) {
-          var values = json.values[key].slice(i, i+3);
-          var sum = 0;
-          var num = 0;
-          for (var j = 0; j < 3; j++) {
-            if (values[j] !== null) {
-              sum += values[j];
-              num++;
-            }
-          }
-          if (num === 0)
-            newArr.push(null);
-          else
-            newArr.push(sum / num);
-        }
-        // console.log(newArr);
-        json.values[key] = newArr;
-      }
+function fetchDataset(name, metro) {
+  console.log(metro);
+  d3.xhr('/' + name)
+    .header("Content-Type", "application/json")
+    .post(JSON.stringify(metro), function(error, result) {
+      if (error) return console.warn(error);
 
+      var json = JSON.parse(result.response);
+      console.log('received dataset ' + name);
+      console.log(json);
 
-      // TODO: Keep this and run again as soon as we have all metro averages
-      // if (json[key]) {
-      //   for (var i = 0; i < data[name][key].length; i++) {
-      //     if (json[key][i] === null)
-      //       nullCount++;
+      var average = json.average[Object.keys(json.average)[0]];
+      json.average = average ? average : nullArr;
+
+      // if (json.average) {
+      //   var newArr = [];
+      //   for (var i = 0; i < json.average.length-1; i+=3) {
+      //     var values = json.average.slice(i, i+3);
+      //     var sum = 0;
+      //     var num = 0;
+      //     for (var j = 0; j < 3; j++) {
+      //       if (values[j] !== null) {
+      //         sum += values[j];
+      //         num++;
+      //       }
+      //     }
+      //     if (num === 0)
+      //       newArr.push(null);
+      //     else
+      //       newArr.push(sum / num);
       //   }
+      //   // console.log(newArr);
+      //   json.average = newArr;
       // }
 
-    }
 
-    // console.log(name + ': ' + nullCount);
+      // // var nullCount = 0;
+      // // TODO: Do this in backend
+      // for (var key in json.values) {
+      //   // console.log(key);
+      //   if (json.values[key]) {
+      //     var newArr = [];
+      //     for (var i = 0; i < json.values[key].length-1; i+=3) {
+      //       var values = json.values[key].slice(i, i+3);
+      //       var sum = 0;
+      //       var num = 0;
+      //       for (var j = 0; j < 3; j++) {
+      //         if (values[j] !== null) {
+      //           sum += values[j];
+      //           num++;
+      //         }
+      //       }
+      //       if (num === 0)
+      //         newArr.push(null);
+      //       else
+      //         newArr.push(sum / num);
+      //     }
+      //     // console.log(newArr);
+      //     json.values[key] = newArr;
+      //   }
 
-    data[name] = json;
 
-    numLoaded++;
-    if (numLoaded == datasetNames.length) {
-      // TODO: Remove this once we have a description
-      d3.select('#loading').text('Done!');
-    }
+        // TODO: Keep this and run again as soon as we have all metro averages
+        // if (json[key]) {
+        //   for (var i = 0; i < data[name][key].length; i++) {
+        //     if (json[key][i] === null)
+        //       nullCount++;
+        //   }
+        // }
 
-    if (selectDatasetWhenLoaded == name) {
-      dataset(name);
-      selectDatasetWhenLoaded = '';
-    }
+      // }
 
-  });
-}
+      // console.log(name + ': ' + nullCount);
 
-// Load the datasets as the first thing, so we reduce waiting time
-var datasetNames = ['mediansaleprice', 'soldforloss', 'decreasinginvalues', 'soldasforeclosures'];
-for (var i = 0; i < datasetNames.length; i++) {
-  fetchDataset(datasetNames[i]);
+      data[name] = json;
+
+      numLoaded++;
+      if (numLoaded == datasetNames.length) {
+        // TODO: Remove this once we have a description
+        d3.select('#loading').text('Done!');
+      }
+
+      if (selectDatasetWhenLoaded == name) {
+        dataset(name);
+        selectDatasetWhenLoaded = '';
+      }
+
+    }); 
 }
 
 
@@ -136,20 +140,27 @@ var numberFormats = {'': function() { return ''; }, mediansaleprice: d3.format('
 
 function down() {
   if (!slidedDown) {
-    d3.select('#front-header')
-      .transition()
-      .duration(1000)
-      .style('top', '-300px');
+    // d3.select('#front-header')
+    //   .transition()
+    //   .duration(1000)
+    //   .style('top', '-300px');
 
-    d3.select('#content')
-      .transition()
-      .duration(1000)
-      .style('top', '80px');
 
-    d3.select('#up-arrow')
+    d3.select('#navbar')
       .transition()
       .duration(1000)
-      .style('opacity', 1);
+      .style('top', '0px');
+
+    d3.select('#descriptions')
+      .transition()
+      .duration(1000)
+      .style('top', '50px');
+
+    d3.select('#content-pane')
+      .transition()
+      .duration(1000)
+      .style('top', '50px');
+
 
     d3.selectAll('.description')
       .transition()
@@ -161,32 +172,42 @@ function down() {
   }
 }
 
-function up() {
-  if (slidedDown) {
-    d3.select('#front-header')
-      .transition()
-      .duration(1000)
-      .style('top', '0px');
+d3.select('#choose-san-diego').on('click', function() {
+  d3.select('#navbar')
+    .style('visibility', 'visible')
+    .transition()
+    .duration(1000)
+    .style('top', '300px')
+    .style('opacity', 1);
 
-    d3.select('#content')
-      .transition()
-      .duration(1000)
-      .style('top', '380px');
+  d3.select('#descriptions')
+    .transition()
+    .delay(1000)
+    .style('visibility', 'visible');
 
-    d3.select('#up-arrow')
-      .transition()
-      .duration(1000)
-      .style('opacity', 0);
+  d3.select('#content-pane')
+    .style('visibility', 'visible')
+    .transition()
+    .duration(1000)
+    .style('top', '350px');
 
-    // TODO: uninit visualizations when going up
+  d3.select('#footer')
+    .transition()
+    .duration(1000)
+    .style('background-color', '#616161');
 
-    slidedDown = false;
+
+  d3.select('#header')
+    .style('visibility', 'hidden');
+
+
+  // Load the datasets as the first thing, so we reduce waiting time
+  for (var i = 0; i < datasetNames.length; i++) {
+    fetchDataset(datasetNames[i], metros[0]);
   }
-}
 
+});
 
-// TODO: Keep this or replace it by a simple link to the main page?
-d3.select('#up-arrow').on('click', up);
 
 
 d3.selectAll('.nav-title')
