@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Financial Crisis in San Diego</title>
+  <title>Financial Crisis</title>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.96.1/css/materialize.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.css">
@@ -20,17 +20,28 @@
 <body class="grey darken-3">
 
 
-<div id="header" class="center-align" style="padding: 20px; color: #f8f8f8;">
+<div id="metro-name-wrapper" style="z-index: 1; position: absolute; left: 20px; top: 10px; height: 50px; line-height: 50px; visibility: hidden; opacity: 0; font-size: 1.4rem"><span id="metro-name" style="font-size: 1em; color: #f8f8f8"></span> <a href="/" style="font-size: 0.8rem">Change</a></div>
+
+
+<div id="header" class="container section center-align" style="color: #f8f8f8;">
   <h3>Some description</h3>
-  <p id="loading">Loading datasets...</p>
-  <p id="choose-san-diego">San Diego</p>
+  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+  tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+  quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+  consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+  cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+  proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+  <div style="margin-top: 40px">
+    {{#each metros}}
+    <span class="choose-metro btn teal waves-effect" style="margin: 2px">{{metro}}, {{state}}</span>
+    {{/each}}
+  </div>
 </div>
 
 
 
 <!-- TODO: Change this to nav (currently, materialize alters the style of that) -->
 <div id="navbar" style="position: absolute; top: calc(100% - 100px); height: 50px; width: 100%; text-align: center; opacity: 0; visibility: hidden">
-  <a href="/"><div style="position: absolute; left: 10px; height: 50px; line-height: 50px; color: #bdbdbd">Back</div></a>
   <div id="nav-title-1" class="nav-title mediansaleprice">Sale Price</div><!--
   --><div id="nav-title-2" class="nav-title soldforloss ">Sold for Loss</div><!--
   --><div id="nav-title-3" class="nav-title decreasinginvalues">Decreasing Values</div><!--
@@ -56,7 +67,7 @@
   </div>
 </div>
 
-<div id="content-pane" class="grey darken-1">
+<div id="content-pane" class="grey darken-1" style="cursor: pointer;">
 <div id="content">
 
   <div id="content-overlay" style="position: absolute; width: 100%; height: 100%; z-index: 2;">

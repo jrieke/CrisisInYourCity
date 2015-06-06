@@ -30,53 +30,6 @@ function fetchDataset(name, metro) {
       var average = json.average[Object.keys(json.average)[0]];
       json.average = average ? average : nullArr;
 
-      // if (json.average) {
-      //   var newArr = [];
-      //   for (var i = 0; i < json.average.length-1; i+=3) {
-      //     var values = json.average.slice(i, i+3);
-      //     var sum = 0;
-      //     var num = 0;
-      //     for (var j = 0; j < 3; j++) {
-      //       if (values[j] !== null) {
-      //         sum += values[j];
-      //         num++;
-      //       }
-      //     }
-      //     if (num === 0)
-      //       newArr.push(null);
-      //     else
-      //       newArr.push(sum / num);
-      //   }
-      //   // console.log(newArr);
-      //   json.average = newArr;
-      // }
-
-
-      // // var nullCount = 0;
-      // // TODO: Do this in backend
-      // for (var key in json.values) {
-      //   // console.log(key);
-      //   if (json.values[key]) {
-      //     var newArr = [];
-      //     for (var i = 0; i < json.values[key].length-1; i+=3) {
-      //       var values = json.values[key].slice(i, i+3);
-      //       var sum = 0;
-      //       var num = 0;
-      //       for (var j = 0; j < 3; j++) {
-      //         if (values[j] !== null) {
-      //           sum += values[j];
-      //           num++;
-      //         }
-      //       }
-      //       if (num === 0)
-      //         newArr.push(null);
-      //       else
-      //         newArr.push(sum / num);
-      //     }
-      //     // console.log(newArr);
-      //     json.values[key] = newArr;
-      //   }
-
 
         // TODO: Keep this and run again as soon as we have all metro averages
         // if (json[key]) {
@@ -92,15 +45,10 @@ function fetchDataset(name, metro) {
 
       data[name] = json;
 
-      numLoaded++;
-      if (numLoaded == datasetNames.length) {
-        // TODO: Remove this once we have a description
-        d3.select('#loading').text('Done!');
-      }
 
       if (selectDatasetWhenLoaded == name) {
-        dataset(name);
         selectDatasetWhenLoaded = '';
+        dataset(name);
       }
 
     }); 
@@ -140,21 +88,24 @@ var numberFormats = {'': function() { return ''; }, mediansaleprice: d3.format('
 
 function down() {
   if (!slidedDown) {
-    // d3.select('#front-header')
-    //   .transition()
-    //   .duration(1000)
-    //   .style('top', '-300px');
-
 
     d3.select('#navbar')
       .transition()
       .duration(1000)
       .style('top', '0px');
 
+
     d3.select('#descriptions')
       .transition()
       .duration(1000)
       .style('top', '50px');
+
+    d3.select('#metro-name-wrapper')
+      .transition()
+      .delay(500)
+      .duration(500)
+      .style('top', '0px')
+      .style('font-size', '16px');
 
     d3.select('#content-pane')
       .transition()
@@ -172,41 +123,64 @@ function down() {
   }
 }
 
-d3.select('#choose-san-diego').on('click', function() {
-  d3.select('#navbar')
-    .style('visibility', 'visible')
-    .transition()
-    .duration(1000)
-    .style('top', '300px')
-    .style('opacity', 1);
+d3.selectAll('.choose-metro')
+  .data(metros)
+  .on('click', function(d) {
+    d3.select('#navbar')
+      .style('visibility', 'visible')
+      .transition()
+      .duration(1000)
+      .style('top', '300px')
+      .style('opacity', 1);
 
-  d3.select('#descriptions')
-    .transition()
-    .delay(1000)
-    .style('visibility', 'visible');
+    d3.select('#descriptions')
+      .transition()
+      .delay(1000)
+      .style('visibility', 'visible');
 
-  d3.select('#content-pane')
-    .style('visibility', 'visible')
-    .transition()
-    .duration(1000)
-    .style('top', '350px');
+    d3.select('#metro-name-wrapper')
+      .style('visibility', 'visible')
+      .transition()
+      .duration(1000)
+      .style('opacity', 1);
 
-  d3.select('#footer')
-    .transition()
-    .duration(1000)
-    .style('background-color', '#616161');
+    d3.select('#metro-name')
+      .text(d.metro);
+
+    d3.select('#content-pane')
+      .style('visibility', 'visible')
+      .transition()
+      .duration(1000)
+      .style('top', '350px');
+
+    d3.select('#footer')
+      .transition()
+      .duration(1000)
+      .style('background-color', '#616161');
 
 
-  d3.select('#header')
-    .style('visibility', 'hidden');
+    d3.select('#header')
+      .transition()
+      .duration(1000)
+      .style('opacity', 0)
+    d3.select('#header')
+      .transition()
+      .delay(1000)
+      .style('visibility', 'hidden');
 
 
-  // Load the datasets as the first thing, so we reduce waiting time
-  for (var i = 0; i < datasetNames.length; i++) {
-    fetchDataset(datasetNames[i], metros[0]);
-  }
+    // TODO: Does this timeout make sense?
+    setTimeout(function() {loadMap(d);}, 0);
 
-});
+
+    setTimeout(function() {
+      // Load the datasets as the first thing, so we reduce waiting time
+      for (var i = 0; i < datasetNames.length; i++) {
+        fetchDataset(datasetNames[i], d);
+      }
+    }, 1000);    
+
+  });
 
 
 
@@ -223,17 +197,18 @@ d3.selectAll('.nav-title')
     down();
     dataset(datasetNames[i]);
     d3.selectAll('.nav-title').classed('active', false);
+    d3.select('#content-pane').style('cursor', 'auto');
     d3.select(this).classed('active', true);
   });
 
 
-// TODO: #content only covers the area of the visualizations, not the border around them. make this for the complete area
 // TODO: Show a pointer cursor for this
 // TODO: Do not use slidedDown and a click on content, but a different overlay
-d3.select('#content').on('click', function(d,i) {
+d3.select('#content-pane').on('click', function(d,i) {
   if (!slidedDown) {
     down();
     d3.select('.nav-title').classed('active',true);
+    d3.select('#content-pane').style('cursor', 'auto');
     dataset('mediansaleprice');
 
     slidedDown = true;
@@ -402,12 +377,16 @@ function dataset(name) {
     showDatasetInMapLegend(selectedDataset);
     showCurrentValuesInMap();
 
-    barChart.data.colors({ values: datasetColors[selectedDataset].charts });
     barChart.axis.max(maxDataValues[selectedDataset]);
-    barChart.axis.labels({y: axisLabels[selectedDataset]});    
+    barChart.axis.labels({y: axisLabels[selectedDataset]});
+    barChart.data.colors({ values: datasetColors[selectedDataset].charts });
     sortAreasByValue();
     showTopBottomValuesInBarChart();
     highlightSelectedAreaInBarChart();
+
+    // TODO: Sometimes, the bar chart does not update properly here (the values show up, but the bars stay grey and the same height as before). 
+    // Redrawing via resize fixes this temporarily. Investigate, why it does not update properly in the first place.
+    barChart.resize();
     
     timeChart.data.colors({ area: datasetColors[selectedDataset].charts });
     d3.select('#area-text').style('color', datasetColors[selectedDataset].charts);
@@ -438,7 +417,6 @@ function time(index) {
     // TODO: If there are just going to be top/bottom values in the bar chart, integrate all of this stuff into one method
     showTopBottomValuesInBarChart();
     highlightSelectedAreaInBarChart();
-
     highlightSelectedTimeInTimeChart();
 
     showCurrentValuesInMap();
@@ -754,216 +732,219 @@ var timeChart = c3.generate({
 
 var colorScale = d3.scale.linear().clamp(true);  // range will be added during 'dataset'
 var blankMapColors = {};
-var map = new Datamap({
-  element: document.getElementById('map'),
-  // responsive: true,
-  geographyConfig: {
-    dataUrl: 'data/SanDiego.json',
-    borderColor: '#757575', 
-    borderWidth: 0,  // 0.7
-    highlightOnHover: false,
-    // highlightFillColor: 'foo',  // just some random string to keep fill color the same
-    // highlightBorderColor: 'black',
-    // highlightBorderWidth: 2,
-    popupTemplate: function(geography, data) {
-      var s = '<div class="hoverinfo" style="text-align: center">' + geography.id.replace('zip', '');
-      if (geography.properties.name)
-        s += '<br><span style="font-size: 0.85em">' + geography.properties.name  + '</span>';
-      if (lockedArea === '')
-        s += '<br><span style="font-size: 0.85em; color: red; font-weight: bold">Click to Select</span>';
-      s += '</div>';
-      return s;
+var map;
+function loadMap(metro) {
+  map = new Datamap({
+    element: document.getElementById('map'),
+    // responsive: true,
+    geographyConfig: {
+      dataUrl: 'data/' + metro.metro.replace(' ', '') + '.json',
+      borderColor: '#757575', 
+      borderWidth: 0,  // 0.7
+      highlightOnHover: false,
+      // highlightFillColor: 'foo',  // just some random string to keep fill color the same
+      // highlightBorderColor: 'black',
+      // highlightBorderWidth: 2,
+      popupTemplate: function(geography, data) {
+        var s = '<div class="hoverinfo" style="text-align: center">' + geography.id.replace('zip', '');
+        if (geography.properties.name)
+          s += '<br><span style="font-size: 0.85em">' + geography.properties.name  + '</span>';
+        if (lockedArea === '')
+          s += '<br><span style="font-size: 0.85em; color: red; font-weight: bold">Click to Select</span>';
+        s += '</div>';
+        return s;
+      }
+    },
+    scope: 'tl_2010_06_zcta510',
+    fills: {
+      defaultFill: startColor
+    }, 
+    setProjection: function(element, options) {
+      var width = options.width || element.offsetWidth;
+      var height = options.height || element.offsetHeight;
+
+      // console.log('w: ' + width + ' h:' + height);
+
+      // console.log(element);
+      // console.log(options);
+
+      // // Create a unit projection.
+      // var projection = d3.geo.mercator()
+      //   .scale(1)
+      //   .translate([0, 0]);
+
+      // // Create a path generator.
+      // var path = d3.geo.path()
+      //   .projection(projection);
+
+      // var areas = topojson.feature(us, us.objects.states)
+
+      // // Compute the bounds of a feature of interest, then derive scale & translate.
+      // var b = path.bounds(element),
+      //     s = 0.95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height),
+      //     t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
+
+      // // Update the projection to use computed scale & translate.
+      // projection
+      //     .scale(s)
+      //     .translate(t);
+
+
+      var projection = d3.geo.mercator()
+    		.center([-117.0, 33.0])
+    		.scale(20000) //* width);
+        .translate([width / 2, height / 2]);
+  	
+       return {path: d3.geo.path().projection(projection), projection: projection};
+    },
+    done: function(datamap) {    
+
+      originalSubunitsSize = datamap.svg.select('.datamaps-subunits').node().getBoundingClientRect();
+      clipMapToContainer();
+
+      console.log('translate(' + (mapSize().width / 2 - 100) + 'px, ' + (mapSize().height - 50) + 'px)');
+
+      mapLegend = datamap.svg.append('g')
+        .style('transform', 'translate(' + (mapSize().width / 2 - 96) + 'px, ' + (mapSize().height - 65) + 'px)')
+        .classed('map-legend', true);
+
+      // Make legend with color gradient, see https://gist.github.com/nowherenearithaca/4449376
+      // and http://bl.ocks.org/mbostock/1086421
+
+      var numStops = 10;
+      for (var datasetName in datasetColors) {
+        var gradient = mapLegend.append("defs")
+          .append("linearGradient")
+          .attr("id",'gradient-' + datasetName)
+          .attr("x1","0%")
+          .attr("x2","100%")
+          .attr("y1","0%")
+          .attr("y2","0%");
+
+        var scale = d3.scale.linear()
+          .domain([0, numStops-1])
+          .range(['#f8f8f8', datasetColors[datasetName].map]);
+
+        for (var i = 0; i < numStops; i++) {
+          // console.log(i + ' - ' + i/(numStops-1) + ' - ' + scale(i));
+          gradient.append("stop")
+            .attr("offset", i / (numStops - 1))
+            .attr("stop-color", scale(i));
+        }  
+      }
+
+      mapLegendTextName = mapLegend.append('text')
+        // .attr("class","legendText")
+        .attr("text-anchor", "middle")
+        .attr("x", 70)
+        .attr("y", 10);
+
+      mapLegendRect = mapLegend.append("rect")
+        .attr("fill", startColor)
+        .attr("x", 0)
+        .attr("y", 20)
+        .attr("width", 140)
+        .attr("height", 10);
+
+      mapLegend.append('rect')
+        .attr('fill', startColor)
+        .attr('x', 155)
+        .attr('y', 20)
+        .attr('width', 37)
+        .attr('height', 10);
+
+      mapLegend.append('text')
+        // .attr("class","legendText")
+        .attr("text-anchor", "start")
+        .attr("x", 155)
+        .attr("y", 43)
+        .text('No Data');
+
+      mapLegendTextMin = mapLegend.append('text')
+        // .attr("class","legendText")
+        .attr("text-anchor", "start")
+        .attr("x", 0)
+        .attr("y", 43);
+
+      mapLegendTextMiddle = mapLegend.append('text')
+        // .attr("class","legendText")
+        .attr("text-anchor", "middle")
+        .attr("x", 70)
+        .attr("y", 43);
+
+      mapLegendTextMax = mapLegend.append('text')
+        // .attr("class","legendText")
+        .attr("text-anchor", "end")
+        .attr("x", 140)
+        .attr("y", 43);
+
+
+
+
+
+      // TODO: Make sure to select dataset only once map is loaded
+      blankMapColors = {};
+      var geometries = datamap.customTopo.objects.tl_2010_06_zcta510.geometries;
+      for (var i = 0; i < geometries.length; i++) {
+        blankMapColors[geometries[i].id] = startColor;
+      }
+
+      // define drop shadow as here: http://bl.ocks.org/cpbotha/5200394
+      var defs = datamap.svg.append("defs");
+
+      var ids = ['drop-shadow', 'drop-shadow-small'];
+      var stdDeviations = [4, 1.5];
+      for (var i = 0; i < ids.length; i++) {
+        var filter = defs.append("filter")
+            .attr("id", ids[i])
+            .attr("x", "-50%")
+            .attr("y", "-50%")
+            .attr("height", "200%")  // prevent the shadow from being clipped by making the filter area bigger
+            .attr("width", "200%");
+
+        filter.append("feGaussianBlur")
+            .attr("in", "SourceAlpha")
+            .attr("stdDeviation", stdDeviations[i])  // size of the shadow
+            .attr("result", "blur");
+
+        filter.append("feOffset")
+            .attr("in", "blur")
+            // .attr("dx", 5)  // translation in x/y direction
+            // .attr("dy", 5)
+            .attr("result", "offsetBlur");
+
+        var feMerge = filter.append("feMerge");
+
+        feMerge.append("feMergeNode")
+            .attr("in", "offsetBlur");
+        feMerge.append("feMergeNode")
+            .attr("in", "SourceGraphic");
+      }
+
+
+      // Function to place svg element on top of all other elements
+      d3.selection.prototype.moveToFront = function() {
+        return this.each(function(){
+          this.parentNode.appendChild(this);
+        });
+      };
+
+      datamap.svg.selectAll('.datamaps-subunit')
+        .on('mouseover.custom', function(geography) {      
+          area(geography.id.replace('zip', ''));
+        })
+        .on('click', function(geography) {
+          lockSelectedArea();
+        });
+
+
+      datamap.svg.select('.datamaps-subunits')
+        .on('mouseout', function(geography) {
+          area(lockedArea);        
+        });
     }
-  },
-  scope: 'tl_2010_06_zcta510',
-  fills: {
-    defaultFill: startColor
-  }, 
-  setProjection: function(element, options) {
-    var width = options.width || element.offsetWidth;
-    var height = options.height || element.offsetHeight;
-
-    // console.log('w: ' + width + ' h:' + height);
-
-    // console.log(element);
-    // console.log(options);
-
-    // // Create a unit projection.
-    // var projection = d3.geo.mercator()
-    //   .scale(1)
-    //   .translate([0, 0]);
-
-    // // Create a path generator.
-    // var path = d3.geo.path()
-    //   .projection(projection);
-
-    // var areas = topojson.feature(us, us.objects.states)
-
-    // // Compute the bounds of a feature of interest, then derive scale & translate.
-    // var b = path.bounds(element),
-    //     s = 0.95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height),
-    //     t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
-
-    // // Update the projection to use computed scale & translate.
-    // projection
-    //     .scale(s)
-    //     .translate(t);
-
-
-    var projection = d3.geo.mercator()
-  		.center([-117.0, 33.0])
-  		.scale(20000) //* width);
-      .translate([width / 2, height / 2]);
-	
-     return {path: d3.geo.path().projection(projection), projection: projection};
-  },
-  done: function(datamap) {    
-
-    originalSubunitsSize = datamap.svg.select('.datamaps-subunits').node().getBoundingClientRect();
-    clipMapToContainer();
-
-    console.log('translate(' + (mapSize().width / 2 - 100) + 'px, ' + (mapSize().height - 50) + 'px)');
-
-    mapLegend = datamap.svg.append('g')
-      .style('transform', 'translate(' + (mapSize().width / 2 - 96) + 'px, ' + (mapSize().height - 65) + 'px)')
-      .classed('map-legend', true);
-
-    // Make legend with color gradient, see https://gist.github.com/nowherenearithaca/4449376
-    // and http://bl.ocks.org/mbostock/1086421
-
-    var numStops = 10;
-    for (var datasetName in datasetColors) {
-      var gradient = mapLegend.append("defs")
-        .append("linearGradient")
-        .attr("id",'gradient-' + datasetName)
-        .attr("x1","0%")
-        .attr("x2","100%")
-        .attr("y1","0%")
-        .attr("y2","0%");
-
-      var scale = d3.scale.linear()
-        .domain([0, numStops-1])
-        .range(['#f8f8f8', datasetColors[datasetName].map]);
-
-      for (var i = 0; i < numStops; i++) {
-        // console.log(i + ' - ' + i/(numStops-1) + ' - ' + scale(i));
-        gradient.append("stop")
-          .attr("offset", i / (numStops - 1))
-          .attr("stop-color", scale(i));
-      }  
-    }
-
-    mapLegendTextName = mapLegend.append('text')
-      // .attr("class","legendText")
-      .attr("text-anchor", "middle")
-      .attr("x", 70)
-      .attr("y", 10);
-
-    mapLegendRect = mapLegend.append("rect")
-      .attr("fill", startColor)
-      .attr("x", 0)
-      .attr("y", 20)
-      .attr("width", 140)
-      .attr("height", 10);
-
-    mapLegend.append('rect')
-      .attr('fill', startColor)
-      .attr('x', 155)
-      .attr('y', 20)
-      .attr('width', 37)
-      .attr('height', 10);
-
-    mapLegend.append('text')
-      // .attr("class","legendText")
-      .attr("text-anchor", "start")
-      .attr("x", 155)
-      .attr("y", 43)
-      .text('No Data');
-
-    mapLegendTextMin = mapLegend.append('text')
-      // .attr("class","legendText")
-      .attr("text-anchor", "start")
-      .attr("x", 0)
-      .attr("y", 43);
-
-    mapLegendTextMiddle = mapLegend.append('text')
-      // .attr("class","legendText")
-      .attr("text-anchor", "middle")
-      .attr("x", 70)
-      .attr("y", 43);
-
-    mapLegendTextMax = mapLegend.append('text')
-      // .attr("class","legendText")
-      .attr("text-anchor", "end")
-      .attr("x", 140)
-      .attr("y", 43);
-
-
-
-
-
-    // TODO: Make sure to select dataset only once map is loaded
-    blankMapColors = {};
-    var geometries = datamap.customTopo.objects.tl_2010_06_zcta510.geometries;
-    for (var i = 0; i < geometries.length; i++) {
-      blankMapColors[geometries[i].id] = startColor;
-    }
-
-    // define drop shadow as here: http://bl.ocks.org/cpbotha/5200394
-    var defs = datamap.svg.append("defs");
-
-    var ids = ['drop-shadow', 'drop-shadow-small'];
-    var stdDeviations = [4, 1.5];
-    for (var i = 0; i < ids.length; i++) {
-      var filter = defs.append("filter")
-          .attr("id", ids[i])
-          .attr("x", "-50%")
-          .attr("y", "-50%")
-          .attr("height", "200%")  // prevent the shadow from being clipped by making the filter area bigger
-          .attr("width", "200%");
-
-      filter.append("feGaussianBlur")
-          .attr("in", "SourceAlpha")
-          .attr("stdDeviation", stdDeviations[i])  // size of the shadow
-          .attr("result", "blur");
-
-      filter.append("feOffset")
-          .attr("in", "blur")
-          // .attr("dx", 5)  // translation in x/y direction
-          // .attr("dy", 5)
-          .attr("result", "offsetBlur");
-
-      var feMerge = filter.append("feMerge");
-
-      feMerge.append("feMergeNode")
-          .attr("in", "offsetBlur");
-      feMerge.append("feMergeNode")
-          .attr("in", "SourceGraphic");
-    }
-
-
-    // Function to place svg element on top of all other elements
-    d3.selection.prototype.moveToFront = function() {
-      return this.each(function(){
-        this.parentNode.appendChild(this);
-      });
-    };
-
-    datamap.svg.selectAll('.datamaps-subunit')
-      .on('mouseover.custom', function(geography) {      
-        area(geography.id.replace('zip', ''));
-      })
-      .on('click', function(geography) {
-        lockSelectedArea();
-      });
-
-
-    datamap.svg.select('.datamaps-subunits')
-      .on('mouseout', function(geography) {
-        area(lockedArea);        
-      });
-  }
-});
+  });
+}
 
 var originalSubunitsSize;
 function clipMapToContainer() {
