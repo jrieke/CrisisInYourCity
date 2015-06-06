@@ -41,51 +41,67 @@ app.get('/labels', function(req, res) {
 });
 
 
+app.get("/metro", function(res, req){
+	return res.json([
+		{metro: "San Diego", state: "CA"},
+		{metro: "Los Angeles", state: "CA"},
+		{metro: "San Francisco", state: "CA"}
+	]);
+});
+
 //delphi routes
-app.get("/soldforgain", function (req, res) {
-	delphi.executeYearBoundedQuery({tablename: delphi.TABLE_SOLD_FOR_GAIN},
-		{metro: "San Diego", startYear: 2004, endYear: 2015},
+app.post("/soldforgain", function (req, res) {
+	console.log(req);
+	delphi.executeYearBoundedQuery({tablename: delphi.ZIP_TABLE_SOLD_FOR_GAIN},
+		{metro: req.body.metro, startYear: 2004, endYear: 2014},
 		function(rows){
-			return res.json(helpers.parseRowsByColumn(rows, 'RegionName', 'Value'));
+			return res.json(helpers.reduceData(helpers.parseRowsByColumn(rows, 'RegionName', 'Value'),3));
 	});
 });
 
-app.get("/mediansaleprice",function(req, res){
-	delphi.executeYearBoundedQuery({tablename: delphi.TABLE_MEDIAN_SALE_PRICE, metro: false},
-		{metro: "San Diego", startYear: 2004, endYear: 2015},
-		function(rows){
-			return res.json({values: helpers.parseRowsByColumn(rows, 'RegionName', 'Value'), average: ""});
-	});
+app.post("/mediansaleprice",function(req, res){
+	delphi.executeYearBoundedQuery({tablename: delphi.ZIP_TABLE_MEDIAN_SALE_PRICE, metro: false},
+		{metro: req.body.metro, startYear: 2004, endYear: 2014},
+		function(rows1){
+			delphi.executeYearBoundedQuery({tablename: delphi.METRO_TABLE_MEDIAN_SALE_PRICE, metro: true},
+				{metro: req.body.metro + ", " + req.body.state, startYear: 2004, endYear: 2014},
+				function(rows2){
+					return res.json({values: helpers.reduceData(helpers.parseRowsByColumn(rows1, 'RegionName', 'Value'),3),
+						average: helpers.parseRowsByColumn(rows2, 'RegionName', 'Value')});
+				});
+		});
 });
 
-app.get("/soldasforeclosures", function(req, res){
-	delphi.executeYearBoundedQuery({tablename: delphi.TABLE_FORECLOSURES, metro: false},
-		{metro: "San Diego", startYear: 2004, endYear: 2015},
+app.post("/soldasforeclosures", function(req, res){
+	delphi.executeYearBoundedQuery({tablename: delphi.ZIP_TABLE_FORECLOSURES, metro: false},
+		{metro: req.body.metro, startYear: 2004, endYear: 2014},
 		function(rows1){
 			delphi.executeYearBoundedQuery({tablename: delphi.METRO_TABLE_FORECLOSURES, metro: true},
-				{metro: "San Diego, CA", startYear: 2004, endYear: 2015},
+				{metro: req.body.metro + ", " + req.body.state, startYear: 2004, endYear: 2014},
 				function(rows2){
-					return res.json({values: helpers.parseRowsByColumn(rows1, 'RegionName', 'Value'), average: helpers.parseRowsByColumn(rows2, 'RegionName', 'Value')});
+					return res.json({values: helpers.reduceData(helpers.parseRowsByColumn(rows1, 'RegionName', 'Value'),3),
+						average: helpers.parseRowsByColumn(rows2, 'RegionName', 'Value')});
 				});
 	});
 });
 
-app.get("/soldforloss", function(req, res){
-	delphi.executeYearBoundedQuery({tablename: delphi.TABLE_SOLD_FOR_LOSS, metro: false},
-		{metro: "San Diego", startYear: 2004, endYear: 2015},
+app.post("/soldforloss", function(req, res){
+	delphi.executeYearBoundedQuery({tablename: delphi.ZIP_TABLE_SOLD_FOR_LOSS, metro: false},
+		{metro: req.body.metro, startYear: 2004, endYear: 2014},
 		function(rows){
-			return res.json({values: helpers.parseRowsByColumn(rows, 'RegionName', 'Value'), average: ""});
+			return res.json({values: helpers.reduceData(helpers.parseRowsByColumn(rows, 'RegionName', 'Value'),3), average: ""});
 	});
 });
 
-app.get("/decreasinginvalues", function(req, res){
-	delphi.executeYearBoundedQuery({tablename: delphi.TABLE_DECREASING_VALUES, metro: false},
-		{metro: "San Diego", startYear: 2004, endYear: 2015},
+app.post("/decreasinginvalues", function(req, res){
+	delphi.executeYearBoundedQuery({tablename: delphi.ZIP_TABLE_DECREASING_VALUES, metro: false},
+		{metro: req.body.metro, startYear: 2004, endYear: 2014},
 		function(rows1){
 			delphi.executeYearBoundedQuery({tablename: delphi.METRO_TABLE_DECREASING_VALUES, metro: true},
-				{metro: "San Diego, CA", startYear: 2004, endYear: 2015},
+				{metro: req.body.metro + ", " + req.body.state, startYear: 2004, endYear: 2014},
 				function(rows2){
-					return res.json({values: helpers.parseRowsByColumn(rows1, 'RegionName', 'Value'), average: helpers.parseRowsByColumn(rows2, 'RegionName', 'Value')});
+					return res.json({values: helpers.reduceData(helpers.parseRowsByColumn(rows1, 'RegionName', 'Value'),3),
+						average: helpers.parseRowsByColumn(rows2, 'RegionName', 'Value')});
 				});
 	});
 });
