@@ -10,6 +10,7 @@
 
   <link rel="stylesheet" href="css/custom.css">
 
+
   <!--Let browser know website is mobile optimized-->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 </head>
@@ -29,7 +30,7 @@
 
     <!-- TODO: Change this to nav (currently, materialize alters the style of that) -->
     <div id="navbar" style="position: absolute; bottom: 0px; height: 50px; width: 100%; text-align: center">
-      <i id="up-arrow" class="mdi-navigation-expand-less small" style="cursor: pointer; opacity: 0; color: #f8f8f8; position: absolute; left: 10px; height: 50px; line-height: 50px"></i>
+      <a href="/"><div style="position: absolute; left: 10px; height: 50px; line-height: 50px; color: #bdbdbd">Back</div></a>
       <div id="nav-title-1" class="nav-title mediansaleprice">Sale Price</div><!--
       --><div id="nav-title-2" class="nav-title soldforloss ">Sold for Loss</div><!--
       --><div id="nav-title-3" class="nav-title decreasinginvalues">Decreasing Values</div><!--
@@ -39,16 +40,16 @@
   </div>
 
   <div id="description-1" class="description mediansaleprice" style="background-color: rgba(239, 83, 80, 1);">
-    Median sale price for all homes sold on Zillow in one month
+    Median sale price for all homes sold in one month
   </div>
   <div id="description-2" class="description soldforloss" style="background-color: rgba(0, 188, 212, 1);">
-    Percentage of homes sold on Zillow in one month for less than acquired
+    Percentage of homes that sold for less than the previous purchase price in one month
   </div>
   <div id="description-3" class="description decreasinginvalues" style="background-color: rgba(139, 195, 74, 1);">
-    TODO
+    Percentage of homes whose value has fallen in the last year
   </div>
   <div id="description-4" class="description soldasforeclosures" style="background-color: rgba(255, 179, 0, 1);">
-    Number of homes foreclosed in one month
+    Number of homes per 10 000 that were foreclosed in one month
   </div>
 
 </div>
@@ -129,8 +130,8 @@
 
 </div>
 
-<div class="center-align grey darken-2 grey-text text-lighten-1" style="position: absolute; bottom: 0px; height: 50px; width: 100%; font-size: 0.9em">
-  <p>&copy; Johannes Rieke, Chris Blum, Sindre Magnussen, Petter Astrup, Nemanja Aksic</p>
+<div class="center-align grey darken-2 grey-text text-lighten-1" style="z-index: 2; position: absolute; bottom: 0px; height: 50px; width: 100%; font-size: 0.9em; line-height: 50px">
+  &copy; <a href="https://github.com/jrieke">Johannes Rieke</a>, <a href="https://github.com/sindrma">Sindre Magnussen</a>, <a href="https://github.com/chrisblum">Chris Blum</a>, <a href="https://github.com/petteas">Petter Astrup</a>, <a href="https://github.com/nemanjaaks">Nemanja Aksic</a>
 </div>
 
 

@@ -8,6 +8,13 @@ body {
   overflow: hidden;
 }
 
+a {
+  color: inherit;
+}
+
+a:hover {
+  color: #f8f8f8;
+}
 
 /* ------------------------------------------ Nav bar and front page ------------------------------------------------ */
 

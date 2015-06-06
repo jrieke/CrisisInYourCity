@@ -130,8 +130,8 @@ var datasetColors = {mediansaleprice: {map: '#f44336', charts: '#ef5350'}, soldf
 var minDataValue = 0;
 // TODO: Make these better
 var maxDataValues = {mediansaleprice: 1000000, soldforloss: 100, decreasinginvalues: 100, soldasforeclosures: 70};
-var axisLabels = {mediansaleprice: 'Median sale price / $', soldforloss: 'Homes sold for loss / %', decreasinginvalues: 'Homes decreasing in value / %', soldasforeclosures: 'Homes foreclosed / %'};
-var numberFormats = {'': function() { return ''; }, mediansaleprice: d3.format('.3s'), soldforloss: d3.format('.0f'), decreasinginvalues: d3.format('.0f'), soldasforeclosures: d3.format('.0f')};
+var axisLabels = {mediansaleprice: 'Median sale price', soldforloss: 'Homes sold for loss', decreasinginvalues: 'Homes decreasing in value', soldasforeclosures: 'Homes foreclosed out of 10k'};
+var numberFormats = {'': function() { return ''; }, mediansaleprice: d3.format('$.3s'), soldforloss: function(x) { return d3.format('.0f')(x) + '%'; }, decreasinginvalues: function(x) { return d3.format('.0f')(x) + '%'; }, soldasforeclosures: d3.format('.0f')};
 
 
 function down() {
