@@ -13,7 +13,7 @@ var datasetNames = ['mediansaleprice', 'soldforloss', 'decreasinginvalues', 'sol
 var data = {};
 var numLoaded = 0;
 
-console.log(metros);
+// console.log(metros);
 
 
 function fetchDataset(name, metro) {
@@ -122,65 +122,6 @@ function down() {
     slidedDown = true;
   }
 }
-
-d3.selectAll('.choose-metro')
-  .data(metros)
-  .on('click', function(d) {
-    d3.select('#navbar')
-      .style('visibility', 'visible')
-      .transition()
-      .duration(1000)
-      .style('top', '300px')
-      .style('opacity', 1);
-
-    d3.select('#descriptions')
-      .transition()
-      .delay(1000)
-      .style('visibility', 'visible');
-
-    d3.select('#metro-name-wrapper')
-      .style('visibility', 'visible')
-      .transition()
-      .duration(1000)
-      .style('opacity', 1);
-
-    d3.select('#metro-name')
-      .text(d.metro);
-
-    d3.select('#content-pane')
-      .style('visibility', 'visible')
-      .transition()
-      .duration(1000)
-      .style('top', '350px');
-
-    d3.select('#footer')
-      .transition()
-      .duration(1000)
-      .style('background-color', '#616161');
-
-
-    d3.select('#header')
-      .transition()
-      .duration(1000)
-      .style('opacity', 0)
-    d3.select('#header')
-      .transition()
-      .delay(1000)
-      .style('visibility', 'hidden');
-
-
-    // TODO: Does this timeout make sense?
-    setTimeout(function() {loadMap(d);}, 0);
-
-
-    setTimeout(function() {
-      // Load the datasets as the first thing, so we reduce waiting time
-      for (var i = 0; i < datasetNames.length; i++) {
-        fetchDataset(datasetNames[i], d);
-      }
-    }, 1000);    
-
-  });
 
 
 
@@ -484,7 +425,76 @@ function lockSelectedArea() {
 
 
 
+/*  Autocomplete  */
 
+
+var metrosArray = [];
+for (var i = 0; i < metros.length; i++) {
+  metrosArray[i] = {value: metros[i].metro + ', ' + metros[i].state, data: metros[i]};
+}
+
+console.log(metrosArray);
+
+$('#autocomplete').autocomplete({
+    lookup: metrosArray,
+    lookupLimit: 5,
+    onSelect: function (result) {
+
+      d3.select('#navbar')
+        .style('visibility', 'visible')
+        .transition()
+        .duration(1000)
+        .style('top', '300px')
+        .style('opacity', 1);
+
+      d3.select('#descriptions')
+        .transition()
+        .delay(1000)
+        .style('visibility', 'visible');
+
+      d3.select('#metro-name-wrapper')
+        .style('visibility', 'visible')
+        .transition()
+        .duration(1000)
+        .style('opacity', 1);
+
+      d3.select('#metro-name')
+        .text(result.data.metro);
+
+      d3.select('#content-pane')
+        .style('visibility', 'visible')
+        .transition()
+        .duration(1000)
+        .style('top', '350px');
+
+      d3.select('#footer')
+        .transition()
+        .duration(1000)
+        .style('background-color', '#616161');
+
+
+      d3.select('#header')
+        .transition()
+        .duration(1000)
+        .style('opacity', 0);
+      d3.select('#header')
+        .transition()
+        .delay(1000)
+        .style('visibility', 'hidden');
+
+
+      // TODO: Does this timeout make sense?
+      setTimeout(function() {loadMap(result.data);}, 0);
+
+
+      setTimeout(function() {
+        // Load the datasets as the first thing, so we reduce waiting time
+        for (var i = 0; i < datasetNames.length; i++) {
+          fetchDataset(datasetNames[i], result.data);
+        }
+      }, 1000);    
+    }
+});
 
 /* ------------------------------------------- Time Slider ----------------------------------------------- */
 
@@ -738,7 +748,7 @@ function loadMap(metro) {
     element: document.getElementById('map'),
     // responsive: true,
     geographyConfig: {
-      dataUrl: 'data/' + metro.metro.replace(' ', '') + '.json',
+      dataUrl: 'data/' + metro.state + '/' + metro.metro.replace(' ', '') + '.json',
       borderColor: '#757575', 
       borderWidth: 0,  // 0.7
       highlightOnHover: false,

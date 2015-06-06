@@ -325,3 +325,11 @@ a:hover {
 #loading-spinner.soldasforeclosures {
   border-color: #ffb300;
 }
+
+
+/* Autocomplete */
+.autocomplete-suggestions { padding-left: 1px; padding-top: 5px; }
+.autocomplete-suggestion { text-align: center; font-size: 1.1rem; cursor: pointer; padding-top: 10px; white-space: nowrap; overflow: hidden; color: #bdbdbd;}
+.autocomplete-suggestion strong { font-weight: bold; color: #f8f8f8; }
+.autocomplete-selected { color: #03a9f4; }
+.autocomplete-selected strong { color: #03a9f4; }
