@@ -27,7 +27,7 @@
     <div style="font-size: 2.2rem; display: inline-block; margin-right: 10px; margin-bottom: 10px">The Financial Crisis in </div>
 
     <div style="width: 250px; display: inline-block; vertical-align: top">
-      <input type="text" id="autocomplete" class="white-text" style="vertical-align: top; border-color: #f8f8f8; box-shadow: none; text-align: center; font-size: 2.2rem; width: 100%; padding-left: 1px; margin-bottom: 15px" spellcheck="false" autofocus>
+      <input type="text" id="autocomplete" class="white-text" style="vertical-align: top; border-color: #f8f8f8; box-shadow: none; text-align: center; font-size: 2.2rem; width: 100%; padding-left: 1px; margin-bottom: 15px" spellcheck="false" placeholder="" autofocus>
       <div id="suggestions" style="width: 100%; z-index: 9999; position: relative"></div>  
     </div>
 
@@ -79,8 +79,9 @@
 <div id="content-pane" class="grey darken-1" style="cursor: pointer;">
 <div id="content">
 
-  <div id="content-overlay" style="position: absolute; width: 100%; height: 100%; z-index: 2;">
+  <div id="content-overlay" class="valign-wrapper" style="position: absolute; width: 100%; height: 100%; z-index: 2;">
 
+  <!-- TODO: Make sure that these have max the width of time-slider-wrapper -->
     <div id="loading-spinner-wrapper" class="preloader-wrapper big active" style="display: none">
       <div id="loading-spinner" class="spinner-layer spinner-blue-only">
         <div class="circle-clipper left">
@@ -93,7 +94,12 @@
       </div>
     </div>
 
+    <p id="error-message" class="center-align" style="width: 100%; color: #f8f8f8; visibility: hidden">
+    Could not load this dataset.<br>Try another one!
+    </p>
+
   </div>
+
 
 
 
@@ -104,13 +110,16 @@
       <div id="bar-chart-wrapper" style="position: absolute; top: 0px; height: calc(50% - 35px); width: 100%;">
         <div id="bar-chart"></div>
       </div>
+
+      
+
       <div id="time-chart-wrapper" style="position: absolute; bottom: 10px; height: calc(50% - 35px); width: 100%;">
-        <div id="time-chart"></div>
-        <div id="time-chart-legend" style="visibility:hidden; z-index: 1; position: absolute; top: -5px; right: 10px; font-size: 0.75rem; text-align: right;">        
-          <p id="city-text" style="display: inline-block; color: #f8f8f8; margin-top: 3px; margin-bottom: 3px; background-color: #757575; padding-left: 5px">Metro Average</p>
-          <br>
-          <p id="area-text" style="display: inline-block; color: #ef5350; margin-top: 3px; margin-bottom: 3px; background-color: #757575; padding-left: 5px">Select an area on the map</p>
+
+        <div id="time-chart-legend" style="z-index: 1; visibility: hidden; position: absolute; top: -2.5px; width: 90%; left: 10%; text-align: center; font-size: 0.7rem;">
+          <span id="metro-text" style="color: #f8f8f8; padding: 0 7px; background-color: #757575">Metro Average</span><!--
+          --><span id="area-text" style="color: #ef5350; padding: 0 7px; background-color: #757575">Select an area on the map</span>
         </div>
+        <div id="time-chart"></div>        
       </div>
 
     </div>
@@ -125,8 +134,12 @@
 
       <div style="flex: 1; margin-top: 20px; position: relative">
         <div style="position: absolute; height: 100%; left: 0px; width: calc(50% - 15px)">
-          <p class="time-text time-text-left" style="top: 16%"><span style="font-weight: bold;">Apr 06</span><br>Home prices peak</p>
-          <p class="time-text time-text-left" style="top: 35%"><span style="font-weight: bold;">Mar 08</span><br>JP Morgan Chase takes over Bear Stearns</p>
+          <p class="time-text time-text-left" style="top: 2%"><span style="font-weight: bold;">Mid 04</span><br>US Homeownership peaks</p>
+          <p class="time-text time-text-left hide-on-little" style="top: 28%"><span style="font-weight: bold;">Apr 07</span><br>> 50 mortgage companies have filed bankruptcy</p>
+          <p class="time-text time-text-left" style="top: 40%"><span style="font-weight: bold;">Sep 08</span><br>Lehman files bankruptcy, BOA buys Merill Lynch</p>
+          <p class="time-text time-text-left hide-on-very-little" style="top: 70%"><span style="font-weight: bold;">Nov 10</span><br>US Home values down by 26 percent  since 2006</p>
+          <p class="time-text time-text-left hide-on-little" style="top: 89%"><span style="font-weight: bold;">14</span><br>Foreclosures still above pre-crisis level</p>
+          
         </div>
         <div id="time-slider" style="cursor: pointer; position: absolute; height: 100%; left: 50%">
           <div class="d3-slider-progress d3-slider d3-slider-vertical" style="position: absolute; top: 0px; bottom: 100%; height: auto; width: 100%; background: #f8f8f8"></div>
@@ -138,8 +151,12 @@
     
         </div>
         <div style="position: absolute; height: 100%; right: 0px; width: calc(50% - 15px)">
-          <!-- <p class="time-text time-text-right" style="top: 30%"><span style="font-weight: bold;">Oct 07</span><br>Countrywide reports first loss in 25 years</p> -->
-          <p class="time-text time-text-right" style="top: 42%"><span style="font-weight: bold;">Sep 08</span><br>Lehman Brothers files bankruptcy</p>
+          <p class="time-text time-text-right hide-on-very-little" style="top: 19%"><span style="font-weight: bold;">Apr 06</span><br>US Home prices peak</p>
+          <p class="time-text time-text-right" style="top: 35%"><span style="font-weight: bold;">Mar 08</span><br>JP Morgan Chase buys Bear Stearns</p>
+          <p class="time-text time-text-right hide-on-little" style="top: 45%"><span style="font-weight: bold;">Feb 09</span><br>American Recovery and Reinvestment Act</p>
+          <p class="time-text time-text-right" style="top: 80%"><span style="font-weight: bold;">Early 13</span><br>Stock market recovers</p>
+          
+
         </div>
       </div>
 

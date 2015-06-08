@@ -44,9 +44,9 @@ app.get('/labels', function(req, res) {
 /*  delphi routes  */
 app.post("/mediansaleprice",function(req, res){
 	return queryDatabaseMetroAndZip({tablename: delphi.ZIP_TABLE_MEDIAN_SALE_PRICE, metro: false},
-		{metro: req.body.metro, startYear: 2004, endYear: 2014},
+		{metro: req.body.metro, state: req.body.state, startYear: 2004, endYear: 2014},
 		{tablename: delphi.METRO_TABLE_MEDIAN_SALE_PRICE, metro: true},
-		{metro: req.body.metro + ", " + req.body.state, startYear: 2004, endYear: 2014},
+		{metro: req.body.metro, state: req.body.state, startYear: 2004, endYear: 2014},
 		['RegionName', 'Value'],
 		function(data){
 			return res.json(data);
@@ -55,9 +55,9 @@ app.post("/mediansaleprice",function(req, res){
 
 app.post("/soldasforeclosures", function(req, res){
 	return queryDatabaseMetroAndZip({tablename: delphi.ZIP_TABLE_FORECLOSURES, metro: false},
-		{metro: req.body.metro, startYear: 2004, endYear: 2014},
+		{metro: req.body.metro, state: req.body.state, startYear: 2004, endYear: 2014},
 		{tablename: delphi.METRO_TABLE_FORECLOSURES, metro: true},
-		{metro: req.body.metro + ", " + req.body.state, startYear: 2004, endYear: 2014},
+		{metro: req.body.metro, state: req.body.state, startYear: 2004, endYear: 2014},
 		['RegionName', 'Value'],
 		function(data){
 			return res.json(data);
@@ -66,7 +66,7 @@ app.post("/soldasforeclosures", function(req, res){
 
 app.post("/soldforloss", function(req, res){
 	delphi.executeYearBoundedQuery({tablename: delphi.ZIP_TABLE_SOLD_FOR_LOSS, metro: false},
-		{metro: req.body.metro, startYear: 2004, endYear: 2014},
+		{metro: req.body.metro, state: req.body.state, startYear: 2004, endYear: 2014},
 		function(rows){
 			return res.json({values: helpers.reduceData(helpers.parseRowsByColumn(rows, 'RegionName', 'Value'),3), average: ""});
 	});
@@ -74,9 +74,9 @@ app.post("/soldforloss", function(req, res){
 
 app.post("/decreasinginvalues", function(req, res){
 	return queryDatabaseMetroAndZip({tablename: delphi.ZIP_TABLE_DECREASING_VALUES, metro: false},
-		{metro: req.body.metro, startYear: 2004, endYear: 2014},
+		{metro: req.body.metro, state: req.body.state, startYear: 2004, endYear: 2014},
 		{tablename: delphi.METRO_TABLE_DECREASING_VALUES, metro: true},
-		{metro: req.body.metro + ", " + req.body.state, startYear: 2004, endYear: 2014},
+		{metro: req.body.metro, state: req.body.state, startYear: 2004, endYear: 2014},
 		['RegionName', 'Value'],
 		function(data){
 			return res.json(data);

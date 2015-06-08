@@ -27,17 +27,16 @@ module.exports = function(connString){
         + "\"RegionName\"=$1 AND \"Year\">=$2 AND"
         + " \"Year\"<= $3 ORDER BY \"RegionName\", \"Year\", \"Month\"";
     var metro_where = " WHERE "
-        + "\"State\"='CA' AND \"Metro\"=$1 AND \"Year\">=$2 AND"
-        + " \"Year\"<= $3 ORDER BY \"RegionName\", \"Year\", \"Month\"";
+        + "\"State\"=$1 AND \"Metro\"=$2 AND \"Year\">=$3 AND"
+        + " \"Year\"<= $4 ORDER BY \"RegionName\", \"Year\", \"Month\"";
 
     module.executeYearBoundedQuery = function (config, params, callback){
         postgre.connect(connString, function(err, client, done){
             if(err){
                 console.log("Error fetching client from pool");
             }
-
             client.query( getQueryString(config.metro, config.tablename),
-                [params.metro, params.startYear, params.endYear],
+                getQueryParameters(config.metro, params),
                 function(err, result){
                     done();
 
@@ -50,7 +49,7 @@ module.exports = function(connString){
         });
     };
 
-    var getQueryString = function (is_metro_query, tablename){
+    var getQueryString = function (is_metro_query, tablename) {
         var queryString;
         if(!is_metro_query){
             queryString = query_select + tablename + metro_where;
@@ -58,6 +57,14 @@ module.exports = function(connString){
             queryString = query_select + tablename + metro_region_where;
         }
         return queryString;
+    };
+
+    var getQueryParameters = function (is_metro_query, params) {
+        if(!is_metro_query){
+            return [params.state, params.metro, params.startYear, params.endYear];
+        } else {
+            return [params.metro + ', ' + params.state, params.startYear, params.endYear];
+        }
     };
 
 

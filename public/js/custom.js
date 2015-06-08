@@ -1,56 +1,76 @@
 // TODO: Make a minified version
 
 /* ------------------------------------------- Data Fetching -------------------------------------------------- */
-
-// var months = [//'2000-01-15', '2000-02-15', '2000-03-15', '2000-04-15', '2000-05-15', '2000-06-15', '2000-07-15', '2000-08-15', '2000-09-15', '2000-10-15', '2000-11-15', '2000-12-15', '2001-01-15', '2001-02-15', '2001-03-15', '2001-04-15', '2001-05-15', '2001-06-15', '2001-07-15', '2001-08-15', '2001-09-15', '2001-10-15', '2001-11-15', '2001-12-15', '2002-01-15', '2002-02-15', '2002-03-15', '2002-04-15', '2002-05-15', '2002-06-15', '2002-07-15', '2002-08-15', '2002-09-15', '2002-10-15', '2002-11-15', '2002-12-15', '2003-01-15', '2003-02-15', '2003-03-15', '2003-04-15', '2003-05-15', '2003-06-15', '2003-07-15', '2003-08-15', '2003-09-15', '2003-10-15', '2003-11-15', '2003-12-15', 
-// '2004-01-15', '2004-02-15', '2004-03-15', '2004-04-15', '2004-05-15', '2004-06-15', '2004-07-15', '2004-08-15', '2004-09-15', '2004-10-15', '2004-11-15', '2004-12-15', 
-// '2005-01-15', '2005-02-15', '2005-03-15', '2005-04-15', '2005-05-15', '2005-06-15', '2005-07-15', '2005-08-15', '2005-09-15', '2005-10-15', '2005-11-15', '2005-12-15', '2006-01-15', '2006-02-15', '2006-03-15', '2006-04-15', '2006-05-15', '2006-06-15', '2006-07-15', '2006-08-15', '2006-09-15', '2006-10-15', '2006-11-15', '2006-12-15', '2007-01-15', '2007-02-15', '2007-03-15', '2007-04-15', '2007-05-15', '2007-06-15', '2007-07-15', '2007-08-15', '2007-09-15', '2007-10-15', '2007-11-15', '2007-12-15', '2008-01-15', '2008-02-15', '2008-03-15', '2008-04-15', '2008-05-15', '2008-06-15', '2008-07-15', '2008-08-15', '2008-09-15', '2008-10-15', '2008-11-15', '2008-12-15', '2009-01-15', '2009-02-15', '2009-03-15', '2009-04-15', '2009-05-15', '2009-06-15', '2009-07-15', '2009-08-15', '2009-09-15', '2009-10-15', '2009-11-15', '2009-12-15', '2010-01-15', '2010-02-15', '2010-03-15', '2010-04-15', '2010-05-15', '2010-06-15', '2010-07-15', '2010-08-15', '2010-09-15', '2010-10-15', '2010-11-15', '2010-12-15', '2011-01-15', '2011-02-15', '2011-03-15', '2011-04-15', '2011-05-15', '2011-06-15', '2011-07-15', '2011-08-15', '2011-09-15', '2011-10-15', '2011-11-15', '2011-12-15', '2012-01-15', '2012-02-15', '2012-03-15', '2012-04-15', '2012-05-15', '2012-06-15', '2012-07-15', '2012-08-15', '2012-09-15', '2012-10-15', '2012-11-15', '2012-12-15', '2013-01-15', '2013-02-15', '2013-03-15', '2013-04-15', '2013-05-15', '2013-06-15', '2013-07-15', '2013-08-15', '2013-09-15', '2013-10-15', '2013-11-15', '2013-12-15', '2014-01-15', '2014-02-15', '2014-03-15', '2014-04-15', '2014-05-15', '2014-06-15', '2014-07-15', '2014-08-15', '2014-09-15', '2014-10-15', '2014-11-15', '2014-12-15', '2015-01-15']
 var months = ['2004-02-15', '2004-05-15', '2004-08-15', '2004-11-15', '2005-02-15', '2005-05-15', '2005-08-15', '2005-11-15', '2006-02-15', '2006-05-15', '2006-08-15', '2006-11-15', '2007-02-15', '2007-05-15', '2007-08-15', '2007-11-15', '2008-02-15', '2008-05-15', '2008-08-15', '2008-11-15', '2009-02-15', '2009-05-15', '2009-08-15', '2009-11-15', '2010-02-15', '2010-05-15', '2010-08-15', '2010-11-15', '2011-02-15', '2011-05-15', '2011-08-15', '2011-11-15', '2012-02-15', '2012-05-15', '2012-08-15', '2012-11-15', '2013-02-15', '2013-05-15', '2013-08-15', '2013-11-15', '2014-02-15', '2014-05-15', '2014-08-15', '2014-11-15'];
 var nullArr = Array.apply(null, new Array(months.length)).map(function() { return null; });
 
 var datasetNames = ['mediansaleprice', 'soldforloss', 'decreasinginvalues', 'soldasforeclosures'];
 
-var data = {};
-var numLoaded = 0;
+var LOADING = 1;
+var LOADED = 2;
+var FAILED = 3;
+var datasetStatus = {'mediansaleprice': LOADING, 'soldforloss': LOADING, 'decreasinginvalues': LOADING, 'soldasforeclosures': LOADING};
 
-// console.log(metros);
+var data = {};
+
 
 
 function fetchDataset(name, metro) {
-  console.log(metro);
   d3.xhr('/' + name)
     .header("Content-Type", "application/json")
     .post(JSON.stringify(metro), function(error, result) {
-      if (error) return console.warn(error);
+      if (error) {
+        datasetStatus[name] = FAILED;
+        return console.warn(error);
+      }
 
       var json = JSON.parse(result.response);
       console.log('received dataset ' + name);
       console.log(json);
 
-      var average = json.average[Object.keys(json.average)[0]];
-      json.average = average ? average : nullArr;
+      // var numValues = 0;
+      // var numMissingValues = 0;
 
-
-        // TODO: Keep this and run again as soon as we have all metro averages
-        // if (json[key]) {
-        //   for (var i = 0; i < data[name][key].length; i++) {
-        //     if (json[key][i] === null)
-        //       nullCount++;
-        //   }
-        // }
-
+      // function count(x) {
+      //   numValues++;
+      //   if (x === null )
+      //     numMissingValues++;
       // }
 
-      // console.log(name + ': ' + nullCount);
+      // if (json.average)
+      //   json.average[Object.keys(json.average)[0]].forEach(count);
+
+      // for (var key in json.values) {
+      //   json.values[key].forEach(count);
+      // }
+
+
+      // console.log('No of values: ' + numValues + '  - No. of missing values: ' + numMissingValues);
+
+      
+
+
+      if (json.values === null && json.average === null) {
+        datasetStatus[name] = FAILED;
+      } else {
+        datasetStatus[name] = LOADED;
+        var average = json.average[Object.keys(json.average)[0]];
+        json.average = average ? average : nullArr;
+      }
+
 
       data[name] = json;
 
+      // console.log('No of zip code areas:' + Object.keys(json.values).length);
 
+      // TODO: Maybe make this better
       if (selectDatasetWhenLoaded == name) {
         selectDatasetWhenLoaded = '';
         dataset(name);
       }
 
+
+      
     }); 
 }
 
@@ -66,7 +86,7 @@ function fetchDataset(name, metro) {
 /* ------------------------------------------- Initialization --------------------------------------------------- */
 
 var slidedDown = false;
-var maxSliderValue = 43.99;//132;  // TODO: Maybe change to numSliderValues
+var maxSliderValue = months.length - 0.01;
 var scrollSpeed = 0.01;
 var playing = false;
 var startColor = '#9e9e9e';
@@ -143,8 +163,6 @@ d3.selectAll('.nav-title')
   });
 
 
-// TODO: Show a pointer cursor for this
-// TODO: Do not use slidedDown and a click on content, but a different overlay
 d3.select('#content-pane').on('click', function(d,i) {
   if (!slidedDown) {
     down();
@@ -176,9 +194,40 @@ function initVisualizations() {
     });
 
 
+  // TODO: Deactivate this while page is updating
   $(document).on('mousewheel', function(evt) {
     moveSliderTo(Math.max(0, Math.min(maxSliderValue, slider.value() - scrollSpeed * event.deltaY)));
   });
+}
+
+
+function resetVisualizations() {
+  timeChart.axis.labels({y: ' '});
+  barChart.axis.labels({y: ' '});
+
+  barChart.data.colors({ values: startColor });
+  barChart.load({ json: barChartDefaultValues });
+  barChart.axis.max(1);
+  timeChart.load({ json: timeChartDefaultValues });
+  // timeChart.data.colors({ area: startColor });
+
+
+  d3.select('#time-chart-legend').style('visibility', 'hidden');
+  d3.select('#time-chart').select('.c3-axis-x').style('visibility', 'hidden', 'important');
+  d3.select('#bar-chart').select('.c3-axis-x').style('visibility', 'hidden', 'important');
+  d3.select('#map').select('.map-legend').style('visibility', 'hidden');
+
+  map.updateChoropleth(blankMapColors);  // TODO: Refactor this into a method resetMapValues or resetMapColors
+  // TODO: Maybe hide selected and clicked area in map  
+
+
+  // TODO: Needed? Can't be hovered anyway because of content-overlay
+  d3.select('#time-chart').select('.c3-chart')
+    .on('mouseover', null)
+    .on('mousemove', null)
+    .on('mouseout', null);
+
+  $(document).on('mousewheel', null);
 }
 
 
@@ -273,13 +322,13 @@ function showValuesInBarChart(ranks) {
   for (var i = 0; i < ranks.length; i++) {
     areaValuePairsToShow[i] = (ranks[i] === null) ? [' ', null] : sortedAreaValuePairs[ranks[i]];
   }
-  // console.log(areaValuePairsToShow);
+  console.log(areaValuePairsToShow);
 
-  areasInBarChart = areaValuePairsToShow.map(function(item) { return item[0]; });
+  areasInBarChart = areaValuePairsToShow.map(function(item) { return item ? item[0] : ' '; });
 
   barChart.load({
     json: {
-      values: areaValuePairsToShow.map(function(item) { return item[1] === null ? 0 : item[1]; })
+      values: areaValuePairsToShow.map(function(item) { return (item && item[1]) ? item[1] : 0; })
     },
     done: function() {      
       attachMouseListenersToBarChart();
@@ -301,50 +350,75 @@ function dataset(name) {
 
   d3.select('#content-overlay').style('visibility', 'visible');
   d3.select('#time-slider-wrapper').style('visibility', 'hidden');
-  // TODO: .classed does not update the color immediately
-  d3.select('#loading-spinner').classed(datasetNames.join(' '), false).classed(name, true);
-  d3.select('#loading-spinner-wrapper').style('display', 'block');
 
 
-  if (!data[name]) {  // dataset is not loaded yet, show it later
-    selectDatasetWhenLoaded = name;
-  } else {
-    if (!selectedDataset) { initVisualizations(); }  // first time a dataset is selected
+  console.log(datasetStatus[name]);
 
-    selectedDataset = name;
+  selectDatasetWhenLoaded = '';
 
-    colorScale.domain([minDataValue, maxDataValues[selectedDataset]]);
-    colorScale.range(['#f8f8f8', datasetColors[selectedDataset].map]);
-    showDatasetInMapLegend(selectedDataset);
-    showCurrentValuesInMap();
 
-    barChart.axis.max(maxDataValues[selectedDataset]);
-    barChart.axis.labels({y: axisLabels[selectedDataset]});
-    barChart.data.colors({ values: datasetColors[selectedDataset].charts });
-    sortAreasByValue();
-    showTopBottomValuesInBarChart();
-    highlightSelectedAreaInBarChart();
+  switch (datasetStatus[name]) {
+    case LOADING:
+      selectDatasetWhenLoaded = name;
+      // TODO: .classed does not update the color immediately
+      d3.select('#loading-spinner').classed(datasetNames.join(' '), false).classed(name, true);
+      d3.select('#loading-spinner-wrapper').style('display', 'block');
+      resetVisualizations(); // TODO: Only do this if another dataset was already loaded before
+      break;
+    case FAILED:
+      selectedDataset = '';
 
-    // TODO: Sometimes, the bar chart does not update properly here (the values show up, but the bars stay grey and the same height as before). 
-    // Redrawing via resize fixes this temporarily. Investigate, why it does not update properly in the first place.
-    barChart.resize();
-    
-    timeChart.data.colors({ area: datasetColors[selectedDataset].charts });
-    d3.select('#area-text').style('color', datasetColors[selectedDataset].charts);
-    timeChart.axis.max(maxDataValues[selectedDataset]);
-    timeChart.axis.labels({y: axisLabels[selectedDataset]});
-    timeChart.load({
-      json: {
-        months: months,  // has to be loaded as well because both average and area are loaded
-        average: data[selectedDataset].average,
-        area: selectedArea ? data[selectedDataset].values[selectedArea] : nullArr
+      d3.select('#error-message').style('visibility', 'visible');
+      d3.select('#loading-spinner-wrapper').style('display', 'none');
+      resetVisualizations();
+      break;
+    case LOADED:    
+      if (!selectedDataset) { initVisualizations(); }  // first time a dataset is selected
+
+      selectedDataset = name;
+
+      colorScale.domain([minDataValue, maxDataValues[selectedDataset]]);
+      colorScale.range(['#f8f8f8', datasetColors[selectedDataset].map]);
+      showDatasetInMapLegend(selectedDataset);
+      showCurrentValuesInMap();
+      highlightSelectedAreaInMap();
+
+      barChart.axis.max(maxDataValues[selectedDataset]);
+      barChart.axis.labels({y: axisLabels[selectedDataset]});
+      barChart.data.colors({ values: datasetColors[selectedDataset].charts });
+      sortAreasByValue();
+      showTopBottomValuesInBarChart();
+      highlightSelectedAreaInBarChart();
+
+      // TODO: Sometimes, the bar chart does not update properly here (the values show up, but the bars stay grey and the same height as before). 
+      // Redrawing via resize fixes this temporarily. Investigate, why it does not update properly in the first place.
+      barChart.resize();
+      attachMouseListenersToBarChart();
+
+      
+      timeChart.data.colors({ area: datasetColors[selectedDataset].charts, average: '#f8f8f8' });
+      d3.select('#area-text').style('color', datasetColors[selectedDataset].charts);
+      timeChart.axis.max(maxDataValues[selectedDataset]);
+      timeChart.axis.labels({y: axisLabels[selectedDataset]});
+      timeChart.load({
+        json: {
+          months: months,  // has to be loaded as well because both average and area are loaded
+          average: data[selectedDataset].average,
+          area: selectedArea ? data[selectedDataset].values[selectedArea] : nullArr
+        }
+      });
+      if (data[selectedDataset].average == nullArr) {
+        d3.select('#metro-text').style('display', 'none');//text('Metro Average not available').style('color', startColor);
+      } else {
+        d3.select('#metro-text').style('display', 'inline');//text('Metro Average').style('color', '#f8f8f8');
       }
-    });
-    highlightSelectedTimeInTimeChart();
+      highlightSelectedTimeInTimeChart();
 
-    d3.select('#loading-spinner-wrapper').style('display', 'none');
-    d3.select('#content-overlay').style('visibility', 'hidden');
-    d3.select('#time-slider-wrapper').style('visibility', 'visible');
+      d3.select('#loading-spinner-wrapper').style('display', 'none');
+      d3.select('#error-message').style('visibility', 'hidden');
+      d3.select('#content-overlay').style('visibility', 'hidden');
+      d3.select('#time-slider-wrapper').style('visibility', 'visible');
+      break;
   }
   
 }
@@ -374,7 +448,7 @@ function area(name) {
             area: name ? data[selectedDataset].values[name] : nullArr
           }
         });
-        d3.select('#area-text').text(name ? name : 'Select an area on the map');
+        d3.select('#area-text').text(name ? 'ZIP ' + name : 'Select an area on the map');
       }
     }, 50);
 
@@ -665,16 +739,14 @@ function updateSliderElements(sliderValue) {
 
 /* ------------------------------------------- Bar Chart ----------------------------------------------- */
 
+var barChartDefaultValues = { values: [1, 0.9, 0.8, null, 0.3, 0.2, 0.1] };
+var barChartDefaultColors = { values: startColor };
 var barChart = c3.generate({
   bindto: '#bar-chart',
   size: barChartSize(),
   data: {
-    json: {
-      values: [1, 0.9, 0.8, null, 0.3, 0.2, 0.1]
-    },
-    colors: {
-      values: startColor
-    },
+    json: barChartDefaultValues,
+    colors: barChartDefaultColors,
     type: 'bar',
     // TODO: If labels are shown, there is a slight space between the bars and the area names. Fix this
     labels: {
@@ -726,19 +798,19 @@ var barChart = c3.generate({
 
 /* ------------------------------------------- Time Chart ----------------------------------------------- */
 
+var timeChartDefaultValues = {
+      months: months,
+      average: nullArr,
+      area: nullArr
+    };
+var timeChartDefaultColors = { average: startColor, area: startColor };
 var timeChart = c3.generate({
   bindto: '#time-chart',
   size: timeChartSize(), 
   data: {
     x: 'months',
-    json: {
-      months: months,
-      average: nullArr,
-      area: nullArr
-    },
-    colors: {      
-      average: '#f8f8f8'
-    },
+    json: timeChartDefaultValues,
+    colors: timeChartDefaultColors,
     names: {
       area: "",
       average: "Metro Average"
@@ -808,7 +880,7 @@ function loadMap(metro) {
       // highlightBorderColor: 'black',
       // highlightBorderWidth: 2,
       popupTemplate: function(geography, data) {
-        var s = '<div class="hoverinfo" style="text-align: center">' + geography.id.replace('zip', '');
+        var s = '<div class="hoverinfo"><span style="font-weight: bold">' + geography.id.replace('zip', 'ZIP ') + '</span>';
         if (geography.properties.name)
           s += '<br><span style="font-size: 0.85em">' + geography.properties.name  + '</span>';
         if (lockedArea === '')
@@ -817,7 +889,7 @@ function loadMap(metro) {
         return s;
       }
     },
-    scope: 'tl_2010_06_zcta510',
+    scope: 'zip',
     fills: {
       defaultFill: startColor
     }, 
@@ -946,7 +1018,7 @@ function loadMap(metro) {
 
       // TODO: Make sure to select dataset only once map is loaded
       blankMapColors = {};
-      var geometries = datamap.customTopo.objects.tl_2010_06_zcta510.geometries;
+      var geometries = datamap.customTopo.objects.zip.geometries;
       for (var i = 0; i < geometries.length; i++) {
         blankMapColors[geometries[i].id] = startColor;
       }
@@ -971,8 +1043,8 @@ function loadMap(metro) {
 
         filter.append("feOffset")
             .attr("in", "blur")
-            // .attr("dx", 5)  // translation in x/y direction
-            // .attr("dy", 5)
+            // .attr("dx", 1)  // translation in x/y direction
+            // .attr("dy", 1)
             .attr("result", "offsetBlur");
 
         var feMerge = filter.append("feMerge");
@@ -1012,28 +1084,30 @@ var originalSubunitsSize;
 function clipMapToContainer() {
   var subunits = d3.select('#map').select('.datamaps-subunits');
 
-  var divSize = mapSize();
-  var originalSubunitsSize = subunits.node().getBoundingClientRect();
-  var scaleFactor = Math.min(divSize.width / originalSubunitsSize.width, divSize.height / originalSubunitsSize.height);
+  if (subunits.node()) {
 
-  // TODO: Firefox scales elements from the center, so the map position is wrong afterwards.
-  // subunits.style('position', 'absolute');
-  // subunits.style('-moz-transform-origin', 'top left');
+    var divSize = mapSize();
+    var scaleFactor = Math.min(divSize.width / originalSubunitsSize.width, divSize.height / originalSubunitsSize.height);
 
-  // apply scale and measure again for translation values
-  var scaleTransform = 'scale(' + scaleFactor + ')';
-  subunits.style('transform', scaleTransform);
-  // subunits.style('-webkit-transform', scaleTransform);
-  // subunits.style('-ms-transform', scaleTransform);
-  // subunits.style('-moz-transform', scaleTransform);
-  var newSubunitsSize = subunits.node().getBoundingClientRect();
+    // TODO: Firefox scales elements from the center, so the map position is wrong afterwards.
+    // subunits.style('position', 'absolute');
+    // subunits.style('-moz-transform-origin', 'top left');
 
-  // apply final scale and translation
-  var finalTransform = 'translate(' + (divSize.left - newSubunitsSize.left + divSize.width / 2 - newSubunitsSize.width / 2) + 'px, ' + (divSize.top - newSubunitsSize.top + divSize.height / 2 - newSubunitsSize.height / 2) + 'px) scale(' + scaleFactor + ')';
-  subunits.style('transform', finalTransform);
-  // subunits.style('-webkit-transform', finalTransform);
-  // subunits.style('-ms-transform', finalTransform);
-  // subunits.style('-moz-transform', finalTransform);
+    // apply scale and measure again for translation values
+    var scaleTransform = 'scale(' + scaleFactor + ')';
+    subunits.style('transform', scaleTransform);
+    // subunits.style('-webkit-transform', scaleTransform);
+    // subunits.style('-ms-transform', scaleTransform);
+    // subunits.style('-moz-transform', scaleTransform);
+    var newSubunitsSize = subunits.node().getBoundingClientRect();
+
+    // apply final scale and translation
+    var finalTransform = 'translate(' + (divSize.left - newSubunitsSize.left + divSize.width / 2 - newSubunitsSize.width / 2) + 'px, ' + (divSize.top - newSubunitsSize.top + divSize.height / 2 - newSubunitsSize.height / 2) + 'px) scale(' + scaleFactor + ')';
+    subunits.style('transform', finalTransform);
+    // subunits.style('-webkit-transform', finalTransform);
+    // subunits.style('-ms-transform', finalTransform);
+    // subunits.style('-moz-transform', finalTransform);
+  }
 }
 
 var mapLegend, mapLegendRect, mapLegendTextName, mapLegendTextMin, mapLegendTextMiddle, mapLegendTextMax;
