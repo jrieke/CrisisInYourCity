@@ -428,6 +428,7 @@ function lockSelectedArea() {
 /*  Autocomplete  */
 
 
+
 var metrosArray = [];
 for (var i = 0; i < metros.length; i++) {
   metrosArray[i] = {value: metros[i].metro + ', ' + metros[i].state, data: metros[i]};
@@ -435,66 +436,117 @@ for (var i = 0; i < metros.length; i++) {
 
 console.log(metrosArray);
 
-$('#autocomplete').autocomplete({
+
+// TODO: Rename result, eg to metroObject
+function metro(metroObject) {
+
+  d3.select('#navbar')
+    .style('visibility', 'visible')
+    .transition()
+    .duration(1000)
+    .style('top', '300px')
+    .style('opacity', 1);
+
+  d3.select('#descriptions')
+    .transition()
+    .delay(1000)
+    .style('visibility', 'visible');
+
+  d3.select('#metro-name-wrapper')
+    .style('visibility', 'visible')
+    .transition()
+    .duration(1000)
+    .style('opacity', 1);
+
+  d3.select('#metro-name')
+    .text(metroObject.metro);
+
+  d3.select('#content-pane')
+    .style('visibility', 'visible')
+    .transition()
+    .duration(1000)
+    .style('top', '350px');
+
+  d3.select('#footer')
+    .transition()
+    .duration(1000)
+    .style('background-color', '#616161');
+
+
+  d3.select('#header')
+    .transition()
+    .duration(1000)
+    .style('opacity', 0);
+  d3.select('#header')
+    .transition()
+    .delay(1000)
+    .style('visibility', 'hidden');
+
+
+  // TODO: Does this timeout make sense?
+  setTimeout(function() {loadMap(metroObject);}, 0);
+
+
+  setTimeout(function() {
+    // Load the datasets as the first thing, so we reduce waiting time
+    for (var i = 0; i < datasetNames.length; i++) {
+      fetchDataset(datasetNames[i], metroObject);
+    }
+  }, 1000);    
+}
+
+var autocomplete = $('#autocomplete').autocomplete({
     lookup: metrosArray,
-    lookupLimit: 5,
+    lookupLimit: 4, 
+    showNoSuggestionNotice: true,
+    triggerSelectOnValidInput: false,
+    autoSelectFirst: true,
+    appendTo: d3.select('#suggestions'),
     onSelect: function (result) {
-
-      d3.select('#navbar')
-        .style('visibility', 'visible')
-        .transition()
-        .duration(1000)
-        .style('top', '300px')
-        .style('opacity', 1);
-
-      d3.select('#descriptions')
-        .transition()
-        .delay(1000)
-        .style('visibility', 'visible');
-
-      d3.select('#metro-name-wrapper')
-        .style('visibility', 'visible')
-        .transition()
-        .duration(1000)
-        .style('opacity', 1);
-
-      d3.select('#metro-name')
-        .text(result.data.metro);
-
-      d3.select('#content-pane')
-        .style('visibility', 'visible')
-        .transition()
-        .duration(1000)
-        .style('top', '350px');
-
-      d3.select('#footer')
-        .transition()
-        .duration(1000)
-        .style('background-color', '#616161');
-
-
-      d3.select('#header')
-        .transition()
-        .duration(1000)
-        .style('opacity', 0);
-      d3.select('#header')
-        .transition()
-        .delay(1000)
-        .style('visibility', 'hidden');
-
-
-      // TODO: Does this timeout make sense?
-      setTimeout(function() {loadMap(result.data);}, 0);
-
-
-      setTimeout(function() {
-        // Load the datasets as the first thing, so we reduce waiting time
-        for (var i = 0; i < datasetNames.length; i++) {
-          fetchDataset(datasetNames[i], result.data);
-        }
-      }, 1000);    
+      metro(result.data);
     }
 });
+
+d3.select('#suggestions')
+  .selectAll('.autocomplete-default')
+  .data([ 
+      {metro: 'Los Angeles', state: 'CA'},
+      {metro: 'San Francisco', state: 'CA'},
+      {metro: 'San Diego', state: 'CA'},
+      {metro: 'Sacramento', state: 'CA'}
+    ])
+  .enter()
+  .append('div')
+  .classed('autocomplete-suggestion', true)
+  .classed('autocomplete-default', true)
+  .text(function(d) { return d.metro; })
+  .on('mouseover', function() { d3.select(this).classed('autocomplete-selected', true); })
+  .on('mouseout', function() { d3.select(this).classed('autocomplete-selected', false); })
+  .on('click', function(d) { 
+    d3.select('#autocomplete').attr('value', d.metro + ', ' + d.state);
+    metro(d); 
+  });
+
+
+d3.select('#autocomplete')
+  .on('input', function() {
+    if (this.value) {
+      d3.selectAll('.autocomplete-default').style('display', 'none');
+      d3.select('#header-description').style('visibility', 'hidden');
+    } else {
+      d3.selectAll('.autocomplete-default').style('display', 'block');
+      d3.select('#header-description').style('visibility', 'visible');
+    }
+  });
+
+// d3.select('.autocomplete-suggestions')
+//   .selectAll('div')
+//   .data(['San Diego, CA', 'Sacramento, CA', 'San Francisco, CA', 'Los Angeles, CA'])
+//   .enter()
+//   .append('div')
+//   .classed('autocomplete-suggestion', true)
+//   .text(function(d) {return d;});
+
 
 /* ------------------------------------------- Time Slider ----------------------------------------------- */
 
@@ -812,7 +864,7 @@ function loadMap(metro) {
       originalSubunitsSize = datamap.svg.select('.datamaps-subunits').node().getBoundingClientRect();
       clipMapToContainer();
 
-      console.log('translate(' + (mapSize().width / 2 - 100) + 'px, ' + (mapSize().height - 50) + 'px)');
+      // console.log('translate(' + (mapSize().width / 2 - 100) + 'px, ' + (mapSize().height - 50) + 'px)');
 
       mapLegend = datamap.svg.append('g')
         .style('transform', 'translate(' + (mapSize().width / 2 - 96) + 'px, ' + (mapSize().height - 65) + 'px)')
@@ -961,14 +1013,27 @@ function clipMapToContainer() {
   var subunits = d3.select('#map').select('.datamaps-subunits');
 
   var divSize = mapSize();
+  var originalSubunitsSize = subunits.node().getBoundingClientRect();
   var scaleFactor = Math.min(divSize.width / originalSubunitsSize.width, divSize.height / originalSubunitsSize.height);
 
+  // TODO: Firefox scales elements from the center, so the map position is wrong afterwards.
+  // subunits.style('position', 'absolute');
+  // subunits.style('-moz-transform-origin', 'top left');
+
   // apply scale and measure again for translation values
-  subunits.style('transform', 'scale(' + scaleFactor + ')');
+  var scaleTransform = 'scale(' + scaleFactor + ')';
+  subunits.style('transform', scaleTransform);
+  // subunits.style('-webkit-transform', scaleTransform);
+  // subunits.style('-ms-transform', scaleTransform);
+  // subunits.style('-moz-transform', scaleTransform);
   var newSubunitsSize = subunits.node().getBoundingClientRect();
 
   // apply final scale and translation
-  subunits.style('transform', 'translate(' + (divSize.left - newSubunitsSize.left + divSize.width / 2 - newSubunitsSize.width / 2) + 'px, ' + (divSize.top - newSubunitsSize.top + divSize.height / 2 - newSubunitsSize.height / 2) + 'px) scale(' + scaleFactor + ')');
+  var finalTransform = 'translate(' + (divSize.left - newSubunitsSize.left + divSize.width / 2 - newSubunitsSize.width / 2) + 'px, ' + (divSize.top - newSubunitsSize.top + divSize.height / 2 - newSubunitsSize.height / 2) + 'px) scale(' + scaleFactor + ')';
+  subunits.style('transform', finalTransform);
+  // subunits.style('-webkit-transform', finalTransform);
+  // subunits.style('-ms-transform', finalTransform);
+  // subunits.style('-moz-transform', finalTransform);
 }
 
 var mapLegend, mapLegendRect, mapLegendTextName, mapLegendTextMin, mapLegendTextMiddle, mapLegendTextMax;

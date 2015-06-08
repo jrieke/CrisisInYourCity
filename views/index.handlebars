@@ -22,22 +22,27 @@
 
 <div id="metro-name-wrapper" style="z-index: 1; position: absolute; left: 20px; top: 10px; height: 50px; line-height: 50px; visibility: hidden; opacity: 0; font-size: 1.4rem"><span id="metro-name" style="font-size: 1em; color: #f8f8f8"></span> <a href="/" style="font-size: 0.8rem">Change</a></div>
 
+<div id="header" class="" style="color: #f8f8f8; text-align: center; top: calc(50% - 100px); position: absolute; width: 100%;">
+  
+    <div style="font-size: 2.2rem; display: inline-block; margin-right: 10px; margin-bottom: 10px">The Financial Crisis in </div>
 
-<div id="header" class="container section center-align" style="color: #f8f8f8;">
-  <h3>Some description</h3>
-  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-  tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-  quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-  consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-  cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-  proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-  <input type="text" id="autocomplete" class="white-text" style="text-align: center; width: 200px; font-size: 1.1rem; padding-left: 1px">
-  <!-- <div style="margin-top: 40px">
-    {{#each metros}}
-    <span class="choose-metro btn teal waves-effect" style="margin: 2px">{{metro}}, {{state}}</span>
-    {{/each}}
-  </div> -->
+    <div style="width: 250px; display: inline-block; vertical-align: top">
+      <input type="text" id="autocomplete" class="white-text" style="vertical-align: top; border-color: #f8f8f8; box-shadow: none; text-align: center; font-size: 2.2rem; width: 100%; padding-left: 1px; margin-bottom: 15px" spellcheck="false" autofocus>
+      <div id="suggestions" style="width: 100%; z-index: 9999; position: relative"></div>  
+    </div>
+
+
+
+  <!-- <p id="header-description" style="color: #9e9e9e; text-align: center;">A data visualization built with <a href="http://d3js.org/">D3</a>. Powered by data from <a href="http://www.zillow.com/research/data/">Zillow</a>.</p> -->
 </div>
+
+
+<!-- <div id="header-2" style="position: absolute; width: 100%; top: 40%; color: #9e9e9e; text-align: center">
+  
+  <p style="font-size: 1.2rem">Choose one of these datasets:</p>
+</div> -->
+
+
 
 
 
@@ -54,6 +59,9 @@
 </div>
 
 <div id="descriptions">
+  <!-- <div class="description" style="visibility: visible; color: #bdbdbd">
+  Click above to change dataset
+  </div> -->
   <div id="description-1" class="description mediansaleprice" style="background-color: rgba(239, 83, 80, 1);">
     Median sale price for all homes sold in one month
   </div>
@@ -107,7 +115,7 @@
 
     </div>
 
-    <div id="time-slider-wrapper" style="display: flex; flex-direction: column; visibility: hidden; position: absolute; top: 10px; left: 37.5%; width: 25%; bottom: 25px; text-align: center;">
+    <div id="time-slider-wrapper" style="display: flex; flex-direction: column; visibility: hidden; position: absolute; top: 25px; left: 37.5%; width: 25%; bottom: 25px; text-align: center;">
 
       <div style="color: #f8f8f8;">
         <span id="month">Jan - Mar</span><br>
@@ -165,10 +173,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mousewheel/3.1.12/jquery.mousewheel.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.devbridge-autocomplete/1.2.7/jquery.devbridge-autocomplete.min.js"></script>
 
 <script src="js/datamaps.none.min.js"></script>
 <script src="js/d3.slider.js"></script>
+<script src="js/jquery.autocomplete.min.js"></script>
 
 <script src="js/custom.js"></script>
 

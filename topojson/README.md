@@ -1,3 +1,5 @@
+*This needs to be updated*
+
 1) Install [topojson](https://github.com/mbostock/topojson/wiki/Command-Line-Reference) globally:
 
 	npm install topojson -g
