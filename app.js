@@ -7,13 +7,14 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
 var dotenv = require('dotenv');
+var async = require('async');
 var app = express();
 
 dotenv.load();
 
-var index = require('./routes/index');
 var delphi = require('./util/delphi')(process.env.DELPHI_CONN_STRING);
 var helpers = require('./util/helpers');
+var constants = require('./util/constants');
 
 
 //Configures the Template engine
@@ -27,11 +28,10 @@ app.use(session({ secret: 'keyboard cat',
 	saveUninitialized: true,
 	resave: true}));
 
-//routes
-app.get('/', index.view);
+app.get('/', function(req, res){
+	res.render('index', {metros: constants.METROS});
+});
 
-
-// TODO: Only for testing, the frontpage will probably be integrated into index later
 app.get('/hslider', function(req, res) {
 	res.render('index_hslider');
 });
@@ -41,40 +41,27 @@ app.get('/labels', function(req, res) {
 });
 
 
-//delphi routes
-app.post("/soldforgain", function (req, res) {
-	console.log(req);
-	delphi.executeYearBoundedQuery({tablename: delphi.ZIP_TABLE_SOLD_FOR_GAIN},
-		{metro: req.body.metro, startYear: 2004, endYear: 2014},
-		function(rows){
-			return res.json(helpers.reduceData(helpers.parseRowsByColumn(rows, 'RegionName', 'Value'),3));
-	});
-});
-
+/*  delphi routes  */
 app.post("/mediansaleprice",function(req, res){
-	delphi.executeYearBoundedQuery({tablename: delphi.ZIP_TABLE_MEDIAN_SALE_PRICE, metro: false},
+	return queryDatabaseMetroAndZip({tablename: delphi.ZIP_TABLE_MEDIAN_SALE_PRICE, metro: false},
 		{metro: req.body.metro, startYear: 2004, endYear: 2014},
-		function(rows1){
-			delphi.executeYearBoundedQuery({tablename: delphi.METRO_TABLE_MEDIAN_SALE_PRICE, metro: true},
-				{metro: req.body.metro + ", " + req.body.state, startYear: 2004, endYear: 2014},
-				function(rows2){
-					return res.json({values: helpers.reduceData(helpers.parseRowsByColumn(rows1, 'RegionName', 'Value'),3),
-						average: helpers.parseRowsByColumn(rows2, 'RegionName', 'Value')});
-				});
-		});
+		{tablename: delphi.METRO_TABLE_MEDIAN_SALE_PRICE, metro: true},
+		{metro: req.body.metro + ", " + req.body.state, startYear: 2004, endYear: 2014},
+		['RegionName', 'Value'],
+		function(data){
+			return res.json(data);
+	});
 });
 
 app.post("/soldasforeclosures", function(req, res){
-	delphi.executeYearBoundedQuery({tablename: delphi.ZIP_TABLE_FORECLOSURES, metro: false},
+	return queryDatabaseMetroAndZip({tablename: delphi.ZIP_TABLE_FORECLOSURES, metro: false},
 		{metro: req.body.metro, startYear: 2004, endYear: 2014},
-		function(rows1){
-			delphi.executeYearBoundedQuery({tablename: delphi.METRO_TABLE_FORECLOSURES, metro: true},
-				{metro: req.body.metro + ", " + req.body.state, startYear: 2004, endYear: 2014},
-				function(rows2){
-					return res.json({values: helpers.reduceData(helpers.parseRowsByColumn(rows1, 'RegionName', 'Value'),3),
-						average: helpers.parseRowsByColumn(rows2, 'RegionName', 'Value')});
-				});
-	});
+		{tablename: delphi.METRO_TABLE_FORECLOSURES, metro: true},
+		{metro: req.body.metro + ", " + req.body.state, startYear: 2004, endYear: 2014},
+		['RegionName', 'Value'],
+		function(data){
+			return res.json(data);
+		});
 });
 
 app.post("/soldforloss", function(req, res){
@@ -86,26 +73,46 @@ app.post("/soldforloss", function(req, res){
 });
 
 app.post("/decreasinginvalues", function(req, res){
-	delphi.executeYearBoundedQuery({tablename: delphi.ZIP_TABLE_DECREASING_VALUES, metro: false},
+	return queryDatabaseMetroAndZip({tablename: delphi.ZIP_TABLE_DECREASING_VALUES, metro: false},
 		{metro: req.body.metro, startYear: 2004, endYear: 2014},
-		function(rows1){
-			delphi.executeYearBoundedQuery({tablename: delphi.METRO_TABLE_DECREASING_VALUES, metro: true},
-				{metro: req.body.metro + ", " + req.body.state, startYear: 2004, endYear: 2014},
-				function(rows2){
-					return res.json({values: helpers.reduceData(helpers.parseRowsByColumn(rows1, 'RegionName', 'Value'),3),
-						average: helpers.parseRowsByColumn(rows2, 'RegionName', 'Value')});
-				});
+		{tablename: delphi.METRO_TABLE_DECREASING_VALUES, metro: true},
+		{metro: req.body.metro + ", " + req.body.state, startYear: 2004, endYear: 2014},
+		['RegionName', 'Value'],
+		function(data){
+			return res.json(data);
+		});
+});
+
+var queryDatabaseMetroAndZip = function(zip_config, zip_params, metro_config, metro_params, parsing_strings, callback){
+	var async_tasks = [];
+	var rows1;
+	var rows2;
+	async_tasks.push(function(callback){
+		delphi.executeYearBoundedQuery(zip_config,
+			zip_params,
+			function(rows){
+				rows1 = rows;
+				callback();
+			});
 	});
-});
+	async_tasks.push(function(callback){
+		delphi.executeYearBoundedQuery(metro_config,
+			metro_params,
+			function(rows){
+				rows2 = rows;
+				callback();
+			});
+	});
+	async.parallel(async_tasks, function(err){
+		if(err) return err;
 
-//Return topojson based on parameter. For example /topojson?city=3 will return the file for Los Angeles
-app.get("/topojson", function(req, res){
-	var city = req.query.city.valueOf().toLowerCase().trim().replace(/\s/g,'');
-	return res.json(helpers.getTopoJson(city));
-});
+		callback({values: helpers.reduceData(helpers.parseRowsByColumn(rows1, parsing_strings[0], parsing_strings[1]),3),
+			average: helpers.reduceData(helpers.parseRowsByColumn(rows2, parsing_strings[0], parsing_strings[1]),3)});
+	});
+};
 
 
-//set environment ports and start application
+/* set environment ports and start application */
 app.set('port', process.env.PORT || 3000);
 http.createServer(app).listen(app.get('port'), function(){
 	console.log('Express server listening on port ' + app.get('port'));

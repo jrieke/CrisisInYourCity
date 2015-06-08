@@ -7,6 +7,9 @@
 //var topolosangeles = require('../public/data/LosAngeles.json');
 
 exports.parseRowsByColumn =  function(rows, column, value_column){
+    if(rows === undefined || rows[0] === undefined || rows === null){
+        return null;
+    }
     var jsonData = {};
     var currentRegion = rows[0][column];
     var values = [];
@@ -43,6 +46,9 @@ exports.getTopoJson= function(city){
 };
 
 exports.reduceData = function(data, factor){
+    if(data === null || data === undefined){
+        return null;
+    }
     for (var key in data) {
         if (data[key]) {
             var newdata = [];
