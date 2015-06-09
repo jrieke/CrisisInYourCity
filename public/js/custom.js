@@ -645,6 +645,11 @@ function metro(metroObject) {
         // d3.select('#content-pane').style('cursor', 'auto');
         d3.select(this).classed('active', true);
         fadeOut('#dataset-hint');
+      })
+      .on('touchend', function() {
+
+        // TODO: On touch devices, make this go away
+        d3.selectAll('.description').transition().delay(5000).style('visibility', 'hidden');
       });
   }, transitionDuration);
 

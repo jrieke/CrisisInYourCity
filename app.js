@@ -18,7 +18,7 @@ var constants = require('./util/constants');
 
 
 //Configures the Template engine
-app.engine('handlebars', handlebars());//{defaultLayout: 'layout'}));
+app.engine('handlebars', handlebars());
 app.set('view engine', 'handlebars');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -30,14 +30,6 @@ app.use(session({ secret: 'keyboard cat',
 
 app.get('/', function(req, res){
 	res.render('index', {metros: constants.METROS});
-});
-
-app.get('/hslider', function(req, res) {
-	res.render('index_hslider');
-});
-
-app.get('/labels', function(req, res) {
-	res.render('index_labels');
 });
 
 

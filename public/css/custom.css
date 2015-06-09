@@ -136,7 +136,7 @@ nav ul li {
   line-height: 50px;
 }
 
-@media (max-height: 500px) {
+@media (max-height: 500px), (max-width: 600px) {
   #footer {
     display: none;
     /*background-color: #757575 !important;*/
