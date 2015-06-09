@@ -187,22 +187,26 @@ nav ul li {
 
 #content {
   position: relative;
-  top: 40px;
-  height: calc(100% - 60px);
+  height: 100%;
+  padding-top: 45px;
+  padding-bottom: 35px;
 /*  margin: 0 auto;
   width: 900px;*/
   margin: 0 auto;
-  width: calc(100% - 170px);
+  width: calc(100% - 280px);
 }
 
 @media (max-width: 1000px) {
   #content {
     width: calc(100% - 30px);
+    padding-top: 15px;
+    padding-bottom: 5px;
   }
 }
 
 #middle-console {
   flex: 0 0 230px; 
+  margin: 0 60px;
 }
 
 .adjust-line-height {
@@ -212,6 +216,7 @@ nav ul li {
 @media (max-width: 750px) {
   #middle-console {
     flex: 0 0 50px; 
+    margin: 0 10px;
   }
 
   .time-texts {
@@ -221,6 +226,30 @@ nav ul li {
   .adjust-line-height {
     line-height: 140%;
   }
+}
+
+#time-slider-wrapper {
+  padding-top: 15px; 
+  padding-bottom: 15px;
+}
+
+#map-wrapper {
+  position: relative; width: calc(100% + 100px); height: 100%; top: 0px; left: -50px;
+}
+
+@media (max-width: 750px) {
+  #map-wrapper {
+    width: 100%;
+    left: 0px;
+  }
+}
+
+#charts-wrapper {
+  /*border-right: 40px solid transparent;*/
+  /*border-left: 50px solid transparent;*/
+  /*background-clip: padding-box;*/
+  /*margin-left: 100px;*/
+  /*padding-left: 100px;*/
 }
 
 
