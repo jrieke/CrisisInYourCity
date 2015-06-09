@@ -111,7 +111,7 @@ nav ul li {
   opacity: 0.8; 
   position: absolute; 
   width: 100%; 
-  height: calc(100% - 50px); 
+  height: 100%; 
   top: 0px; 
   left: 0px;
 }
