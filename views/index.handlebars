@@ -7,9 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.css">
 
   <link rel="stylesheet" href="css/d3.slider.css">
-
   <link rel="stylesheet" href="css/custom.css">
-
 
   <!--Let browser know website is mobile optimized-->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
@@ -20,177 +18,158 @@
 <body class="grey darken-3">
 
 
-<!-- TODO: Integrate this into navbar -->
-<div id="metro-name-wrapper" style="z-index: 1; position: absolute; left: 20px; top: 0px; height: 50px; line-height: 50px; visibility: hidden; opacity: 0; font-size: 1.4rem"><span id="metro-name" style="font-size: 1em; color: #f8f8f8"></span> <a href="/" style="font-size: 0.8rem">Change</a></div>
+<!-- TODO: Maybe integrate this into navbar -->
+<div id="metro-name-wrapper" class="to-fade-in" style="z-index: 1; position: absolute; left: 20px; top: 0px; height: 50px; line-height: 50px;"><span id="metro-name" style="font-size: 1.4rem; color: #f5f5f5"></span> <a href="/" style="font-size: 0.8rem">Change</a></div>
 
-<div id="header" class="" style="color: #f8f8f8; text-align: center; top: calc(50% - 100px); position: absolute; width: 100%;">
+<div id="header" class="grey-text text-lighten-4 center-align" style="top: calc(50% - 100px); position: absolute; width: 95%; left: 2.5%">
   
-    <div style="font-size: 2.2rem; display: inline-block; margin-right: 10px; margin-bottom: 10px">The Financial Crisis in </div>
+    <div class="left-align" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;">
+      <div class="hide-on-med-and-up grey-text center-align" style="font-size: 0.9rem; margin-bottom: 10px;">A visualization of<br>US housing market data from 2004 to 2014</div>
+      <div style="font-size: 2.2rem;">The Financial Crisis in </div>
+      <div class="hide-on-small-only grey-text" style="font-size: 0.9rem; line-heigth: 0.9rem; margin-top: 2px;">A visualization of US housing market data<br>from 2004 to 2014</div>
+    </div>
 
-    <div style="width: 250px; display: inline-block; vertical-align: top">
-      <input type="text" id="autocomplete" class="white-text" style="vertical-align: top; border-color: #f8f8f8; box-shadow: none; text-align: center; font-size: 2.2rem; width: 100%; padding-left: 1px; margin-bottom: 15px" spellcheck="false" placeholder="" autofocus>
+    <div class="center-align" style="width: 250px; display: inline-block; vertical-align: top;">
+      <input type="text" id="autocomplete" class="center-align" style="font-size: 2.2rem; width: 100%; margin-bottom: 15px" spellcheck="false" placeholder="" autofocus>
       <div id="suggestions" style="width: 100%; z-index: 9999; position: relative"></div>  
     </div>
 
-
-
-  <!-- <p id="header-description" style="color: #9e9e9e; text-align: center;">A data visualization built with <a href="http://d3js.org/">D3</a>. Powered by data from <a href="http://www.zillow.com/research/data/">Zillow</a>.</p> -->
 </div>
 
 
-<!-- <div id="header-2" style="position: absolute; width: 100%; top: 40%; color: #9e9e9e; text-align: center">
-  
-  <p style="font-size: 1.2rem">Choose one of these datasets:</p>
-</div> -->
+  <!-- <div id="header-description" style="color: #9e9e9e; text-align: center; position: absolute; bottom: 30px; left: 0; width: 100%; height: 50px; line-height: 50px; font-size: 0.9em">Built with data from <a href="http://www.zillow.com/research/data/">Zillow</a>.</div> -->
 
 
 
-
-
-<!-- TODO: Change this to nav (currently, materialize alters the style of that) -->
-<div id="navbar" style="position: absolute; top: calc(100% - 100px); height: 50px; width: 100%; text-align: center; opacity: 0; visibility: hidden">
-  <div id="nav-title-1" class="nav-title mediansaleprice">Sale Price</div><!--
-  --><div id="nav-title-2" class="nav-title soldforloss ">Sold for Loss</div><!--
-  --><div id="nav-title-3" class="nav-title decreasinginvalues">Decreasing Values</div><!--
-  --><div id="nav-title-4" class="nav-title soldasforeclosures">Foreclosures</div>
-</div>
+<nav class="grey darken-3 grey-text text-lighten-4">
+  <ul>
+    <li id="nav-title-1" class="mediansaleprice">Sale Price</li><!--
+    --><li id="nav-title-2" class="soldforloss ">Sold for Loss</li><!--
+    --><li id="nav-title-3" class="decreasinginvalues">Decreasing Values</li><!--
+    --><li id="nav-title-4" class="soldasforeclosures">Foreclosures</li>
+  </ul>
+</nav>
 
   
-
-</div>
 
 <div id="descriptions">
-  <!-- <div class="description" style="visibility: visible; color: #bdbdbd">
-  Click above to change dataset
-  </div> -->
-  <div id="description-1" class="description mediansaleprice" style="background-color: rgba(239, 83, 80, 1);">
+  <div class="description mediansaleprice" style="background-color: rgba(239, 83, 80, 1);">
     Median sale price for all homes sold in one month
   </div>
-  <div id="description-2" class="description soldforloss" style="background-color: rgba(0, 188, 212, 1);">
+  <div class="description soldforloss" style="background-color: rgba(0, 188, 212, 1);">
     Percentage of homes that sold for less than the previous purchase price in one month
   </div>
-  <div id="description-3" class="description decreasinginvalues" style="background-color: rgba(139, 195, 74, 1);">
+  <div class="description decreasinginvalues" style="background-color: rgba(139, 195, 74, 1);">
     Percentage of homes whose value has fallen in the last year
   </div>
-  <div id="description-4" class="description soldasforeclosures" style="background-color: rgba(255, 179, 0, 1);">
+  <div class="description soldasforeclosures" style="background-color: rgba(255, 179, 0, 1);">
     Number of homes per 10 000 that were foreclosed in one month
   </div>
 </div>
 
+
 <div id="content-pane" class="grey darken-1">
-<div id="content">
 
-  <div id="content-overlay" class="valign-wrapper" style="position: absolute; width: 100%; height: 100%; z-index: 2;">
+  <div id="content-overlay" class="cover" style="z-index: 2;"></div>
 
-  
+  <div id="content" class="flex-container">
 
-  </div>
+    <!-- <div style="display: flex; width: 100%; height: 100%"> -->
 
+      <div class="flex-container-vertical" style="flex: 1; height: 100%; padding-left: 50px">
 
-
-
-  <div style="display: flex; width: 100%; height: 100%">
-
-    <div style="flex: 1; height: 100%; display: flex; flex-direction: column; padding-left: 50px">
-
-      <div id="bar-chart-wrapper" style="flex: 1; width: 100%; margin-bottom: 30px">
-        <div id="bar-chart"></div>
-        <div class="bar-chart-hoverover" style="z-index: 10001; position: absolute; display: none"></div>
-      </div>
-
-      
-
-      <div id="time-chart-wrapper" style="flex: 1; width: 100%; margin-top: 30px; position: relative">
-
-        <div id="time-chart-legend" style="z-index: 1; visibility: hidden; position: absolute; top: -2.5px; width: 90%; left: 10%; text-align: center; font-size: 0.7rem;">
-          <span id="metro-text" style="color: #f8f8f8; padding: 0 7px; background-color: #757575">Metro Average</span><!--
-          --><span id="area-text" style="color: #ef5350; padding: 0 7px; background-color: #757575">Select an area on the map</span>
-        </div>
-        <div id="time-chart"></div>        
-      </div>
-
-    </div>
-
-
-
-    <div id="middle-console" style="margin: 0 40px; text-align: center; position: relative">
-
-      <div id="loading-spinner-wrapper" class="preloader-wrapper big active" style="display: none; opaciy: 0; visibility: hidden">
-        <div id="loading-spinner" class="spinner-layer spinner-blue-only">
-          <div class="circle-clipper left">
-            <div class="circle"></div>
-          </div><div class="gap-patch">
-            <div class="circle"></div>
-          </div><div class="circle-clipper right">
-            <div class="circle"></div>
-          </div>
-        </div>
-      </div>
-
-      <div id="dataset-hint" style="display: flex; flex-direction: column; opacity: 0; position: absolute; width: 100%; height: 100%; visibility: hidden; color: #f8f8f8">
-        <div class="arrow" style="flex: 1; width: 1px; margin: 0 auto; margin-bottom: 20px; margin-top: 10px"></div>
-        <div style="line-height: 200%">Select a dataset <br>to see how the crisis affected the housing market</div>
-        <div style="flex: 1"></div>
-      </div>
-
-      <div id="error-message" class="valign-wrapper" style="opacity: 0; line-height: 200%; position: absolute; width: 100%; height: 100%; visibility: hidden; color: #f8f8f8">
-        This dataset could not be loaded.<br>Try another one!
-      </div>
-
-
-      <div id="time-slider-wrapper" style="padding-top: 20px; padding-bottom: 20px; position: absolute; width: 100%; height: 100%; display: flex; flex-direction: column; visibility: hidden;">
-        <div style="color: #f8f8f8;">
-          <span id="month">Jan - Mar</span><br>
-          <span id="year" style="font-size: 2em;">2004</span><br>
-          <i id="time-play-pause" class="mdi-av-play-circle-fill" style="color: #f8f8f8; font-size: 2.7rem; cursor: pointer"></i>
+        <div id="bar-chart-wrapper" class="flex-row" style="margin-bottom: 30px">
+          <div id="bar-chart"></div>
+          <div class="bar-chart-hoverover"></div>
         </div>
 
-        <div style="flex: 1; margin-top: 20px; position: relative;">
+        <div id="time-chart-wrapper" class="flex-row" style="margin-top: 30px; position: relative;">
+          <div id="time-chart"></div>
+          <div id="time-chart-legend">
+            <ul><li id="metro-text" style="color: #f5f5f5">Metro Average</li><li id="area-text">Select an area on the map</li></ul>
+          </div>
+        </div>
 
-          <div class="time-texts" style="position: absolute; left: 0px; height: 100%; width: 100px">
-            <p class="time-text time-text-left" style="top: 2%"><span style="font-weight: bold;">Mid 04</span><br>US Homeownership peaks</p>
-            <p class="time-text time-text-left hide-on-little" style="top: 28%"><span style="font-weight: bold;">Apr 07</span><br>> 50 mortgage companies have filed bankruptcy</p>
-            <p class="time-text time-text-left" style="top: 40%"><span style="font-weight: bold;">Sep 08</span><br>Lehman files bankruptcy, BOA buys Merill Lynch</p>
-            <p class="time-text time-text-left hide-on-very-little" style="top: 70%"><span style="font-weight: bold;">Nov 10</span><br>US Home values down by 26 percent  since 2006</p>
-            <p class="time-text time-text-left hide-on-little" style="top: 89%"><span style="font-weight: bold;">14</span><br>Foreclosures still above pre-crisis level</p>
+      </div>
+
+      <div id="middle-console" class="center-align" style="margin: 0 40px; position: relative">
+
+        <div id="loading-spinner-wrapper" class="preloader-wrapper big active to-fade-in">
+          <div id="loading-spinner" class="spinner-layer spinner-blue-only">
+            <div class="circle-clipper left">
+              <div class="circle"></div>
+            </div><div class="gap-patch">
+              <div class="circle"></div>
+            </div><div class="circle-clipper right">
+              <div class="circle"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="dataset-hint" class="flex-container-vertical cover to-fade-in grey-text text-lighten-4">
+          <div class="arrow flex-row" style="width: 1px; margin: 0 auto; margin-bottom: 20px; margin-top: 10px"></div>
+          <div class="adjust-line-height">Click on a dataset<span class="hide-on-small-only"> <br>to see how the crisis affected the housing market</span></div>
+          <div class="flex-row"></div>
+        </div>
+
+        <div id="error-message" class="valign-wrapper cover to-fade-in grey-text text-lighten-4 adjust-line-height">
+          This dataset could not be loaded.<span class="hide-on-small-only"><br>Try another one!</span>
+        </div>
+
+
+        <div id="time-slider-wrapper" class="flex-container-vertical cover to-fade-in" style="padding-top: 20px; padding-bottom: 20px;">
+          
+          <div class="grey-text text-lighten-4">
+            <span id="month">Jan - Mar</span><br>
+            <span id="year" style="font-size: 2em;">2004</span><br>
+            <i id="time-play-pause" class="mdi-av-play-circle-fill grey-text text-lighten-4" style="font-size: 2.7rem; cursor: pointer"></i>
           </div>
 
-          <div id="time-slider" style="position: absolute; height: 100%; cursor: pointer; left: calc(50% - 2px)">
-            <div class="d3-slider-progress d3-slider d3-slider-vertical" style="position: absolute; top: 0px; bottom: 100%; height: auto; width: 100%; background: #f8f8f8"></div>
-            <div class="time-point" style="top: 9.1%"></div>
-            <div class="time-point" style="top: 27.3%"></div>
-            <div class="time-point" style="top: 45.5%"></div>
-            <div class="time-point" style="top: 63.7%"></div>
-            <div class="time-point" style="top: 81.9%"></div>    
-          </div>
+          <div class="flex-row flex-container" style="margin-top: 20px; position: relative;">
 
-          <div class="time-texts" style="position: absolute; right: 0px; height: 100%; width: 100px;">
-            <p class="time-text time-text-right hide-on-very-little" style="top: 19%"><span style="font-weight: bold;">Apr 06</span><br>US Home prices peak</p>
-            <p class="time-text time-text-right" style="top: 35%"><span style="font-weight: bold;">Mar 08</span><br>JP Morgan Chase buys Bear Stearns</p>
-            <p class="time-text time-text-right hide-on-little" style="top: 45%"><span style="font-weight: bold;">Feb 09</span><br>American Recovery and Reinvestment Act</p>
-            <p class="time-text time-text-right" style="top: 80%"><span style="font-weight: bold;">Early 13</span><br>Stock market recovers</p>
-            
+            <div class="time-texts time-texts-left">
+              <p style="top: 2%"><strong>Mid 04</strong><br>US Homeownership peaks</p>
+              <p class="hide-on-little" style="top: 28%"><strong>Apr 07</strong><br>> 50 mortgage companies have filed bankruptcy</p>
+              <p style="top: 40%"><strong>Sep 08</strong><br>Lehman files bankruptcy, BOA buys Merill Lynch</p>
+              <p class="hide-on-very-little" style="top: 70%"><strong>Nov 10</strong><br>US Home values down by 26 percent  since 2006</p>
+              <p class="hide-on-little" style="top: 89%"><strong>14</strong><br>Foreclosures still above pre-crisis level</p>
+            </div>
+
+            <div id="time-slider">
+              <div class="d3-slider-progress d3-slider d3-slider-vertical grey lighten-4"></div>
+
+              <div class="time-point" style="top: 9.1%"></div>
+              <div class="time-point" style="top: 27.3%"></div>
+              <div class="time-point" style="top: 45.5%"></div>
+              <div class="time-point" style="top: 63.7%"></div>
+              <div class="time-point" style="top: 81.9%"></div> 
+            </div>
+
+            <div class="time-texts time-texts-right">
+              <p class="hide-on-very-little" style="top: 19%"><strong>Apr 06</strong><br>US Home prices peak</p>
+              <p style="top: 35%"><strong>Mar 08</strong><br>JP Morgan Chase buys Bear Stearns</p>
+              <p class="hide-on-little" style="top: 45%"><strong>Feb 09</strong><br>American Recovery and Reinvestment Act</p>
+              <p style="top: 80%"><strong>Early 13</strong><br>Stock market recovers</p>
+            </div>
 
           </div>
         </div>
+
       </div>
 
-    </div>
-
-    <!-- TODO: Revert this to using a wrapper, if possible -->
-    <div style="flex: 1; display: flex; position: relative">
-    <!-- position: absolute !important; right: 0px; width: 37%; height: 100%; padding-bottom: 0 !important"> -->
-      <div id="map" style="width: 100%; "></div>
-    </div>
+      <div id="map-wrapper" class="flex-column">
+        <div id="map" class="cover"></div>
+      </div>
 
   </div>
 
 </div>
+
+
+<div id="footer" class="grey darken-3 center-align grey-text">
+  With data from <a href="http://www.zillow.com/research/data/">Zillow</a> &nbsp;&copy;&nbsp; <a href="https://github.com/jrieke">Johannes Rieke</a>, <a href="https://github.com/sindrma">Sindre Magnussen</a>, <a href="https://github.com/chrisblum">Chris Blum</a>, <a href="https://github.com/petteas">Petter Astrup</a>, <a href="https://github.com/nemanjaaks">Nemanja Aksic</a>
 </div>
 
-<div id="footer" class="center-align grey-text text-lighten-1" style="background-color: #424242; z-index: 2; position: absolute; bottom: 0px; height: 50px; width: 100%; font-size: 0.9em; line-height: 50px">
-  &copy; <a href="https://github.com/jrieke">Johannes Rieke</a>, <a href="https://github.com/sindrma">Sindre Magnussen</a>, <a href="https://github.com/chrisblum">Chris Blum</a>, <a href="https://github.com/petteas">Petter Astrup</a>, <a href="https://github.com/nemanjaaks">Nemanja Aksic</a>
-</div>
 
 <script type="text/javascript">
   var metros = [
@@ -214,9 +193,5 @@
 <script src="js/leap-gestures.js"></script>
 <script src="js/custom.js"></script>
 
-
-<script type="text/javascript">
-
-</script>
 </body>
 </html>

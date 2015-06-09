@@ -63,11 +63,27 @@ function fetchDataset(name, metro) {
       if (json.values === null && json.average === null) {
         datasetStatus[name] = FAILED;
       } else {
-        datasetStatus[name] = LOADED;
-        if (json.average && Object.keys(json.average) && Object.keys(json.average)[0])
+        // var min = Number.MAX_VALUE;
+        // var max = 0;
+
+        if (json.average && Object.keys(json.average) && Object.keys(json.average)[0]) {
           json.average = json.average[Object.keys(json.average)[0]];
-        else
+          // min = Math.min(min, Math.min.apply(null, json.average));
+          // max = Math.max(max, Math.max.apply(null, json.average));
+        }
+        else {
           json.average = nullArr;
+        }
+        
+        // for (var area in json.values) {
+        //   min = Math.min(min, Math.min.apply(null, json.values[area]));
+        //   max = Math.max(max, Math.max.apply(null, json.values[area]));
+        // }
+
+        // minDataValues[name] = min;
+        // maxDataValues[name] = max;
+
+        datasetStatus[name] = LOADED;
       }
 
 
@@ -111,9 +127,10 @@ var selectDatasetWhenLoaded = '';
 
 var datasetColors = {mediansaleprice: {map: '#f44336', charts: '#ef5350'}, soldforloss: {map: '#00bcd4', charts: '#00bcd4'}, decreasinginvalues: {map: '#8bc34a', charts: '#8bc34a'}, soldasforeclosures: {map: '#ffb300', charts: '#ffb300'}};
 var navBarColors = {mediansaleprice: '#ef5350', soldforloss: '#00bcd4', decreasinginvalues: '#8bc34a', soldasforeclosures: '#ffb300'};
-var minDataValue = 0;
+// var minDataValue = 0;
 // TODO: Make these better
-var maxDataValues = {mediansaleprice: 1000000, soldforloss: 100, decreasinginvalues: 100, soldasforeclosures: 70};
+var minDataValues = {mediansaleprice: 200000, soldforloss: 0, decreasinginvalues: 0, soldasforeclosures: 0};
+var maxDataValues = {mediansaleprice: 1000000, soldforloss: 80, decreasinginvalues: 100, soldasforeclosures: 80};
 var axisLabels = {mediansaleprice: 'Median sale price', soldforloss: 'Homes sold for loss', decreasinginvalues: 'Homes decreasing in value', soldasforeclosures: 'Homes foreclosed out of 10k'};
 var numberFormats = {'': function() { return ''; }, mediansaleprice: d3.format('$.3s'), soldforloss: function(x) { return d3.format('.0f')(x) + '%'; }, decreasinginvalues: function(x) { return d3.format('.0f')(x) + '%'; }, soldasforeclosures: d3.format('.0f')};
 
@@ -177,9 +194,9 @@ function resetVisualizations() {
 
 /*---------------------------------------- Leap Motion -------------------------------------------------------------- */
 //Highlighter  - Switching between tabs etc
-var currentTab=$('.nav-title').attr('id').split("-")[2];
+var currentTab=$('nav ul li').attr('id').split("-")[2];
 var updateHighlights = function(dir){
-    //var nextTab = $('.nav-title').attr('id').split("-")[2];
+    //var nextTab = $('nav ul li').attr('id').split("-")[2];
 
 
     var nextTab=0;
@@ -203,24 +220,24 @@ var updateHighlights = function(dir){
         down();
         initVisualizations();
         dataset(datasetNames[nextTab-1]);
-        d3.selectAll('.nav-title').classed('active', false);
+        d3.selectAll('nav ul li').classed('active', false);
         var tag ="#"+datasetNames[nextTab-1];
         d3.select('.'+datasetNames[nextTab-1]).classed('active',true);
-        //console.log('.nav-title '+datasetNames[nextTab-1]);
+        //console.log('nav ul li '+datasetNames[nextTab-1]);
         slidedDown = true;
     }
     else{
         dataset(datasetNames[nextTab-1]);
-        d3.selectAll('.nav-title').classed('active', false);
+        d3.selectAll('nav ul li').classed('active', false);
         var tag ="#"+datasetNames[nextTab-1];
         d3.select('.'+datasetNames[nextTab-1]).classed('active',true);
-        //console.log('.nav-title '+datasetNames[nextTab-1]);
+        //console.log('nav ul li '+datasetNames[nextTab-1]);
         console.log();
 
     }
 
     //d3.dataset(datasetNames[nextTab-1]);
-    //d3.selectAll('.nav-title').classed('active',true);
+    //d3.selectAll('nav ul li').classed('active',true);
 
     //console.log(datasetNames[nextTab-1]);
     console.log("next:"+nextTab);
@@ -457,12 +474,13 @@ function dataset(name) {
 
       selectedDataset = name;
 
-      colorScale.domain([minDataValue, maxDataValues[selectedDataset]]);
+      colorScale.domain([minDataValues[selectedDataset], maxDataValues[selectedDataset]]);
       colorScale.range(['#f8f8f8', datasetColors[selectedDataset].map]);
       showDatasetInMapLegend(selectedDataset);
       showCurrentValuesInMap();
       highlightSelectedAreaInMap();
 
+      barChart.axis.min(minDataValues[selectedDataset]);
       barChart.axis.max(maxDataValues[selectedDataset]);
       barChart.axis.labels({y: axisLabels[selectedDataset]});
       barChart.data.colors({ values: datasetColors[selectedDataset].charts });
@@ -478,13 +496,14 @@ function dataset(name) {
 
       timeChart.data.colors({ area: datasetColors[selectedDataset].charts, average: '#f8f8f8' });
       d3.select('#area-text').style('color', datasetColors[selectedDataset].charts);
+      timeChart.axis.min(minDataValues[selectedDataset]);
       timeChart.axis.max(maxDataValues[selectedDataset]);
       timeChart.axis.labels({y: axisLabels[selectedDataset]});
       timeChart.load({
         json: {
           months: months,  // has to be loaded as well because both average and area are loaded
           average: data[selectedDataset].average,
-          area: selectedArea ? data[selectedDataset].values[selectedArea] : nullArr
+          area: (selectedArea && selectedArea in data[selectedDataset].values) ? data[selectedDataset].values[selectedArea] : nullArr
         }
       });
       if (data[selectedDataset].average == nullArr) {
@@ -516,6 +535,8 @@ function time(index) {
     highlightSelectedTimeInTimeChart();
 
     showCurrentValuesInMap();
+    d3.select('.datamaps-hoverover').html(popupText(selectedArea));
+    d3.select('.bar-chart-hoverover').style('display', 'none');
   }
 }
 
@@ -526,10 +547,10 @@ function area(name) {
       if (name == selectedArea) {  // only load data into the time chart if the area is still selected
         timeChart.load({
           json: {
-            area: name ? data[selectedDataset].values[name] : nullArr
+            area: (name && name in data[selectedDataset].values) ? data[selectedDataset].values[name] : nullArr
           }
         });
-        d3.select('#area-text').text(name ? 'ZIP ' + name : 'Select an area on the map');
+        d3.select('#area-text').text(name ? selectedMetro.state + ' ' + name : 'Select an area on the map');
       }
     }, 50);
 
@@ -540,8 +561,10 @@ function area(name) {
 }
 
 function lockSelectedArea() {
-  d3.select('#map').select('.zip' + lockedArea).style('filter', '');
-  lockedArea = selectedArea;
+  if (lockedArea != selectedArea) {
+    d3.select('#map').select('.zip' + lockedArea).style('filter', '');
+    lockedArea = selectedArea;
+  }
 }
 
 
@@ -549,7 +572,7 @@ function lockSelectedArea() {
 /*  Autocomplete  */
 
 
-
+var selectedMetro;
 var metrosArray = [];
 for (var i = 0; i < metros.length; i++) {
   metrosArray[i] = {value: metros[i].metro + ', ' + metros[i].state, data: metros[i]};
@@ -560,10 +583,12 @@ for (var i = 0; i < metros.length; i++) {
 
 function metro(metroObject) {
 
+  selectedMetro = metroObject;
+
   var transitionDuration = 1700;
 
 
-  d3.select('#navbar')
+  d3.select('nav')
     .style('visibility', 'visible')
     .transition()
     .duration(transitionDuration)
@@ -596,30 +621,31 @@ function metro(metroObject) {
   d3.select('#footer')
     .transition()
     .duration(transitionDuration)
-    .style('background-color', '#616161');
+    .style('background-color', '#616161', 'important');
 
   fadeOut('#header');
 
-  setTimeout(function() { d3.selectAll('.nav-title')
-    .style('cursor', 'pointer')
-    // .transition()
-    // .delay(1000)
-    .on('mouseover', function(d, i) {
-      d3.select(d3.selectAll('.description')[0][i]).style('visibility', 'visible');
-      // d3.selectAll('.nav-title').classed('active', false);
-    })
-    .on('mouseout', function() {
-      d3.selectAll('.description').style('visibility', 'hidden');
-      // d3.select(d3.selectAll('.nav-title')[0][selectedTitle]).classed('active', 'true');
-    })
-    .on('click', function(d, i) {
-      d3.select('#dataset-hint').style('visibility', 'hidden');
-      dataset(datasetNames[i]);
-      d3.selectAll('.nav-title').classed('active', false);
-      // d3.select('#content-pane').style('cursor', 'auto');
-      d3.select(this).classed('active', true);
-      fadeOut('#dataset-hint');
-    });
+  setTimeout(function() {
+    d3.selectAll('nav ul li')
+      .style('cursor', 'pointer')
+      // .transition()
+      // .delay(1000)
+      .on('mouseover', function(d, i) {
+        d3.select(d3.selectAll('.description')[0][i]).style('visibility', 'visible');
+        // d3.selectAll('nav ul li').classed('active', false);
+      })
+      .on('mouseout', function() {
+        d3.selectAll('.description').style('visibility', 'hidden');
+        // d3.select(d3.selectAll('nav ul li')[0][selectedTitle]).classed('active', 'true');
+      })
+      .on('click', function(d, i) {
+        d3.select('#dataset-hint').style('visibility', 'hidden');
+        dataset(datasetNames[i]);
+        d3.selectAll('nav ul li').classed('active', false);
+        // d3.select('#content-pane').style('cursor', 'auto');
+        d3.select(this).classed('active', true);
+        fadeOut('#dataset-hint');
+      });
   }, transitionDuration);
 
 
@@ -698,7 +724,7 @@ d3.select('#time-slider').call(
       time(getTimeIndex(value));
     }));
 
-d3.selectAll('.time-text').on('click', function() {
+d3.selectAll('.time-texts p').on('click', function() {
   var top = parseFloat(d3.select(this).style('top'));
   var sliderHeight = parseFloat(d3.select('#time-slider').style('height'));
   moveSliderTo((sliderHeight - top) / sliderHeight * maxSliderValue - 1);
@@ -768,7 +794,7 @@ function updateSliderElements(sliderValue) {
   //   .duration(250);
 
 
-  d3.selectAll('.time-text')
+  d3.selectAll('.time-texts p')
     .each(function() {
       var element = d3.select(this);
       var top = parseFloat(element.style('top'));
@@ -835,6 +861,7 @@ var barChart = c3.generate({
     y: {
       min: 0,
       max: 1,
+      padding: {bottom: 0, top: 15},
       tick: {
         format: function(d) {return '';}
       },
@@ -900,7 +927,7 @@ var timeChart = c3.generate({
     y: {
       min: 0,
       max: 1,
-      // padding: {bottom: 0},
+      padding: {bottom: 0, top: 15},
       tick: {
         count: 4,
         format: function(d) {return '';}
@@ -922,16 +949,14 @@ var timeChart = c3.generate({
 
 
 
-function popupText(zip) {
-  var s = '<div class="hoverinfo"><span style="font-weight: bold">ZIP ' + zip + '</span>';
-  if (zip in areaNames)
-    s += '<br><span style="font-size: 0.85em">' + areaNames[zip]  + '</span>';
-  if (lockedArea === '')
-    s += '<br><span style="font-size: 0.85em; color: red; font-weight: bold">Click to Select</span>';
-  s += '</div>';
-  return s;
+function popupText(area) {
+  return '<div class="hoverinfo"><span style="font-weight: bold">' + 
+    ((area in data[selectedDataset].values) ? numberFormats[selectedDataset](data[selectedDataset].values[area][selectedTimeIndex]) : 'No Data') +
+    '</span><br><span style="font-size: 0.9em">' + ((area in areaNames) ? (areaNames[area] + ', ') : '') + selectedMetro.state + ' ' + area +
+    ((lockedArea) ? '' : '<br><span style="font-size: 0.9em; color: red; font-weight: bold">Click to select</span>') + '</div>';
 }
 var areaNames = {};
+
 
 
 /* ------------------------------------------- Map ------------------------------------------------------- */
@@ -1182,9 +1207,9 @@ var mapLegend, mapLegendRect, mapLegendTextName, mapLegendTextMin, mapLegendText
 function showDatasetInMapLegend(name) {
   mapLegendRect.attr('fill', 'url(#gradient-' + name + ')');
   mapLegendTextName.text(axisLabels[name]);
-  mapLegendTextMin.text(0);
-  mapLegendTextMiddle.text(numberFormats[name](maxDataValues[name] / 2));
-  mapLegendTextMax.text(numberFormats[name](maxDataValues[name]));  // TODO: Make clear that the rightmost color also encompasses values > max value
+  mapLegendTextMin.text(numberFormats[name](minDataValues[name]));
+  mapLegendTextMiddle.text(numberFormats[name](minDataValues[name] + (maxDataValues[name] - minDataValues[name]) / 2));
+  mapLegendTextMax.text('>' + numberFormats[name](maxDataValues[name]));  // TODO: Make clear that the rightmost color also encompasses values > max value
 }
 
 
@@ -1197,7 +1222,7 @@ function timeChartSize() {
   return d3.select('#time-chart-wrapper').node().getBoundingClientRect();
 }
 function mapSize() {
-  return d3.select('#map').node().getBoundingClientRect();
+  return d3.select('#map-wrapper').node().getBoundingClientRect();
 }
 
 // var originalMapSize = mapSize();  // TODO: Do this in done method of datamaps

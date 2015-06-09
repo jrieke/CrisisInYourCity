@@ -15,17 +15,86 @@ a:hover {
   color: #03a9f4;
 }
 
-/* ------------------------------------------ Nav bar and front page ------------------------------------------------ */
+input[type=text], input[type=text]:focus, input[type=text]:focus:not([readonly]) {
+  border-color: #f5f5f5; 
+  box-shadow: none;
+}
 
 
 
-.nav-title {
-  color: #f8f8f8;
-  padding-left: 25px;
-  padding-right: 25px;
+
+/* ------------------------------------------ Helpers ------------------------------------------------ */
+
+.cover {
+  position: absolute !important;
+  width: 100%;
+  height: 100%;
+}
+
+.flex-container {
+  display: flex;
+  position: relative;
+}
+.flex-row {
+  width: 100%;
+  flex: 1;
+}
+
+.flex-container-vertical {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+}
+.flex-column {
+  height: 100%;
+  flex: 1;
+}
+
+.to-fade-in {
+  visibility: hidden;
+  opacity: 0;
+}
+
+
+
+
+/* ------------------------------------------ Header and footer ------------------------------------------------ */
+
+nav {
+  line-height: 50px; 
+  position: absolute; 
+  top: calc(100% - 100px); 
+  height: 50px; 
+  width: 100%; 
+  text-align: center; 
+  opacity: 0; 
+  visibility: hidden
+}
+
+nav ul li {
+  padding: 0 25px;
   height: 50px;
   line-height: 50px;  /* vertical alignment */
   display: inline-block;
+
+  float: none;
+  -webkit-transition: none;
+  -moz-transition: none;
+  -o-transition: none;
+  -ms-transition: none;
+  transition: none;
+}
+
+@media (max-width: 620px) {
+  nav ul li {
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 870px) {
+  #metro-name-wrapper {
+    display: none;
+  }
 }
 
 /* TODO: Do not use ids here */
@@ -57,16 +126,62 @@ a:hover {
   visibility: hidden;
 }
 
+#footer {
+  z-index: 2; 
+  position: absolute; 
+  bottom: 0px; 
+  height: 50px; 
+  width: 100%; 
+  font-size: 0.9em; 
+  line-height: 50px;
+}
+
+@media (max-height: 500px) {
+  #footer {
+    display: none;
+    /*background-color: #757575 !important;*/
+  }
+
+  #content-pane {
+    padding-bottom: 0px !important;
+  }
+}
 
 
 
-/* ------------------------------------------ Content page ------------------------------------------------ */
+
+/* ------------------------------------------ Front page ------------------------------------------------ */
+
+.arrow {
+  position: relative;
+  background: #bdbdbd;
+}
+.arrow:after {
+  bottom: 100%;
+  left: 50%;
+  content: " ";
+  position: absolute;
+  pointer-events: none;
+  margin-left: -5px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 5px 10px 5px;
+  border-color: transparent transparent #bdbdbd transparent;
+}
+
+
+
+
+
+/* ------------------------------------------ Layout containers ------------------------------------------------ */
 
 #content-pane {
   position: absolute;
   top: calc(100% - 50px);
   width: 100%;
-  height: calc(100% - 100px);
+  height: calc(100% - 50px);
+  padding-bottom: 50px;
   visibility: hidden;
 }
 
@@ -86,9 +201,32 @@ a:hover {
   }
 }
 
+#middle-console {
+  flex: 0 0 230px; 
+}
+
+.adjust-line-height {
+  line-height: 200%;
+}
+
+@media (max-width: 750px) {
+  #middle-console {
+    flex: 0 0 50px; 
+  }
+
+  .time-texts {
+    display: none;
+  }
+
+  .adjust-line-height {
+    line-height: 140%;
+  }
+}
 
 
-/* ------------------------------------------ All charts ------------------------------------------------ */
+
+
+/* ------------------------------------------ All visualizations ------------------------------------------------ */
 .c3-axis-y .domain {
   visibility: hidden
 }
@@ -98,6 +236,16 @@ a:hover {
 .c3-axis-y-label {
   fill: #f8f8f8;
 }
+
+.hoverinfo {
+  border: none !important;
+  border-radius: 2px !important;
+  box-shadow: 0 0 9px #666 !important;
+  background-color: #f8f8f8 !important;
+  font-family: Roboto, sans-serif;
+  text-align: center;
+}
+
 
 
 
@@ -110,7 +258,7 @@ a:hover {
 }
 
 #time-chart .c3-axis-x {
-  visibility: hidden !important;  /* only in the beginning */
+  visibility: hidden !important;
 }
 #time-chart .c3-axis-x line {
   visibility: hidden
@@ -123,7 +271,6 @@ a:hover {
 }
 
 #time-chart .c3-ygrid {
-  /*stroke-dasharray: 0;*/
   stroke-width: 1.5px;
 }
 
@@ -136,7 +283,6 @@ a:hover {
   transform: translate(0, -3px);
 }
 
-/* only for initialization */
 #time-chart .c3-circle-0 {
   fill-opacity: 1;
 }
@@ -144,16 +290,24 @@ a:hover {
   visibility: visible;
 }
 
-
-
-/*#time-chart .c3-legend-item {
-
+#time-chart-legend {
+  z-index: 1; 
+  visibility: hidden; 
+  position: absolute; 
+  top: -2.5px; 
+  width: 90%; 
+  left: 10%; 
+  text-align: center; 
+  font-size: 0.7rem;
 }
-#time-chart .c3-legend-item-average {
-  transform: translate(100px,-50px);
-  fill: #f8f8f8;
-}*/
-
+#time-chart-legend ul {
+  margin: 0;
+}
+#time-chart-legend ul li {
+  display: inline-block;
+  padding: 0 7px; 
+  background-color: #757575;
+}
 
 
 
@@ -161,9 +315,8 @@ a:hover {
 
 /* ------------------------------------------ Bar chart ------------------------------------------------ */
 
-
 #bar-chart .c3-axis-x {
-  visibility: hidden !important;  /* only in the beginning */
+  visibility: hidden !important;
 }
 #bar-chart .c3-axis-x line {
   visibility: hidden
@@ -191,6 +344,13 @@ a:hover {
   cursor: pointer;
 }
 
+.bar-chart-hoverover {
+  z-index: 10001; 
+  position: absolute; 
+  display: none;
+}
+
+
 
 
 /* ------------------------------------------ Map ------------------------------------------------ */
@@ -208,34 +368,28 @@ a:hover {
   font: 10px sans-serif;
   visibility: hidden;
 }
-
 .map-legend text {  
   fill: #f8f8f8;
 }
 
 
-.hoverinfo {
-  border: none !important;
-  border-radius: 2px !important;
-  box-shadow: 0 0 9px #666 !important;
-  background-color: #f8f8f8 !important;
-  font-family: Roboto, sans-serif;
-  text-align: center;
+
+
+
+/* ------------------------------------------ Time line ------------------------------------------------ */
+
+#time-slider {
+  position: absolute; 
+  height: 100%; 
+  cursor: pointer; 
+  left: calc(50% - 0.125em);
 }
-
-
-
-
-/* ------------------------------------------ Time Slider ------------------------------------------------ */
-
-
 
 .d3-slider {
   background: #9e9e9e;
   border-style: none;    
   border-radius: 0.125em;
 }
-
 .d3-slider-vertical {
   width: 0.25em;
 }
@@ -245,78 +399,23 @@ a:hover {
   background: #f8f8f8;
   border-style: none;
 }
-
 .d3-slider-handle:hover {
   /*border: 10px solid #bdbdbd;*/
   border-style: none;
 }
-
 .d3-slider-vertical .d3-slider-handle {
   width: 1.1em;
   height: 1.1em;
   left: -0.45em; 
 }
 
-/*.d3-slider-axis-right {
-  cursor: auto;
-  left: -3px;
-}
-
-.d3-slider-axis-right line {
-  stroke-width: 2;
-  stroke: #9e9e9e;
-}
-
-.d3-slider-axis-right text {
-  visibility: hidden;
-}*/
-
-.time-text {
+.d3-slider-progress {
   position: absolute; 
-  font-size: 0.7rem; 
-  color: #9e9e9e; 
-  line-height: 1.2;
-  margin: 0;
-  cursor: pointer;
+  top: 0px; 
+  bottom: 100%; 
+  height: auto; 
+  width: 100%;
 }
-
-.time-text-left {  
-  text-align: right; 
-  right: 0;
-}
-
-.time-text-right {
-  text-align: left;
-  left: 0;
-}
-
-#middle-console {
-  flex: 0 0 230px; 
-}
-
-@media (max-width: 700px) {
-  #middle-console {
-    flex: 0 0 50px; 
-  }
-
-  .time-texts {
-    display: none;
-  }
-}
-
-
-@media (max-height: 800px) {
-  .hide-on-little {
-    display: none;
-  }
-}
-
-@media (max-height: 580px) {
-  .hide-on-very-little {
-    display: none;
-  }
-}
-
 
 .time-point {
   background: #9e9e9e;
@@ -328,6 +427,46 @@ a:hover {
   border-radius: 0.25em;
 }
 
+.time-texts {
+  height: 100%;
+  width: 100px;
+  position: absolute;
+}
+.time-texts-left {
+  left: 0px;
+}
+.time-texts-right {
+  right: 0px;
+}
+
+.time-texts p {
+  position: absolute; 
+  font-size: 0.7rem; 
+  color: #9e9e9e; 
+  line-height: 1.2;
+  margin: 0;
+  cursor: pointer;  
+}
+.time-texts-left p {
+  text-align: right;
+}
+.time-texts-right p {
+  text-align: left;
+}
+
+@media (max-height: 800px) {
+  .hide-on-little {
+    display: none;
+  }
+}
+@media (max-height: 580px) {
+  .hide-on-very-little {
+    display: none;
+  }
+}
+
+
+
 
 
 
@@ -337,9 +476,9 @@ a:hover {
   margin: auto;
   position: absolute;
   top: 0; left: 0; bottom: 0; right: 0;
+  display: none; 
 }
 
-/* TODO: Get the dataset colors in here */
 #loading-spinner.mediansaleprice {
   border-color: #ef5350;
 }
@@ -354,57 +493,32 @@ a:hover {
 }
 
 
-/* Autocomplete */
-.autocomplete-suggestions { 
-  /*padding-left: 1px; 
-  padding-top: 5px; */
-  /*display: block !important;*/
+
+
+
+/* ------------------------------------------ Autocomplete ------------------------------------------------ */
+
+.autocomplete-suggestion, .autocomplete-no-suggestion { 
+  text-align: center; 
+  font-size: 1.2rem; 
+  cursor: pointer; 
+  padding-top: 5px; 
+  padding-bottom: 5px; 
+  white-space: nowrap; 
+  overflow: hidden; 
+  color: #bdbdbd;
+}
+.autocomplete-no-suggestion { 
+  color: #ef5350;
+}
+.autocomplete-suggestion strong { 
+  font-weight: bold; 
+  color: #f8f8f8; 
+}
+.autocomplete-selected { 
+  color: #8bc34a; 
+}
+.autocomplete-selected strong { 
+  color: #dcedc8; 
 }
 
-.autocomplete-suggestion, .autocomplete-no-suggestion { text-align: center; font-size: 1.2rem; cursor: pointer; padding-top: 5px; padding-bottom: 5px; white-space: nowrap; overflow: hidden; color: #bdbdbd;}
-.autocomplete-no-suggestion { color: #ef5350;}
-.autocomplete-suggestion strong { font-weight: bold; color: #f8f8f8; }
-.autocomplete-selected { color: #8bc34a; /*text-shadow: 0 0 7px #000000*/ }
-.autocomplete-selected strong { color: #dcedc8; }
-
-
-::-webkit-input-placeholder { /* WebKit browsers */
-    color: #585858;
-}
-:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-   color: #585858;
-   opacity:  1;
-}
-::-moz-placeholder { /* Mozilla Firefox 19+ */
-   color: #585858;
-   opacity: 1;
-}
-:-ms-input-placeholder { /* Internet Explorer 10+ */
-   color: #585858;
-}
-
-
-
-
-
-
-
-
-
-.arrow {
-  position: relative;
-  background: #bdbdbd;
-}
-.arrow:after {
-  bottom: 100%;
-  left: 50%;
-  content: " ";
-  position: absolute;
-  pointer-events: none;
-  margin-left: -5px;
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 0 5px 10px 5px;
-  border-color: transparent transparent #bdbdbd transparent;
-}
