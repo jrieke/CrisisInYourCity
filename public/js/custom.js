@@ -135,8 +135,6 @@ var axisLabels = {mediansaleprice: 'Median sale price', soldforloss: 'Homes sold
 var numberFormats = {'': function() { return ''; }, mediansaleprice: d3.format('$.3s'), soldforloss: function(x) { return d3.format('.0f')(x) + '%'; }, decreasinginvalues: function(x) { return d3.format('.0f')(x) + '%'; }, soldasforeclosures: d3.format('.0f')};
 
 
-
-
 function initVisualizations() {
   d3.select('#time-chart-legend').style('visibility', 'visible');
   d3.select('#time-chart').select('.c3-axis-x').style('visibility', 'visible', 'important');
@@ -216,25 +214,27 @@ var updateHighlights = function(dir){
 
     }
 
-    if(!slidedDown){
-        down();
-        initVisualizations();
-        dataset(datasetNames[nextTab-1]);
-        d3.selectAll('nav ul li').classed('active', false);
-        var tag ="#"+datasetNames[nextTab-1];
-        d3.select('.'+datasetNames[nextTab-1]).classed('active',true);
-        //console.log('nav ul li '+datasetNames[nextTab-1]);
-        slidedDown = true;
-    }
-    else{
-        dataset(datasetNames[nextTab-1]);
-        d3.selectAll('nav ul li').classed('active', false);
-        var tag ="#"+datasetNames[nextTab-1];
-        d3.select('.'+datasetNames[nextTab-1]).classed('active',true);
-        //console.log('nav ul li '+datasetNames[nextTab-1]);
-        console.log();
+    // Johannes: commented this out, because down() is not there anymore, and initVisualizations() is automatically done in dataset()
 
-    }
+    // if(!slidedDown){
+    //     down();
+    //     initVisualizations();
+        dataset(datasetNames[nextTab-1]);
+        d3.selectAll('nav ul li').classed('active', false);
+        var tag ="#"+datasetNames[nextTab-1];
+        d3.select('.'+datasetNames[nextTab-1]).classed('active',true);
+        //console.log('nav ul li '+datasetNames[nextTab-1]);
+        // slidedDown = true;
+    // }
+    // else{
+    //     dataset(datasetNames[nextTab-1]);
+    //     d3.selectAll('nav ul li').classed('active', false);
+    //     var tag ="#"+datasetNames[nextTab-1];
+    //     d3.select('.'+datasetNames[nextTab-1]).classed('active',true);
+    //     //console.log('nav ul li '+datasetNames[nextTab-1]);
+    //     console.log();
+
+    // }
 
     //d3.dataset(datasetNames[nextTab-1]);
     //d3.selectAll('nav ul li').classed('active',true);
@@ -245,7 +245,8 @@ var updateHighlights = function(dir){
 };
 
 var timeSlider = function(dir){
-    if(slidedDown){
+    // if(slidedDown){
+    if (metro) {  // Johannes: slidedDown is not there any more, but you can simply check, if the metro object is defined (then the user has chosen a metro and the visualizations are showing up)
         if((playing && dir==-1) ||(!playing && dir==1)){
             $('#time-play-pause')[0].click();
             //playing = !playing;
