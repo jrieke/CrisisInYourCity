@@ -64,8 +64,10 @@ function fetchDataset(name, metro) {
         datasetStatus[name] = FAILED;
       } else {
         datasetStatus[name] = LOADED;
-        var average = json.average[Object.keys(json.average)[0]];
-        json.average = average ? average : nullArr;
+        if (json.average && Object.keys(json.average) && Object.keys(json.average)[0])
+          json.average = json.average[Object.keys(json.average)[0]];
+        else
+          json.average = nullArr;
       }
 
 
@@ -333,6 +335,18 @@ function highlightSelectedAreaInBarChart() {
   }
 }
 
+
+function positionBarChartHoverover() {
+  var coordinates = [0, 0];
+  coordinates = d3.mouse(d3.select('#bar-chart-wrapper').node());
+  var x = coordinates[0];
+  var y = coordinates[1];
+  d3.select('.bar-chart-hoverover')
+    .style('top', y + 30 + 'px')
+    .style('left', x + 50 + 'px');
+}
+
+
 // Has to be called each time the contents of the bar chart are redrawn. This applies after loading data and resizing.
 function attachMouseListenersToBarChart() {
   d3.select('#bar-chart').selectAll('.c3-event-rect')
@@ -340,9 +354,16 @@ function attachMouseListenersToBarChart() {
     .on('mouseover', function(d, i) {
       if (d != ' ') {
         area(d);
+        d3.select('.bar-chart-hoverover')
+          .style('display', 'block')
+          .html(popupText(d));
+        positionBarChartHoverover();
       } else {
         area(lockedArea);
       }
+    })
+    .on('mousemove', function() {
+      positionBarChartHoverover();
     })
     .on('click', function() {
       lockSelectedArea();
@@ -351,6 +372,7 @@ function attachMouseListenersToBarChart() {
   d3.select('#bar-chart').select('.c3-event-rects')
     .on('mouseout', function(d, i) {
       area(lockedArea);
+      d3.select('.bar-chart-hoverover').style('display', 'none');
     });
 }
 
@@ -596,7 +618,7 @@ function metro(metroObject) {
       d3.selectAll('.nav-title').classed('active', false);
       // d3.select('#content-pane').style('cursor', 'auto');
       d3.select(this).classed('active', true);
-      fadOut('#dataset-hint');
+      fadeOut('#dataset-hint');
     });
   }, transitionDuration);
 
@@ -900,6 +922,17 @@ var timeChart = c3.generate({
 
 
 
+function popupText(zip) {
+  var s = '<div class="hoverinfo"><span style="font-weight: bold">ZIP ' + zip + '</span>';
+  if (zip in areaNames)
+    s += '<br><span style="font-size: 0.85em">' + areaNames[zip]  + '</span>';
+  if (lockedArea === '')
+    s += '<br><span style="font-size: 0.85em; color: red; font-weight: bold">Click to Select</span>';
+  s += '</div>';
+  return s;
+}
+var areaNames = {};
+
 
 /* ------------------------------------------- Map ------------------------------------------------------- */
 
@@ -919,13 +952,7 @@ function loadMap(metro) {
       // highlightBorderColor: 'black',
       // highlightBorderWidth: 2,
       popupTemplate: function(geography, data) {
-        var s = '<div class="hoverinfo"><span style="font-weight: bold">' + geography.id.replace('zip', 'ZIP ') + '</span>';
-        if (geography.properties.name)
-          s += '<br><span style="font-size: 0.85em">' + geography.properties.name  + '</span>';
-        if (lockedArea === '')
-          s += '<br><span style="font-size: 0.85em; color: red; font-weight: bold">Click to Select</span>';
-        s += '</div>';
-        return s;
+        return popupText(geography.id.replace('zip', ''), geography.properties.name);
       }
     },
     scope: 'zip',
@@ -1056,10 +1083,11 @@ function loadMap(metro) {
 
 
       // TODO: Make sure to select dataset only once map is loaded
-      blankMapColors = {};
       var geometries = datamap.customTopo.objects.zip.geometries;
       for (var i = 0; i < geometries.length; i++) {
         blankMapColors[geometries[i].id] = startColor;
+        if (geometries[i]. properties.name)
+          areaNames[geometries[i].id.replace('zip', '')] = geometries[i].properties.name;
       }
 
       // define drop shadow as here: http://bl.ocks.org/cpbotha/5200394
