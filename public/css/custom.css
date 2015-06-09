@@ -92,8 +92,8 @@ nav ul li {
 }
 
 #header{
-    background: rgb(95, 92, 94); /* for IE */
-    background: rgba(95, 92, 94, 0.75);
+    /*background: rgb(95, 92, 94); /* 
+    /*background: rgba(95, 92, 94, 0.75);*/
 
 
 }
@@ -105,6 +105,15 @@ nav ul li {
     filter: blur(5px); /* Firefox 35+, eventually all */
     z-index: 99;
 
+}
+
+#testhead-overlay {
+  opacity: 0.8; 
+  position: absolute; 
+  width: 100%; 
+  height: calc(100% - 50px); 
+  top: 0px; 
+  left: 0px;
 }
 
 @media (max-width: 620px) {
@@ -559,19 +568,18 @@ nav ul li {
   padding-bottom: 5px; 
   white-space: nowrap; 
   overflow: hidden; 
-  color: #3c3939;
+  color: #bdbdbd;
 }
 .autocomplete-no-suggestion { 
   color: #ef5350;
 }
 .autocomplete-suggestion strong { 
-  font-weight: bold; 
   color: #f8f8f8; 
 }
 .autocomplete-selected { 
-  color: #2980b9;
+  color: #8bc34a;
 }
 .autocomplete-selected strong {
-    color: #1d577f;
+    color: #dcedc8;
 }
 
