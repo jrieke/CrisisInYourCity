@@ -14,6 +14,16 @@ var datasetStatus = {'mediansaleprice': LOADING, 'soldforloss': LOADING, 'decrea
 var data = {};
 
 
+function fadeIn(selector, duration) {
+  d3.select(selector).style('visibility' , 'visible')
+    .transition().duration(duration ? duration : 500).style('opacity', 1);
+}
+
+function fadeOut(selector, duration) {
+  d3.select(selector).transition().duration(duration ? duration : 500).style('opacity', 0);
+  d3.select(selector).transition().delay(duration ? duration : 500).style('visibility' , 'hidden');
+}
+
 
 function fetchDataset(name, metro) {
   d3.xhr('/' + name)
@@ -85,7 +95,6 @@ function fetchDataset(name, metro) {
 
 /* ------------------------------------------- Initialization --------------------------------------------------- */
 
-var slidedDown = false;
 var maxSliderValue = months.length - 0.01;
 var scrollSpeed = 0.01;
 var playing = false;
@@ -99,6 +108,7 @@ var selectedDataset = '';
 var selectDatasetWhenLoaded = '';
 
 var datasetColors = {mediansaleprice: {map: '#f44336', charts: '#ef5350'}, soldforloss: {map: '#00bcd4', charts: '#00bcd4'}, decreasinginvalues: {map: '#8bc34a', charts: '#8bc34a'}, soldasforeclosures: {map: '#ffb300', charts: '#ffb300'}};
+var navBarColors = {mediansaleprice: '#ef5350', soldforloss: '#00bcd4', decreasinginvalues: '#8bc34a', soldasforeclosures: '#ffb300'};
 var minDataValue = 0;
 // TODO: Make these better
 var maxDataValues = {mediansaleprice: 1000000, soldforloss: 100, decreasinginvalues: 100, soldasforeclosures: 70};
@@ -106,73 +116,7 @@ var axisLabels = {mediansaleprice: 'Median sale price', soldforloss: 'Homes sold
 var numberFormats = {'': function() { return ''; }, mediansaleprice: d3.format('$.3s'), soldforloss: function(x) { return d3.format('.0f')(x) + '%'; }, decreasinginvalues: function(x) { return d3.format('.0f')(x) + '%'; }, soldasforeclosures: d3.format('.0f')};
 
 
-function down() {
-  if (!slidedDown) {
 
-    d3.select('#navbar')
-      .transition()
-      .duration(1000)
-      .style('top', '0px');
-
-
-    d3.select('#descriptions')
-      .transition()
-      .duration(1000)
-      .style('top', '50px');
-
-    d3.select('#metro-name-wrapper')
-      .transition()
-      .delay(500)
-      .duration(500)
-      .style('top', '0px')
-      .style('font-size', '16px');
-
-    d3.select('#content-pane')
-      .transition()
-      .duration(1000)
-      .style('top', '50px');
-
-
-    d3.selectAll('.description')
-      .transition()
-      .delay(1000)
-      .style('visibility', 'hidden');
-
-
-    slidedDown = true;
-  }
-}
-
-
-
-d3.selectAll('.nav-title')
-  .on('mouseover', function(d, i) {
-    d3.select(d3.selectAll('.description')[0][i]).style('visibility', 'visible');
-    // d3.selectAll('.nav-title').classed('active', false);
-  })
-  .on('mouseout', function() {
-    d3.selectAll('.description').style('visibility', 'hidden');
-    // d3.select(d3.selectAll('.nav-title')[0][selectedTitle]).classed('active', 'true');
-  })
-  .on('click', function(d, i) {
-    down();
-    dataset(datasetNames[i]);
-    d3.selectAll('.nav-title').classed('active', false);
-    d3.select('#content-pane').style('cursor', 'auto');
-    d3.select(this).classed('active', true);
-  });
-
-
-d3.select('#content-pane').on('click', function(d,i) {
-  if (!slidedDown) {
-    down();
-    d3.select('.nav-title').classed('active',true);
-    d3.select('#content-pane').style('cursor', 'auto');
-    dataset('mediansaleprice');
-
-    slidedDown = true;
-  }
-});
 
 function initVisualizations() {
   d3.select('#time-chart-legend').style('visibility', 'visible');
@@ -462,7 +406,7 @@ function dataset(name) {
   // TODO: Make visualizations grey while data is loading, maybe even by using a small transition
 
   d3.select('#content-overlay').style('visibility', 'visible');
-  d3.select('#time-slider-wrapper').style('visibility', 'hidden');
+  fadeOut('#time-slider-wrapper');
 
 
   console.log(datasetStatus[name]);
@@ -476,13 +420,14 @@ function dataset(name) {
       // TODO: .classed does not update the color immediately
       d3.select('#loading-spinner').classed(datasetNames.join(' '), false).classed(name, true);
       d3.select('#loading-spinner-wrapper').style('display', 'block');
+      fadeIn('#loading-spinner-wrapper');
       resetVisualizations(); // TODO: Only do this if another dataset was already loaded before
       break;
     case FAILED:
       selectedDataset = '';
-
-      d3.select('#error-message').style('visibility', 'visible');
-      d3.select('#loading-spinner-wrapper').style('display', 'none');
+      fadeOut('#loading-spinner-wrapper');
+      d3.select('#loading-spinner-wrapper').transition().delay(500).style('display', 'none');
+      fadeIn('#error-message');
       resetVisualizations();
       break;
     case LOADED:
@@ -527,10 +472,11 @@ function dataset(name) {
       }
       highlightSelectedTimeInTimeChart();
 
-      d3.select('#loading-spinner-wrapper').style('display', 'none');
-      d3.select('#error-message').style('visibility', 'hidden');
+      fadeOut('#loading-spinner-wrapper');
+      d3.select('#loading-spinner-wrapper').transition().delay(500).style('display', 'none');
+      fadeOut('#error-message');
       d3.select('#content-overlay').style('visibility', 'hidden');
-      d3.select('#time-slider-wrapper').style('visibility', 'visible');
+      fadeIn('#time-slider-wrapper');
       break;
   }
 
@@ -573,40 +519,6 @@ function area(name) {
 
 function lockSelectedArea() {
   d3.select('#map').select('.zip' + lockedArea).style('filter', '');
-
-  // TODO: Johannes is working on this
-
-  // var i = 0;
-  // while (i < sortedAreaValuePairs.length) {
-  //   console.log(sortedAreaValuePairs[i][0]);
-  //   console.log(selectedArea);
-  //   if (sortedAreaValuePairs[i][0] == selectedArea) {
-  //     break;
-  //   }
-  //   i++;
-  // }
-
-  // console.log(i);
-
-  // // TODO: Change if i is first or last
-  // var itemsToShow = [sortedAreaValuePairs[0], [' ', null], sortedAreaValuePairs[i-1], sortedAreaValuePairs[i], sortedAreaValuePairs[i+1], [' ', null], sortedAreaValuePairs[sortedAreaValuePairs.length-1]];
-  // console.log(itemsToShow);
-
-  // areasInBarChart = itemsToShow.map(function(item) { return item[0]; });
-
-  // barChart.load({
-  //   json: {
-  //     values: itemsToShow.map(function(item) { return item[1] === null ? 0 : item[1]; }),
-  //     neighborhoods: ['1.', ' ', i-1 + '.', i + '.', i+1 + '.', ' ', sortedAreaValuePairs.length + '.'] //itemsToShow.map(function(item) { return item[0]; })
-  //   }
-  // });
-
-  // d3.select('#bar-chart').selectAll('.c3-bar')
-  //   .style('opacity', function(d, i) { return (i == selectedArea) ? 1 : 0.3; });
-  // d3.select('#bar-chart').selectAll('.c3-text')
-  //   .style('fill', function(d, i) { return (i == selectedArea) ? '#f8f8f8' : startColor; });
-
-
   lockedArea = selectedArea;
 }
 
@@ -621,29 +533,27 @@ for (var i = 0; i < metros.length; i++) {
   metrosArray[i] = {value: metros[i].metro + ', ' + metros[i].state, data: metros[i]};
 }
 
-console.log(metrosArray);
+// console.log(metrosArray);
 
 
-// TODO: Rename result, eg to metroObject
 function metro(metroObject) {
+
+  var transitionDuration = 1700;
+
 
   d3.select('#navbar')
     .style('visibility', 'visible')
     .transition()
-    .duration(1000)
-    .style('top', '300px')
+    .duration(transitionDuration)
+    .style('top', '0px')
     .style('opacity', 1);
 
   d3.select('#descriptions')
     .transition()
-    .delay(1000)
+    .delay(transitionDuration)
     .style('visibility', 'visible');
 
-  d3.select('#metro-name-wrapper')
-    .style('visibility', 'visible')
-    .transition()
-    .duration(1000)
-    .style('opacity', 1);
+  fadeIn('#metro-name-wrapper');
 
   d3.select('#metro-name')
     .text(metroObject.metro);
@@ -651,23 +561,47 @@ function metro(metroObject) {
   d3.select('#content-pane')
     .style('visibility', 'visible')
     .transition()
-    .duration(1000)
-    .style('top', '350px');
+    .duration(transitionDuration)
+    .style('top', '50px');
+
+  d3.select('#dataset-hint')   
+    .style('visibility', 'visible')
+    .transition()
+    .duration(500) 
+    .delay(1500)
+    .style('opacity', 1);
 
   d3.select('#footer')
     .transition()
-    .duration(1000)
+    .duration(transitionDuration)
     .style('background-color', '#616161');
 
+  fadeOut('#header');
 
-  d3.select('#header')
-    .transition()
-    .duration(1000)
-    .style('opacity', 0);
-  d3.select('#header')
-    .transition()
-    .delay(1000)
-    .style('visibility', 'hidden');
+  setTimeout(function() { d3.selectAll('.nav-title')
+    .style('cursor', 'pointer')
+    // .transition()
+    // .delay(1000)
+    .on('mouseover', function(d, i) {
+      d3.select(d3.selectAll('.description')[0][i]).style('visibility', 'visible');
+      // d3.selectAll('.nav-title').classed('active', false);
+    })
+    .on('mouseout', function() {
+      d3.selectAll('.description').style('visibility', 'hidden');
+      // d3.select(d3.selectAll('.nav-title')[0][selectedTitle]).classed('active', 'true');
+    })
+    .on('click', function(d, i) {
+      d3.select('#dataset-hint').style('visibility', 'hidden');
+      dataset(datasetNames[i]);
+      d3.selectAll('.nav-title').classed('active', false);
+      // d3.select('#content-pane').style('cursor', 'auto');
+      d3.select(this).classed('active', true);
+      fadOut('#dataset-hint');
+    });
+  }, transitionDuration);
+
+
+  // TODO: Make descriptions active here
 
 
   // TODO: Does this timeout make sense?
@@ -725,14 +659,6 @@ d3.select('#autocomplete')
       d3.select('#header-description').style('visibility', 'visible');
     }
   });
-
-// d3.select('.autocomplete-suggestions')
-//   .selectAll('div')
-//   .data(['San Diego, CA', 'Sacramento, CA', 'San Francisco, CA', 'Los Angeles, CA'])
-//   .enter()
-//   .append('div')
-//   .classed('autocomplete-suggestion', true)
-//   .text(function(d) {return d;});
 
 
 /* ------------------------------------------- Time Slider ----------------------------------------------- */
