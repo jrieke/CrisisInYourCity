@@ -6,6 +6,12 @@ html, body {
 
 body {
   overflow: hidden;
+    background: url(../img/bg.jpg) no-repeat center center scroll;
+    -webkit-transition: all 1s ease ;
+    -moz-transition: all 1s ease;
+    -o-transition: all 1s ease;
+    transition:all 1s ease ;
+
 }
 
 a {
@@ -85,6 +91,22 @@ nav ul li {
   transition: none;
 }
 
+#header{
+    background: rgb(95, 92, 94); /* for IE */
+    background: rgba(95, 92, 94, 0.75);
+
+
+}
+
+#testhead{
+    top: calc(50% - 100px); position: absolute; width: 95%; left: 2.5%;
+    -webkit-filter: blur(5px); /* Chrome, Opera, etc. */
+    filter: url('blur.svg#blur'); /* Older FF and others - http://jordanhollinger.com/media/blur.svg */
+    filter: blur(5px); /* Firefox 35+, eventually all */
+    z-index: 99;
+
+}
+
 @media (max-width: 620px) {
   nav ul li {
     padding: 0 10px;
@@ -96,6 +118,8 @@ nav ul li {
     display: none;
   }
 }
+
+
 
 /* TODO: Do not use ids here */
 #nav-title-1:hover, #nav-title-1.active {background: #ef5350;} /*{border-bottom: 3px solid #ef5350; color: #ef5350;}*/
@@ -535,7 +559,7 @@ nav ul li {
   padding-bottom: 5px; 
   white-space: nowrap; 
   overflow: hidden; 
-  color: #bdbdbd;
+  color: #3c3939;
 }
 .autocomplete-no-suggestion { 
   color: #ef5350;
@@ -545,9 +569,9 @@ nav ul li {
   color: #f8f8f8; 
 }
 .autocomplete-selected { 
-  color: #8bc34a; 
+  color: #2980b9;
 }
-.autocomplete-selected strong { 
-  color: #dcedc8; 
+.autocomplete-selected strong {
+    color: #1d577f;
 }
 
