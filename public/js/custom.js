@@ -1,18 +1,6 @@
 // TODO: Make a minified version
 
-/* ------------------------------------------- Data Fetching -------------------------------------------------- */
-var months = ['2004-02-15', '2004-05-15', '2004-08-15', '2004-11-15', '2005-02-15', '2005-05-15', '2005-08-15', '2005-11-15', '2006-02-15', '2006-05-15', '2006-08-15', '2006-11-15', '2007-02-15', '2007-05-15', '2007-08-15', '2007-11-15', '2008-02-15', '2008-05-15', '2008-08-15', '2008-11-15', '2009-02-15', '2009-05-15', '2009-08-15', '2009-11-15', '2010-02-15', '2010-05-15', '2010-08-15', '2010-11-15', '2011-02-15', '2011-05-15', '2011-08-15', '2011-11-15', '2012-02-15', '2012-05-15', '2012-08-15', '2012-11-15', '2013-02-15', '2013-05-15', '2013-08-15', '2013-11-15', '2014-02-15', '2014-05-15', '2014-08-15', '2014-11-15'];
-var nullArr = Array.apply(null, new Array(months.length)).map(function() { return null; });
-
-var datasetNames = ['mediansaleprice', 'soldforloss', 'decreasinginvalues', 'soldasforeclosures'];
-
-var LOADING = 1;
-var LOADED = 2;
-var FAILED = 3;
-var datasetStatus = {'mediansaleprice': LOADING, 'soldforloss': LOADING, 'decreasinginvalues': LOADING, 'soldasforeclosures': LOADING};
-
-var data = {};
-
+/* ------------------------------------------- Helpers -------------------------------------------------- */
 
 function fadeIn(selector, duration) {
   d3.select(selector).style('visibility' , 'visible')
@@ -24,7 +12,28 @@ function fadeOut(selector, duration) {
   d3.select(selector).transition().delay(duration ? duration : 500).style('visibility' , 'hidden');
 }
 
+// Used for both the map and the bar chart popup
+function popupText(area) {
+  return '<div class="hoverinfo"><span style="font-weight: bold">' + 
+    ((area in data[selectedDataset].values) ? numberFormats[selectedDataset](data[selectedDataset].values[area][selectedTimeIndex]) : 'No Data') +
+    '</span><br><span style="font-size: 0.9em">' + ((area in areaNames) ? (areaNames[area] + ', ') : '') + selectedMetro.state + ' ' + area +
+    ((lockedArea) ? '' : '<br><span style="font-size: 0.9em; color: red; font-weight: bold">Click to select</span>') + '</div>';
+}
 
+
+
+
+/* ------------------------------------------- Data Fetching -------------------------------------------------- */
+var months = ['2004-02-15', '2004-05-15', '2004-08-15', '2004-11-15', '2005-02-15', '2005-05-15', '2005-08-15', '2005-11-15', '2006-02-15', '2006-05-15', '2006-08-15', '2006-11-15', '2007-02-15', '2007-05-15', '2007-08-15', '2007-11-15', '2008-02-15', '2008-05-15', '2008-08-15', '2008-11-15', '2009-02-15', '2009-05-15', '2009-08-15', '2009-11-15', '2010-02-15', '2010-05-15', '2010-08-15', '2010-11-15', '2011-02-15', '2011-05-15', '2011-08-15', '2011-11-15', '2012-02-15', '2012-05-15', '2012-08-15', '2012-11-15', '2013-02-15', '2013-05-15', '2013-08-15', '2013-11-15', '2014-02-15', '2014-05-15', '2014-08-15', '2014-11-15'];
+var datasetNames = ['mediansaleprice', 'soldforloss', 'decreasinginvalues', 'soldasforeclosures'];
+var LOADING = 1;
+var LOADED = 2;
+var FAILED = 3;
+var datasetStatus = {'mediansaleprice': LOADING, 'soldforloss': LOADING, 'decreasinginvalues': LOADING, 'soldasforeclosures': LOADING};
+var nullArr = Array.apply(null, new Array(months.length)).map(function() { return null; });
+var data = {};
+
+// Get a dataset from the backend and put it into 'data'
 function fetchDataset(name, metro) {
   d3.xhr('/' + name)
     .header("Content-Type", "application/json")
@@ -38,66 +47,21 @@ function fetchDataset(name, metro) {
       console.log('received dataset ' + name);
       console.log(json);
 
-      // var numValues = 0;
-      // var numMissingValues = 0;
-
-      // function count(x) {
-      //   numValues++;
-      //   if (x === null )
-      //     numMissingValues++;
-      // }
-
-      // if (json.average)
-      //   json.average[Object.keys(json.average)[0]].forEach(count);
-
-      // for (var key in json.values) {
-      //   json.values[key].forEach(count);
-      // }
-
-
-      // console.log('No of values: ' + numValues + '  - No. of missing values: ' + numMissingValues);
-
-
-
 
       if (json.values === null && json.average === null) {
         datasetStatus[name] = FAILED;
       } else {
-        // var min = Number.MAX_VALUE;
-        // var max = 0;
-
-        if (json.average && Object.keys(json.average) && Object.keys(json.average)[0]) {
-          json.average = json.average[Object.keys(json.average)[0]];
-          // min = Math.min(min, Math.min.apply(null, json.average));
-          // max = Math.max(max, Math.max.apply(null, json.average));
-        }
-        else {
-          json.average = nullArr;
-        }
-        
-        // for (var area in json.values) {
-        //   min = Math.min(min, Math.min.apply(null, json.values[area]));
-        //   max = Math.max(max, Math.max.apply(null, json.values[area]));
-        // }
-
-        // minDataValues[name] = min;
-        // maxDataValues[name] = max;
-
+        json.average = ((json.average && Object.keys(json.average) && Object.keys(json.average)[0])) ? json.average[Object.keys(json.average)[0]] : nullArr;
         datasetStatus[name] = LOADED;
       }
 
-
       data[name] = json;
-
-      // console.log('No of zip code areas:' + Object.keys(json.values).length);
 
       // TODO: Maybe make this better
       if (selectDatasetWhenLoaded == name) {
         selectDatasetWhenLoaded = '';
         dataset(name);
       }
-
-
 
     });
 }
@@ -109,31 +73,23 @@ function fetchDataset(name, metro) {
 
 
 
+/* -------------------------------------- Initialization of visualizations ---------------------------------------------- */
 
-
-/* ------------------------------------------- Initialization --------------------------------------------------- */
-
-var maxSliderValue = months.length - 0.01;
-var scrollSpeed = 0.01;
-var playing = false;
-var startColor = '#9e9e9e';
-var city = 'San Diego';
-var selectedArea = '';
-var lockedArea = '';
-var areasInBarChart = ['92037', '91901', '91902', '91910', '91911', '91913', '92037'];
-var selectedTimeIndex = 0;
+var selectedMetro;
 var selectedDataset = '';
 var selectDatasetWhenLoaded = '';
+var selectedTimeIndex = 0;
+var selectedArea = '';
+var lockedArea = '';
 
+var startColor = '#9e9e9e';
 var datasetColors = {mediansaleprice: {map: '#f44336', charts: '#ef5350'}, soldforloss: {map: '#00bcd4', charts: '#00bcd4'}, decreasinginvalues: {map: '#8bc34a', charts: '#8bc34a'}, soldasforeclosures: {map: '#ffb300', charts: '#ffb300'}};
 var navBarColors = {mediansaleprice: '#ef5350', soldforloss: '#00bcd4', decreasinginvalues: '#8bc34a', soldasforeclosures: '#ffb300'};
-// var minDataValue = 0;
-// TODO: Make these better
+var axisLabels = {mediansaleprice: 'Median sale price', soldforloss: 'Homes sold for loss', decreasinginvalues: 'Homes decreasing in value', soldasforeclosures: 'Homes foreclosed out of 10k'};
+
 var minDataValues = {mediansaleprice: 200000, soldforloss: 0, decreasinginvalues: 0, soldasforeclosures: 0};
 var maxDataValues = {mediansaleprice: 1000000, soldforloss: 80, decreasinginvalues: 100, soldasforeclosures: 80};
-var axisLabels = {mediansaleprice: 'Median sale price', soldforloss: 'Homes sold for loss', decreasinginvalues: 'Homes decreasing in value', soldasforeclosures: 'Homes foreclosed out of 10k'};
 var numberFormats = {'': function() { return ''; }, mediansaleprice: d3.format('$.3s'), soldforloss: function(x) { return d3.format('.0f')(x) + '%'; }, decreasinginvalues: function(x) { return d3.format('.0f')(x) + '%'; }, soldasforeclosures: d3.format('.0f')};
-
 
 function initVisualizations() {
   d3.select('#time-chart-legend').style('visibility', 'visible');
@@ -143,7 +99,6 @@ function initVisualizations() {
 
   d3.select('#time-chart').select('.c3-chart')
     .on('mouseover', function() {
-      // TODO: Get the opacity values right
       d3.select('#time-chart').selectAll('.c3-line').style('stroke-opacity', 0.5);
     })
     .on('mousemove', function() {
@@ -153,7 +108,6 @@ function initVisualizations() {
       d3.select('#time-chart').selectAll('.c3-texts-average,.c3-texts-area').selectAll('.c3-text').style('visibility', function(d, i) { return (i == selectedTimeIndex) ? 'visible' : 'hidden'; });
       d3.select('#time-chart').selectAll('.c3-line').style('stroke-opacity', 1);
     });
-
 
   // TODO: Deactivate this while page is updating
   $(document).on('mousewheel', function(evt) {
@@ -169,8 +123,6 @@ function resetVisualizations() {
     barChart.load({ json: barChartDefaultValues });
     barChart.axis.max(1);
     timeChart.load({ json: timeChartDefaultValues });
-    // timeChart.data.colors({ area: startColor });
-
 
     d3.select('#time-chart-legend').style('visibility', 'hidden');
     d3.select('#time-chart').select('.c3-axis-x').style('visibility', 'hidden', 'important');
@@ -180,279 +132,96 @@ function resetVisualizations() {
     map.updateChoropleth(blankMapColors);  // TODO: Refactor this into a method resetMapValues or resetMapColors
     // TODO: Maybe hide selected and clicked area in map
 
-
-    // TODO: Needed? Can't be hovered anyway because of content-overlay
-    d3.select('#time-chart').select('.c3-chart')
-        .on('mouseover', null)
-        .on('mousemove', null)
-        .on('mouseout', null);
-
     $(document).on('mousewheel', null);
 }
 
-/*---------------------------------------- Leap Motion -------------------------------------------------------------- */
-//Highlighter  - Switching between tabs etc
-var currentTab=$('nav ul li').attr('id').split("-")[2];
-var updateHighlights = function(dir){
-    //var nextTab = $('nav ul li').attr('id').split("-")[2];
 
 
-    var nextTab=0;
-    if(currentTab != null){
-        nextTab=parseInt(currentTab);
-    }
 
-    if((nextTab+dir) <5 && (nextTab+dir)>=1 ){
-        console.log("DIR is : "+parseInt(nextTab+dir));
-        nextTab = nextTab + dir;
-    }
-    else if(nextTab+parseInt(dir) <= 0){
-        nextTab = 4;
-    }
-    else{
-        nextTab = 1;
 
-    }
 
-    // Johannes: commented this out, because down() is not there anymore, and initVisualizations() is automatically done in dataset()
 
-    // if(!slidedDown){
-    //     down();
-    //     initVisualizations();
-        dataset(datasetNames[nextTab-1]);
+/* --------------------------------------- Convenience functions for visualization -------------------------------------------------- */
+/* ----------------------------------- Call ONLY these to change the data that is shown --------------------------------------------- */
+
+// Slide up the visualizations, load the map and data for the metro
+function metro(metroObject) {
+
+  selectedMetro = metroObject;
+
+  // Slide up visualizations and show/hide elements
+  var transitionDuration = 1700;
+  d3.select('nav')
+    .style('visibility', 'visible')
+    .transition()
+    .duration(transitionDuration)
+    .style('top', '0px')
+    .style('opacity', 1);
+  d3.select('#descriptions')
+    .transition()
+    .delay(transitionDuration)
+    .style('visibility', 'visible');
+  fadeIn('#metro-name-wrapper');
+  d3.select('#metro-name')
+    .text(metroObject.metro);
+  d3.select('#content-pane')
+    .style('visibility', 'visible')
+    .transition()
+    .duration(transitionDuration)
+    .style('top', '50px');
+  d3.select('#dataset-hint')   
+    .style('visibility', 'visible')
+    .transition()
+    .duration(500) 
+    .delay(1500)
+    .style('opacity', 1);
+  d3.select('#footer')
+    .transition()
+    .duration(transitionDuration)
+    .style('background-color', '#616161', 'important');
+  fadeOut('#header');
+
+  setTimeout(function() {
+    d3.selectAll('nav ul li')
+      .style('cursor', 'pointer')
+      .on('mouseover', function(d, i) {
+        d3.select(d3.selectAll('.description')[0][i]).style('visibility', 'visible');
+      })
+      .on('mouseout', function() {
+        d3.selectAll('.description').style('visibility', 'hidden');
+      })
+      .on('click', function(d, i) {
+        d3.select('#dataset-hint').style('visibility', 'hidden');
+        dataset(datasetNames[i]);
         d3.selectAll('nav ul li').classed('active', false);
-        var tag ="#"+datasetNames[nextTab-1];
-        d3.select('.'+datasetNames[nextTab-1]).classed('active',true);
-        //console.log('nav ul li '+datasetNames[nextTab-1]);
-        // slidedDown = true;
-    // }
-    // else{
-    //     dataset(datasetNames[nextTab-1]);
-    //     d3.selectAll('nav ul li').classed('active', false);
-    //     var tag ="#"+datasetNames[nextTab-1];
-    //     d3.select('.'+datasetNames[nextTab-1]).classed('active',true);
-    //     //console.log('nav ul li '+datasetNames[nextTab-1]);
-    //     console.log();
+        d3.select(this).classed('active', true);
+        fadeOut('#dataset-hint');
+      })
+      .on('touchend', function() {
+        // On touch devices, automatically hide the description
+        d3.selectAll('.description').transition().delay(5000).style('visibility', 'hidden');
+      });
+  }, transitionDuration);
 
-    // }
+  // TODO: Make descriptions active here
 
-    //d3.dataset(datasetNames[nextTab-1]);
-    //d3.selectAll('nav ul li').classed('active',true);
-
-    //console.log(datasetNames[nextTab-1]);
-    console.log("next:"+nextTab);
-    currentTab=nextTab;
-};
-
-var timeSlider = function(dir){
-    // if(slidedDown){
-    if (metro) {  // Johannes: slidedDown is not there any more, but you can simply check, if the metro object is defined (then the user has chosen a metro and the visualizations are showing up)
-        if((playing && dir==-1) ||(!playing && dir==1)){
-            $('#time-play-pause')[0].click();
-            //playing = !playing;
-        }
-        if(dir == 0){
-            moveSliderTo(maxSliderValue);
-            playing = false;
-            d3.select('#time-play-pause')
-                .classed('mdi-av-play-circle-fill', true)
-                .classed('mdi-av-pause-circle-fill', false);
-        }
+  // Load map and data after some time, so the animations above run smoothly
+  setTimeout(function() {loadMap(metroObject);}, 0);
+  setTimeout(function() {
+    // Load the datasets as the first thing, so we reduce waiting time
+    for (var i = 0; i < datasetNames.length; i++) {
+      fetchDataset(datasetNames[i], metroObject);
     }
-};
-
-//Leapmotion
-var controller = Leap.loop({enableGestures: true}, function(frame){
-});
-
-/* ----------- LEAP FUNCTIONS TO SWIPE BETWEEN PAGES/CATEGORIES --------------*/
-var swipeRightFunction = function(){
-  updateHighlights(1);
-};
-
-
-var swipeLeftFunction = function(){
-    console.log("CALLS LEFT");
-    updateHighlights(-1);
-};
-
-var swipeUpFunction = function () {
-    console.log("Calls UP");
-    timeSlider(-1);
-};
-
-var swipeDownFunction = function () {
-    console.log("Calls DOWN");
-    timeSlider(1);
-};
-
-var circleFunction = function () {
-    console.log("Calls circle");
-    timeSlider(0);
-};
-
-/* ------------- CONFIG FOR LEAP-GESTURES.JS ---------------- */
-config = {
-    // Event handles for recognized gestures
-    swipeLeft: swipeLeftFunction,
-    swipeRight: swipeRightFunction,
-    swipeUp: swipeUpFunction,
-    swipeDown: swipeDownFunction,
-    circle: circleFunction, // Set to null or leave out to not track this type of gesture
-    hand: null,
-    clap: null,
-    statusChanged: null, // gets called when the status changes
-    preventBackForth: true, // This enables users to continuously swipe in one direction.
-    confidenceThreshold: 0.35, // Gestures with a confidence lower than this are ignored
-    handDuration: 800, // How long a fist has to be kept to trigger the event (in ms)
-    controller: controller, // You can pass in a LeapController if youo want, elsewise one is created for you. Remember to set "enableGestures: true"!
-    useControllerEvents: false // If set to true, the event functions will be ignored. You can then use the appropriate controller.on(...) functions (see below)
-};
-
-var leapGestures = new LeapGestures(config);
-
-
-
-
-
-/* --------------------------------------- Visualization Functions -------------------------------------------------- */
-
-function showCurrentValuesInMap() {
-  map.updateChoropleth(blankMapColors);
-  var mapColors = {};
-  for (var area in data[selectedDataset].values) {
-    mapColors['zip' + area] = (data[selectedDataset].values[area][selectedTimeIndex] === null ? startColor : colorScale(data[selectedDataset].values[area][selectedTimeIndex]));
-  }
-  map.updateChoropleth(mapColors);
+  }, 1000);
 }
 
-function highlightSelectedAreaInMap() {
-  if (selectedArea) {
-    d3.selectAll('.datamaps-subunit').style('filter', '');
-    d3.select('#map').select('.zip' + lockedArea).moveToFront().style('filter', 'url(#drop-shadow-small)');
-    d3.select('#map').select('.zip' + selectedArea).moveToFront().style('filter', 'url(#drop-shadow)');
-  } else {
-      d3.select('#map').selectAll('.datamaps-subunit')
-        .style('filter', '');
-  }
-}
-
-
-function highlightSelectedAreaInBarChart() {
-  if (selectedArea) {
-    if (areasInBarChart.indexOf(selectedArea) != -1) {
-      d3.select('#bar-chart').selectAll('.c3-bar').classed('not-highlighted', function(d, i) { return areasInBarChart[i] != selectedArea; });
-      d3.select('#bar-chart').selectAll('.c3-text').classed('highlighted', function(d, i) { return areasInBarChart[i-1] == selectedArea; });
-    } else {
-      d3.select('#bar-chart').selectAll('.c3-bar').classed('not-highlighted', false);
-      d3.select('#bar-chart').selectAll('.c3-text').classed('highlighted', false);
-    }
-  } else {
-    d3.select('#bar-chart').selectAll('.c3-bar').classed('not-highlighted', false);
-    d3.select('#bar-chart').selectAll('.c3-text').classed('highlighted', false);
-  }
-}
-
-
-function positionBarChartHoverover() {
-  var coordinates = [0, 0];
-  coordinates = d3.mouse(d3.select('#bar-chart-wrapper').node());
-  var x = coordinates[0];
-  var y = coordinates[1];
-  d3.select('.bar-chart-hoverover')
-    .style('top', y + 30 + 'px')
-    .style('left', x + 50 + 'px');
-}
-
-
-// Has to be called each time the contents of the bar chart are redrawn. This applies after loading data and resizing.
-function attachMouseListenersToBarChart() {
-  d3.select('#bar-chart').selectAll('.c3-event-rect')
-    .data(areasInBarChart)
-    .on('mouseover', function(d, i) {
-      if (d != ' ') {
-        area(d);
-        d3.select('.bar-chart-hoverover')
-          .style('display', 'block')
-          .html(popupText(d));
-        positionBarChartHoverover();
-      } else {
-        area(lockedArea);
-      }
-    })
-    .on('mousemove', function() {
-      positionBarChartHoverover();
-    })
-    .on('click', function() {
-      lockSelectedArea();
-    });
-
-  d3.select('#bar-chart').select('.c3-event-rects')
-    .on('mouseout', function(d, i) {
-      area(lockedArea);
-      d3.select('.bar-chart-hoverover').style('display', 'none');
-    });
-}
-
-var sortedAreaValuePairs;
-function sortAreasByValue() {
-  sortedAreaValuePairs = Object.keys(data[selectedDataset].values)
-    .filter(function(area) {
-      return data[selectedDataset].values[area][selectedTimeIndex] !== null;
-    })
-    .map(function(area) {
-      return [area, data[selectedDataset].values[area][selectedTimeIndex]];
-    });
-
-  sortedAreaValuePairs.sort(function(first, second) {
-    return second[1] - first[1];
-  });
-}
-
-function showTopBottomValuesInBarChart() {
-    showValuesInBarChart([0, 1, 2, null, sortedAreaValuePairs.length-3, sortedAreaValuePairs.length-2, sortedAreaValuePairs.length-1]);
-}
-
-function showValuesInBarChart(ranks) {
-
-  var areaValuePairsToShow = [];
-  for (var i = 0; i < ranks.length; i++) {
-    areaValuePairsToShow[i] = (ranks[i] === null) ? [' ', null] : sortedAreaValuePairs[ranks[i]];
-  }
-  console.log(areaValuePairsToShow);
-
-  areasInBarChart = areaValuePairsToShow.map(function(item) { return item ? item[0] : ' '; });
-
-  barChart.load({
-    json: {
-      values: areaValuePairsToShow.map(function(item) { return (item && item[1]) ? item[1] : 0; })
-    },
-    done: function() {
-      attachMouseListenersToBarChart();
-    }
-  });
-}
-
-function highlightSelectedTimeInTimeChart() {
-  d3.select('#time-chart').selectAll('.c3-circle').style('fill-opacity', '0');
-  d3.select('#time-chart').selectAll('.c3-circle-' + selectedTimeIndex).style('fill-opacity', '1');
-  d3.select('#time-chart').selectAll('.c3-texts-average,.c3-texts-area').selectAll('.c3-text').style('visibility', function(d, i) {  return (d3.select('#time-chart').select('.c3-circle-' + i).classed('_expanded_') || i == selectedTimeIndex) ? 'visible' : 'hidden';  });
-}
-
-
-
+// Show the dataset in the visualizations
 function dataset(name) {
-
-  // TODO: Make visualizations grey while data is loading, maybe even by using a small transition
 
   d3.select('#content-overlay').style('visibility', 'visible');
   fadeOut('#time-slider-wrapper');
 
-
-  console.log(datasetStatus[name]);
-
   selectDatasetWhenLoaded = '';
-
 
   switch (datasetStatus[name]) {
     case LOADING:
@@ -494,7 +263,6 @@ function dataset(name) {
       barChart.resize();
       attachMouseListenersToBarChart();
 
-
       timeChart.data.colors({ area: datasetColors[selectedDataset].charts, average: '#f8f8f8' });
       d3.select('#area-text').style('color', datasetColors[selectedDataset].charts);
       timeChart.axis.min(minDataValues[selectedDataset]);
@@ -524,8 +292,8 @@ function dataset(name) {
 
 }
 
+// Show data for a time point in the visualizations
 function time(index) {
-  // console.log(index);
   if (index != selectedTimeIndex) {
     selectedTimeIndex = index;
 
@@ -541,9 +309,9 @@ function time(index) {
   }
 }
 
+// Highlight an area in the visualizations and show its data
 function area(name) {
   if (name != selectedArea) {
-    // console.log(name);
     setTimeout(function() {
       if (name == selectedArea) {  // only load data into the time chart if the area is still selected
         timeChart.load({
@@ -561,6 +329,7 @@ function area(name) {
   }
 }
 
+// Make the selected area stay selected permanently
 function lockSelectedArea() {
   if (lockedArea != selectedArea) {
     d3.select('#map').select('.zip' + lockedArea).style('filter', '');
@@ -570,108 +339,14 @@ function lockSelectedArea() {
 
 
 
-/*  Autocomplete  */
 
 
-var selectedMetro;
-var metrosArray = [];
-for (var i = 0; i < metros.length; i++) {
-  metrosArray[i] = {value: metros[i].metro + ', ' + metros[i].state, data: metros[i]};
-}
 
-// console.log(metrosArray);
+/* ------------------------------------------- Autocomplete ----------------------------------------------- */
 
-
-function metro(metroObject) {
-
-  selectedMetro = metroObject;
-
-  var transitionDuration = 1700;
-
-
-  d3.select('nav')
-    .style('visibility', 'visible')
-    .transition()
-    .duration(transitionDuration)
-    .style('top', '0px')
-    .style('opacity', 1);
-
-  d3.select('#descriptions')
-    .transition()
-    .delay(transitionDuration)
-    .style('visibility', 'visible');
-
-  fadeIn('#metro-name-wrapper');
-
-  d3.select('#metro-name')
-    .text(metroObject.metro);
-
-  d3.select('#content-pane')
-    .style('visibility', 'visible')
-    .transition()
-    .duration(transitionDuration)
-    .style('top', '50px');
-
-  d3.select('#dataset-hint')   
-    .style('visibility', 'visible')
-    .transition()
-    .duration(500) 
-    .delay(1500)
-    .style('opacity', 1);
-
-  d3.select('#footer')
-    .transition()
-    .duration(transitionDuration)
-    .style('background-color', '#616161', 'important');
-
-  fadeOut('#header');
-
-  setTimeout(function() {
-    d3.selectAll('nav ul li')
-      .style('cursor', 'pointer')
-      // .transition()
-      // .delay(1000)
-      .on('mouseover', function(d, i) {
-        d3.select(d3.selectAll('.description')[0][i]).style('visibility', 'visible');
-        // d3.selectAll('nav ul li').classed('active', false);
-      })
-      .on('mouseout', function() {
-        d3.selectAll('.description').style('visibility', 'hidden');
-        // d3.select(d3.selectAll('nav ul li')[0][selectedTitle]).classed('active', 'true');
-      })
-      .on('click', function(d, i) {
-        d3.select('#dataset-hint').style('visibility', 'hidden');
-        dataset(datasetNames[i]);
-        d3.selectAll('nav ul li').classed('active', false);
-        // d3.select('#content-pane').style('cursor', 'auto');
-        d3.select(this).classed('active', true);
-        fadeOut('#dataset-hint');
-      })
-      .on('touchend', function() {
-
-        // TODO: On touch devices, make this go away
-        d3.selectAll('.description').transition().delay(5000).style('visibility', 'hidden');
-      });
-  }, transitionDuration);
-
-
-  // TODO: Make descriptions active here
-
-
-  // TODO: Does this timeout make sense?
-  setTimeout(function() {loadMap(metroObject);}, 0);
-
-
-  setTimeout(function() {
-    // Load the datasets as the first thing, so we reduce waiting time
-    for (var i = 0; i < datasetNames.length; i++) {
-      fetchDataset(datasetNames[i], metroObject);
-    }
-  }, 1000);
-}
-
+// Set up autocomplete
 var autocomplete = $('#autocomplete').autocomplete({
-    lookup: metrosArray,
+    lookup: metros.map(function(metroObject) { return {value: metroObject.metro + ', ' + metroObject.state, data: metroObject}; }),
     lookupLimit: 4,
     showNoSuggestionNotice: true,
     triggerSelectOnValidInput: false,
@@ -682,6 +357,7 @@ var autocomplete = $('#autocomplete').autocomplete({
     }
 });
 
+// Create default suggestions
 d3.select('#suggestions')
   .selectAll('.autocomplete-default')
   .data([
@@ -702,7 +378,7 @@ d3.select('#suggestions')
     metro(d);
   });
 
-
+// Show default suggestions when there is no input
 d3.select('#autocomplete')
   .on('input', function() {
     if (this.value) {
@@ -715,90 +391,49 @@ d3.select('#autocomplete')
   });
 
 
+
+
+
+
+
 /* ------------------------------------------- Time Slider ----------------------------------------------- */
 
+var maxSliderValue = months.length - 0.01;
+var scrollSpeed = 0.01;
+var playing = false;
 var slider;
+var monthNames = ['Jan - Mar', 'Apr - Jun', 'Jul - Sep', 'Oct - Dec'];
+
+function getTimeIndex(sliderValue) {
+  return Math.floor(maxSliderValue - sliderValue);
+}
+
+// Init slider
 d3.select('#time-slider').call(
   slider = d3.slider()
     .orientation("vertical")
     .min(0)
     .max(maxSliderValue)
-    // .axis(d3.svg.axis().orient("right").tickSize(9.5).tickValues([8, 16, 24, 32, 40]))//[12,24,36,48,60,72,84,96,108,120,132,144,156,168]))
     .value(maxSliderValue)
     .on('slide', function(evt, value) {
       updateSliderElements(value);
       time(getTimeIndex(value));
     }));
 
+// Make texts on time line clickable
 d3.selectAll('.time-texts p').on('click', function() {
   var top = parseFloat(d3.select(this).style('top'));
   var sliderHeight = parseFloat(d3.select('#time-slider').style('height'));
   moveSliderTo((sliderHeight - top) / sliderHeight * maxSliderValue - 1);
 });
 
-d3.select('#time-play-pause')
-  .on('click', function() {
-    playing = !playing;
-    d3.select('#time-play-pause')
-      .classed('mdi-av-play-circle-fill', !playing)
-      .classed('mdi-av-pause-circle-fill', playing);
-
-    // TODO: Some time, this does not pause on click properly
-    function playTime() {
-      if (playing) {
-        var newValue = Math.max(0, Math.round(slider.value()) - 1);
-        moveSliderTo(newValue);
-        // console.log(slider.value());
-
-        if (newValue === 0) {
-          playing = false;
-          // TODO: Ch
-          d3.select('#time-play-pause')
-            .classed('mdi-av-play-circle-fill', true)
-            .classed('mdi-av-pause-circle-fill', false);
-            // .classed('mdi-av-replay', true);  // TODO: Make the replay icon with a circle around the arrow (just like the play/pause icons)
-        }
-        // console.log(this);
-        window.setTimeout(playTime, 300);
-      }
-    }
-
-    if (playing) {
-      if (slider.value() === 0) {
-        moveSliderTo(maxSliderValue);
-        d3.select('#time-play-pause').classed('mdi-av-replay', false);
-      }
-      playTime();
-    }
-
-  });
-
-
-function getTimeIndex(sliderValue) {
-  return Math.floor(maxSliderValue - sliderValue);
-}
-
-function moveSliderTo(value) {
-  slider.value(value);
-  updateSliderElements(value);
-  time(getTimeIndex(value));
-}
-
-// var oldHeight = '0px';
-// var newHeight = '0px';
-var monthNames = ['Jan - Mar', 'Apr - Jun', 'Jul - Sep', 'Oct - Dec'];//['Q1', 'Q2', 'Q3', 'Q4'];//['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+// Set the month and year labels, highlight progress and notches on time slider
 function updateSliderElements(sliderValue) {
   var pixelsFromTop = parseFloat(d3.select('#time-slider').style('height')) * (maxSliderValue - sliderValue) / maxSliderValue;
 
   // TODO: This is currently in d3.slider.js; move it out from there
   // oldHeight = d3.select('.d3-slider-progress').style('height');
   // newHeight = pixelsFromTop + 'px';
-  // TODO: Make this a class, not an id
-  // d3.select('.d3-slider-progress')
-  //   .transition()
-  //   .styleTween('height', function() { return d3.interpolate(oldHeight, newHeight); })
-  //   .duration(250);
-
 
   d3.selectAll('.time-texts p')
     .each(function() {
@@ -808,22 +443,58 @@ function updateSliderElements(sliderValue) {
       element.style('color', (pixelsFromTop >= top && pixelsFromTop <= bottom) ? '#f8f8f8' : '#9e9e9e');
     });
 
-  // TODO: Maybe move this to time()
   d3.select('#month').text(monthNames[getTimeIndex(sliderValue) % 4]);
   d3.select('#year').text(2004 + Math.floor(getTimeIndex(sliderValue) / 4));
 
-  // oldHeight = newHeight;
-
-  // TODO: Make axis ticks white
   d3.selectAll('.time-point')
     .style('background', function() {
       return parseFloat(d3.select(this).style('top')) <= pixelsFromTop ? '#f8f8f8' : startColor;
     });
-
 }
 
+function moveSliderTo(value) {
+  slider.value(value);
+  updateSliderElements(value);
+  time(getTimeIndex(value));
+}
 
+// Make button play and pause the time slider
+d3.select('#time-play-pause')
+  .on('click', function() {
+    playing = !playing;
+    d3.select('#time-play-pause')
+      .classed('mdi-av-play-circle-fill', !playing)
+      .classed('mdi-av-pause-circle-fill', playing);
 
+    function playTime() {
+      if (playing) {
+        var newValue = Math.max(0, Math.round(slider.value()) - 1);
+        moveSliderTo(newValue);
+
+        if (newValue === 0) {
+          playing = false;
+          d3.select('#time-play-pause')
+            .classed('mdi-av-play-circle-fill', true)
+            .classed('mdi-av-pause-circle-fill', false);
+        }
+
+        // Call this function again after some time to go to the next point
+        window.setTimeout(playTime, 300);
+      }
+    }
+
+    if (playing) {
+
+      // Reset if slider handle is at the bottom
+      if (slider.value() === 0) {
+        moveSliderTo(maxSliderValue);
+        d3.select('#time-play-pause').classed('mdi-av-replay', false);
+      }
+
+      playTime();
+    }
+
+  });
 
 
 
@@ -881,7 +552,100 @@ var barChart = c3.generate({
   tooltip: {show: false}
 });
 
+function highlightSelectedAreaInBarChart() {
+  if (selectedArea) {
+    if (areasInBarChart.indexOf(selectedArea) != -1) {
+      d3.select('#bar-chart').selectAll('.c3-bar').classed('not-highlighted', function(d, i) { return areasInBarChart[i] != selectedArea; });
+      d3.select('#bar-chart').selectAll('.c3-text').classed('highlighted', function(d, i) { return areasInBarChart[i-1] == selectedArea; });
+    } else {
+      d3.select('#bar-chart').selectAll('.c3-bar').classed('not-highlighted', false);
+      d3.select('#bar-chart').selectAll('.c3-text').classed('highlighted', false);
+    }
+  } else {
+    d3.select('#bar-chart').selectAll('.c3-bar').classed('not-highlighted', false);
+    d3.select('#bar-chart').selectAll('.c3-text').classed('highlighted', false);
+  }
+}
 
+function positionBarChartHoverover() {
+  var coordinates = [0, 0];
+  coordinates = d3.mouse(d3.select('#bar-chart-wrapper').node());
+  var x = coordinates[0];
+  var y = coordinates[1];
+  d3.select('.bar-chart-hoverover')
+    .style('top', y + 30 + 'px')
+    .style('left', x + 50 + 'px');
+}
+
+// Has to be called each time the contents of the bar chart are redrawn. This applies after loading data and resizing.
+function attachMouseListenersToBarChart() {
+  d3.select('#bar-chart').selectAll('.c3-event-rect')
+    .data(areasInBarChart)
+    .on('mouseover', function(d, i) {
+      if (d != ' ') {
+        area(d);
+        d3.select('.bar-chart-hoverover')
+          .style('display', 'block')
+          .html(popupText(d));
+        positionBarChartHoverover();
+      } else {
+        area(lockedArea);
+      }
+    })
+    .on('mousemove', function() {
+      positionBarChartHoverover();
+    })
+    .on('click', function() {
+      lockSelectedArea();
+    });
+
+  d3.select('#bar-chart').select('.c3-event-rects')
+    .on('mouseout', function(d, i) {
+      area(lockedArea);
+      d3.select('.bar-chart-hoverover').style('display', 'none');
+    });
+}
+
+// TODO: Refactor this, because we just have top bottom values in the barchart
+var sortedAreaValuePairs;
+function sortAreasByValue() {
+  sortedAreaValuePairs = Object.keys(data[selectedDataset].values)
+    .filter(function(area) {
+      return data[selectedDataset].values[area][selectedTimeIndex] !== null;
+    })
+    .map(function(area) {
+      return [area, data[selectedDataset].values[area][selectedTimeIndex]];
+    });
+
+  sortedAreaValuePairs.sort(function(first, second) {
+    return second[1] - first[1];
+  });
+}
+
+function showTopBottomValuesInBarChart() {
+    showValuesInBarChart([0, 1, 2, null, sortedAreaValuePairs.length-3, sortedAreaValuePairs.length-2, sortedAreaValuePairs.length-1]);
+}
+
+var areasInBarChart = [];
+function showValuesInBarChart(ranks) {
+
+  var areaValuePairsToShow = [];
+  for (var i = 0; i < ranks.length; i++) {
+    areaValuePairsToShow[i] = (ranks[i] === null) ? [' ', null] : sortedAreaValuePairs[ranks[i]];
+  }
+  console.log(areaValuePairsToShow);
+
+  areasInBarChart = areaValuePairsToShow.map(function(item) { return item ? item[0] : ' '; });
+
+  barChart.load({
+    json: {
+      values: areaValuePairsToShow.map(function(item) { return (item && item[1]) ? item[1] : 0; })
+    },
+    done: function() {
+      attachMouseListenersToBarChart();
+    }
+  });
+}
 
 
 
@@ -948,20 +712,15 @@ var timeChart = c3.generate({
   tooltip: {show: false}
 });
 
-
-
-
-
-
-
-
-function popupText(area) {
-  return '<div class="hoverinfo"><span style="font-weight: bold">' + 
-    ((area in data[selectedDataset].values) ? numberFormats[selectedDataset](data[selectedDataset].values[area][selectedTimeIndex]) : 'No Data') +
-    '</span><br><span style="font-size: 0.9em">' + ((area in areaNames) ? (areaNames[area] + ', ') : '') + selectedMetro.state + ' ' + area +
-    ((lockedArea) ? '' : '<br><span style="font-size: 0.9em; color: red; font-weight: bold">Click to select</span>') + '</div>';
+function highlightSelectedTimeInTimeChart() {
+  d3.select('#time-chart').selectAll('.c3-circle').style('fill-opacity', '0');
+  d3.select('#time-chart').selectAll('.c3-circle-' + selectedTimeIndex).style('fill-opacity', '1');
+  d3.select('#time-chart').selectAll('.c3-texts-average,.c3-texts-area').selectAll('.c3-text').style('visibility', function(d, i) {  return (d3.select('#time-chart').select('.c3-circle-' + i).classed('_expanded_') || i == selectedTimeIndex) ? 'visible' : 'hidden';  });
 }
-var areaNames = {};
+
+
+
+
 
 
 
@@ -969,6 +728,7 @@ var areaNames = {};
 
 var colorScale = d3.scale.linear().clamp(true);  // range will be added during 'dataset'
 var blankMapColors = {};
+var areaNames = {};
 var map;
 function loadMap(metro) {
   map = new Datamap({
@@ -977,11 +737,8 @@ function loadMap(metro) {
     geographyConfig: {
       dataUrl: 'data/' + metro.state + '/' + metro.metro.replace(' ', '') + '.json',
       borderColor: '#757575',
-      borderWidth: 0,  // 0.7
+      borderWidth: 0, 
       highlightOnHover: false,
-      // highlightFillColor: 'foo',  // just some random string to keep fill color the same
-      // highlightBorderColor: 'black',
-      // highlightBorderWidth: 2,
       popupTemplate: function(geography, data) {
         return popupText(geography.id.replace('zip', ''), geography.properties.name);
       }
@@ -994,36 +751,9 @@ function loadMap(metro) {
       var width = options.width || element.offsetWidth;
       var height = options.height || element.offsetHeight;
 
-      // console.log('w: ' + width + ' h:' + height);
-
-      // console.log(element);
-      // console.log(options);
-
-      // // Create a unit projection.
-      // var projection = d3.geo.mercator()
-      //   .scale(1)
-      //   .translate([0, 0]);
-
-      // // Create a path generator.
-      // var path = d3.geo.path()
-      //   .projection(projection);
-
-      // var areas = topojson.feature(us, us.objects.states)
-
-      // // Compute the bounds of a feature of interest, then derive scale & translate.
-      // var b = path.bounds(element),
-      //     s = 0.95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height),
-      //     t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
-
-      // // Update the projection to use computed scale & translate.
-      // projection
-      //     .scale(s)
-      //     .translate(t);
-
-
       var projection = d3.geo.mercator()
     		.center([-117.0, 33.0])
-    		.scale(20000) //* width);
+    		.scale(20000)
         .translate([width / 2, height / 2]);
 
        return {path: d3.geo.path().projection(projection), projection: projection};
@@ -1108,8 +838,6 @@ function loadMap(metro) {
         .attr("text-anchor", "end")
         .attr("x", 140)
         .attr("y", 43);
-
-
 
 
 
@@ -1209,7 +937,6 @@ function clipMapToContainer() {
 }
 
 var mapLegend, mapLegendRect, mapLegendTextName, mapLegendTextMin, mapLegendTextMiddle, mapLegendTextMax;
-
 function showDatasetInMapLegend(name) {
   mapLegendRect.attr('fill', 'url(#gradient-' + name + ')');
   mapLegendTextName.text(axisLabels[name]);
@@ -1217,6 +944,30 @@ function showDatasetInMapLegend(name) {
   mapLegendTextMiddle.text(numberFormats[name](minDataValues[name] + (maxDataValues[name] - minDataValues[name]) / 2));
   mapLegendTextMax.text('>' + numberFormats[name](maxDataValues[name]));  // TODO: Make clear that the rightmost color also encompasses values > max value
 }
+
+function showCurrentValuesInMap() {
+  map.updateChoropleth(blankMapColors);
+  var mapColors = {};
+  for (var area in data[selectedDataset].values) {
+    mapColors['zip' + area] = (data[selectedDataset].values[area][selectedTimeIndex] === null ? startColor : colorScale(data[selectedDataset].values[area][selectedTimeIndex]));
+  }
+  map.updateChoropleth(mapColors);
+}
+
+function highlightSelectedAreaInMap() {
+  if (selectedArea) {
+    d3.selectAll('.datamaps-subunit').style('filter', '');
+    d3.select('#map').select('.zip' + lockedArea).moveToFront().style('filter', 'url(#drop-shadow-small)');
+    d3.select('#map').select('.zip' + selectedArea).moveToFront().style('filter', 'url(#drop-shadow)');
+  } else {
+      d3.select('#map').selectAll('.datamaps-subunit')
+        .style('filter', '');
+  }
+}
+
+
+
+
 
 
 /* ------------------------------------------- Resizing --------------------------------------------------- */
@@ -1231,15 +982,119 @@ function mapSize() {
   return d3.select('#map-wrapper').node().getBoundingClientRect();
 }
 
-// var originalMapSize = mapSize();  // TODO: Do this in done method of datamaps
-// var originalSubunitsSize = d3.select('#map').select('.datamaps-subunits').node().getBoundingClientRect();
-// d3.select('#map').select('.datamaps-subunits').style('-webkit-transform', function() {
-//     return 'scale(' + Math.min(originalMapSize.width / originalSubunitsSize.width, originalMapSize.height / originalSubunitsSize.height) + ')';
-//   });
-
 window.addEventListener('resize', function() {
   barChart.resize(barChartSize());
   attachMouseListenersToBarChart();
   timeChart.resize(timeChartSize());
   clipMapToContainer();
 });
+
+
+
+
+
+
+
+/*---------------------------------------- Leap Motion -------------------------------------------------------------- */
+//Highlighter  - Switching between tabs etc
+var currentTab=$('nav ul li').attr('id').split("-")[2];
+var updateHighlights = function(dir){
+    //var nextTab = $('nav ul li').attr('id').split("-")[2];
+
+
+    var nextTab=0;
+    if(currentTab != null){
+        nextTab=parseInt(currentTab);
+    }
+
+    if((nextTab+dir) <5 && (nextTab+dir)>=1 ){
+        console.log("DIR is : "+parseInt(nextTab+dir));
+        nextTab = nextTab + dir;
+    }
+    else if(nextTab+parseInt(dir) <= 0){
+        nextTab = 4;
+    }
+    else{
+        nextTab = 1;
+
+    }
+
+    dataset(datasetNames[nextTab-1]);
+    d3.selectAll('nav ul li').classed('active', false);
+    var tag ="#"+datasetNames[nextTab-1];
+    d3.select('.'+datasetNames[nextTab-1]).classed('active',true);
+
+    //d3.dataset(datasetNames[nextTab-1]);
+    //d3.selectAll('nav ul li').classed('active',true);
+
+    //console.log(datasetNames[nextTab-1]);
+    console.log("next:"+nextTab);
+    currentTab=nextTab;
+};
+
+var timeSlider = function(dir){
+    if (selectedMetro) { 
+        if((playing && dir==-1) ||(!playing && dir==1)){
+            $('#time-play-pause')[0].click();
+            //playing = !playing;
+        }
+        if(dir == 0){
+            moveSliderTo(maxSliderValue);
+            playing = false;
+            d3.select('#time-play-pause')
+                .classed('mdi-av-play-circle-fill', true)
+                .classed('mdi-av-pause-circle-fill', false);
+        }
+    }
+};
+
+//Leapmotion
+var controller = Leap.loop({enableGestures: true}, function(frame){
+});
+
+/* ----------- LEAP FUNCTIONS TO SWIPE BETWEEN PAGES/CATEGORIES --------------*/
+var swipeRightFunction = function(){
+  updateHighlights(1);
+};
+
+
+var swipeLeftFunction = function(){
+    console.log("CALLS LEFT");
+    updateHighlights(-1);
+};
+
+var swipeUpFunction = function () {
+    console.log("Calls UP");
+    timeSlider(-1);
+};
+
+var swipeDownFunction = function () {
+    console.log("Calls DOWN");
+    timeSlider(1);
+};
+
+var circleFunction = function () {
+    console.log("Calls circle");
+    timeSlider(0);
+};
+
+/* ------------- CONFIG FOR LEAP-GESTURES.JS ---------------- */
+config = {
+    // Event handles for recognized gestures
+    swipeLeft: swipeLeftFunction,
+    swipeRight: swipeRightFunction,
+    swipeUp: swipeUpFunction,
+    swipeDown: swipeDownFunction,
+    circle: circleFunction, // Set to null or leave out to not track this type of gesture
+    hand: null,
+    clap: null,
+    statusChanged: null, // gets called when the status changes
+    preventBackForth: true, // This enables users to continuously swipe in one direction.
+    confidenceThreshold: 0.35, // Gestures with a confidence lower than this are ignored
+    handDuration: 800, // How long a fist has to be kept to trigger the event (in ms)
+    controller: controller, // You can pass in a LeapController if youo want, elsewise one is created for you. Remember to set "enableGestures: true"!
+    useControllerEvents: false // If set to true, the event functions will be ignored. You can then use the appropriate controller.on(...) functions (see below)
+};
+
+var leapGestures = new LeapGestures(config);
+
