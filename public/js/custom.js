@@ -1,5 +1,3 @@
-// TODO: Make a minified version
-
 /* ------------------------------------------- Helpers -------------------------------------------------- */
 
 function fadeIn(selector, duration) {
@@ -129,7 +127,7 @@ function resetVisualizations() {
     d3.select('#bar-chart').select('.c3-axis-x').style('visibility', 'hidden', 'important');
     d3.select('#map').select('.map-legend').style('visibility', 'hidden');
 
-    map.updateChoropleth(blankMapColors);  // TODO: Refactor this into a method resetMapValues or resetMapColors
+    map.updateChoropleth(blankMapColors); 
     // TODO: Maybe hide selected and clicked area in map
 
     $(document).on('mousewheel', null);
@@ -203,7 +201,7 @@ function metro(metroObject) {
       });
   }, transitionDuration);
 
-  // TODO: Make descriptions active here
+  // TODO: Activate descriptions here
 
   // Load map and data after some time, so the animations above run smoothly
   setTimeout(function() {loadMap(metroObject);}, 0);
@@ -230,7 +228,7 @@ function dataset(name) {
       d3.select('#loading-spinner').classed(datasetNames.join(' '), false).classed(name, true);
       d3.select('#loading-spinner-wrapper').style('display', 'block');
       fadeIn('#loading-spinner-wrapper');
-      resetVisualizations(); // TODO: Only do this if another dataset was already loaded before
+      resetVisualizations();  // TODO: Only do this if another dataset was already loaded before
       break;
     case FAILED:
       selectedDataset = '';
@@ -298,7 +296,7 @@ function time(index) {
     selectedTimeIndex = index;
 
     sortAreasByValue();
-    // TODO: If there are just going to be top/bottom values in the bar chart, integrate all of this stuff into one method
+    // TODO: This could be refactored into one method
     showTopBottomValuesInBarChart();
     highlightSelectedAreaInBarChart();
     highlightSelectedTimeInTimeChart();
@@ -512,7 +510,7 @@ var barChart = c3.generate({
     json: barChartDefaultValues,
     colors: barChartDefaultColors,
     type: 'bar',
-    // TODO: If labels are shown, there is a slight space between the bars and the area names. Fix this
+    // TODO: If labels are shown, there is a slight space between the bars and the area names
     labels: {
       format: function (value, id, i, j) { return value ? numberFormats[selectedDataset](value) : ''; }
     }
@@ -606,7 +604,6 @@ function attachMouseListenersToBarChart() {
     });
 }
 
-// TODO: Refactor this, because we just have top bottom values in the barchart
 var sortedAreaValuePairs;
 function sortAreasByValue() {
   sortedAreaValuePairs = Object.keys(data[selectedDataset].values)
@@ -733,7 +730,6 @@ var map;
 function loadMap(metro) {
   map = new Datamap({
     element: document.getElementById('map'),
-    // responsive: true,
     geographyConfig: {
       dataUrl: 'data/' + metro.state + '/' + metro.metro.replace(' ', '') + '.json',
       borderColor: '#757575',
@@ -933,6 +929,7 @@ function clipMapToContainer() {
     // subunits.style('-webkit-transform', finalTransform);
     // subunits.style('-ms-transform', finalTransform);
     // subunits.style('-moz-transform', finalTransform);
+
   }
 }
 
@@ -987,7 +984,13 @@ window.addEventListener('resize', function() {
   attachMouseListenersToBarChart();
   timeChart.resize(timeChartSize());
   clipMapToContainer();
+
+  if (mapLegend) {
+    // Translate legend
+    mapLegend.style('transform', 'translate(' + (mapSize().width / 2 - 96) + 'px, ' + (mapSize().height - 65) + 'px)');
+  }
 });
+
 
 
 

@@ -18,10 +18,11 @@
 <body class="grey darken-3">
 
 
-<!-- TODO: Maybe integrate this into navbar -->
 <div id="metro-name-wrapper" class="to-fade-in" style="z-index: 1; position: absolute; left: 20px; top: 0px; height: 50px; line-height: 50px;"><span id="metro-name" style="font-size: 1.4rem; color: #f5f5f5"></span> <a href="/" style="font-size: 0.8rem">Change</a></div>
+
 <div id="testhead"></div>
 <div id="testhead-overlay" class="grey darken-3"></div>
+
 <div id="header" class="grey-text text-lighten-4 center-align" style="position: relative; top: calc(50% - 100px); width: 95%; left: 2.5%; z-index: 100; height:220px">
     <div class="left-align" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;">
       <div class="hide-on-med-and-up grey-text text-lighten-4 center-align" style="font-size: 0.9rem; margin-bottom: 10px;">A visualization of<br>US housing market data from 2004 to 2014</div>
@@ -36,10 +37,6 @@
 </div>
 
 
-  <!-- <div id="header-description" style="color: #9e9e9e; text-align: center; position: absolute; bottom: 30px; left: 0; width: 100%; height: 50px; line-height: 50px; font-size: 0.9em">Built with data from <a href="http://www.zillow.com/research/data/">Zillow</a>.</div> -->
-
-
-
 <nav class="grey darken-3 grey-text text-lighten-4">
   <ul>
     <li id="nav-title-1" class="mediansaleprice">Sale Price</li><!--
@@ -48,7 +45,6 @@
     --><li id="nav-title-4" class="soldasforeclosures">Foreclosures</li>
   </ul>
 </nav>
-
   
 
 <div id="descriptions">
@@ -73,95 +69,93 @@
 
   <div id="content" class="flex-container">
 
-    <!-- <div style="display: flex; width: 100%; height: 100%"> -->
 
-      <div id="charts-wrapper" class="flex-container-vertical flex-column">
+    <div id="charts-wrapper" class="flex-container-vertical flex-column">
 
-        <div id="bar-chart-wrapper" class="flex-row" style="margin-bottom: 30px;">
-          <div id="bar-chart"></div>
-          <div class="bar-chart-hoverover"></div>
-        </div>
-
-        <div id="time-chart-wrapper" class="flex-row" style="margin-top: 30px; position: relative;">
-          <div id="time-chart"></div>
-          <div id="time-chart-legend">
-            <ul><li id="metro-text" style="color: #f5f5f5">Metro Average</li><li id="area-text">Select an area on the map</li></ul>
-          </div>
-        </div>
-        <!-- </div> -->
-
+      <div id="bar-chart-wrapper" class="flex-row" style="margin-bottom: 30px;">
+        <div id="bar-chart"></div>
+        <div class="bar-chart-hoverover"></div>
       </div>
 
-      <div id="middle-console" class="center-align" style="position: relative">
-
-        <div id="loading-spinner-wrapper" class="preloader-wrapper big active to-fade-in">
-          <div id="loading-spinner" class="spinner-layer spinner-blue-only">
-            <div class="circle-clipper left">
-              <div class="circle"></div>
-            </div><div class="gap-patch">
-              <div class="circle"></div>
-            </div><div class="circle-clipper right">
-              <div class="circle"></div>
-            </div>
-          </div>
-        </div>
-
-        <div id="dataset-hint" class="flex-container-vertical cover to-fade-in grey-text text-lighten-4">
-          <div class="arrow flex-row" style="width: 1px; margin: 0 auto; margin-bottom: 20px; margin-top: 10px"></div>
-          <div class="adjust-line-height">Click on a dataset<span class="hide-on-small-only"> <br>to see how the crisis affected the housing market</span></div>
-          <div class="flex-row"></div>
-        </div>
-
-        <div id="error-message" class="valign-wrapper cover to-fade-in grey-text text-lighten-4 adjust-line-height">
-          This dataset could not be loaded.<span class="hide-on-small-only"><br>Try another one!</span>
-        </div>
-
-
-        <div id="time-slider-wrapper" class="flex-container-vertical cover to-fade-in">
-          
-          <div class="grey-text text-lighten-4">
-            <span id="month">Jan - Mar</span><br>
-            <span id="year" style="font-size: 2em;">2004</span><br>
-            <i id="time-play-pause" class="mdi-av-play-circle-fill grey-text text-lighten-4" style="font-size: 2.7rem; cursor: pointer"></i>
-          </div>
-
-          <div class="flex-row flex-container" style="margin-top: 20px; position: relative;">
-
-            <div class="time-texts time-texts-left">
-              <p style="top: 2%"><strong>Mid 04</strong><br>US Homeownership peaks</p>
-              <p class="hide-on-little" style="top: 28%"><strong>Apr 07</strong><br>> 50 mortgage companies have filed bankruptcy</p>
-              <p style="top: 40%"><strong>Sep 08</strong><br>Lehman files bankruptcy, BOA buys Merill Lynch</p>
-              <p class="hide-on-very-little" style="top: 70%"><strong>Nov 10</strong><br>US Home values down by 26 percent  since 2006</p>
-              <p class="hide-on-little" style="top: 89%"><strong>14</strong><br>Foreclosures still above pre-crisis level</p>
-            </div>
-
-            <div id="time-slider">
-              <div class="d3-slider-progress d3-slider d3-slider-vertical grey lighten-4"></div>
-
-              <div class="time-point" style="top: 9.1%"></div>
-              <div class="time-point" style="top: 27.3%"></div>
-              <div class="time-point" style="top: 45.5%"></div>
-              <div class="time-point" style="top: 63.7%"></div>
-              <div class="time-point" style="top: 81.9%"></div> 
-            </div>
-
-            <div class="time-texts time-texts-right">
-              <p class="hide-on-very-little" style="top: 19%"><strong>Apr 06</strong><br>US Home prices peak</p>
-              <p style="top: 35%"><strong>Mar 08</strong><br>JP Morgan Chase buys Bear Stearns</p>
-              <p class="hide-on-little" style="top: 45%"><strong>Feb 09</strong><br>American Recovery and Reinvestment Act</p>
-              <p style="top: 80%"><strong>Early 13</strong><br>Stock market recovers</p>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-
-      <div class="flex-column">
-        <div id="map-wrapper">
-          <div id="map" class="cover"></div>
+      <div id="time-chart-wrapper" class="flex-row" style="margin-top: 30px; position: relative;">
+        <div id="time-chart"></div>
+        <div id="time-chart-legend">
+          <ul><li id="metro-text" style="color: #f5f5f5">Metro Average</li><li id="area-text">Select an area on the map</li></ul>
         </div>
       </div>
+
+    </div>
+
+    <div id="middle-console" class="center-align" style="position: relative">
+
+      <div id="loading-spinner-wrapper" class="preloader-wrapper big active to-fade-in">
+        <div id="loading-spinner" class="spinner-layer spinner-blue-only">
+          <div class="circle-clipper left">
+            <div class="circle"></div>
+          </div><div class="gap-patch">
+            <div class="circle"></div>
+          </div><div class="circle-clipper right">
+            <div class="circle"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="dataset-hint" class="flex-container-vertical cover to-fade-in grey-text text-lighten-4">
+        <div class="arrow flex-row" style="width: 1px; margin: 0 auto; margin-bottom: 20px; margin-top: 10px"></div>
+        <div class="adjust-line-height">Click on a dataset<span class="hide-on-small-only"> <br>to see how the crisis affected the housing market</span></div>
+        <div class="flex-row"></div>
+      </div>
+
+      <div id="error-message" class="valign-wrapper cover to-fade-in grey-text text-lighten-4 adjust-line-height">
+        This dataset could not be loaded.<span class="hide-on-small-only"><br>Try another one!</span>
+      </div>
+
+
+      <div id="time-slider-wrapper" class="flex-container-vertical cover to-fade-in">
+        
+        <div class="grey-text text-lighten-4">
+          <span id="month">Jan - Mar</span><br>
+          <span id="year" style="font-size: 2em;">2004</span><br>
+          <i id="time-play-pause" class="mdi-av-play-circle-fill grey-text text-lighten-4" style="font-size: 2.7rem; cursor: pointer"></i>
+        </div>
+
+        <div class="flex-row flex-container" style="margin-top: 20px; position: relative;">
+
+          <div class="time-texts time-texts-left">
+            <p style="top: 2%"><strong>Mid 04</strong><br>US Homeownership peaks</p>
+            <p class="hide-on-little" style="top: 28%"><strong>Apr 07</strong><br>> 50 mortgage companies have filed bankruptcy</p>
+            <p style="top: 40%"><strong>Sep 08</strong><br>Lehman files bankruptcy, BOA buys Merill Lynch</p>
+            <p class="hide-on-very-little" style="top: 70%"><strong>Nov 10</strong><br>US Home values down by 26 percent  since 2006</p>
+            <p class="hide-on-little" style="top: 89%"><strong>14</strong><br>Foreclosures still above pre-crisis level</p>
+          </div>
+
+          <div id="time-slider">
+            <div class="d3-slider-progress d3-slider d3-slider-vertical grey lighten-4"></div>
+
+            <div class="time-point" style="top: 9.1%"></div>
+            <div class="time-point" style="top: 27.3%"></div>
+            <div class="time-point" style="top: 45.5%"></div>
+            <div class="time-point" style="top: 63.7%"></div>
+            <div class="time-point" style="top: 81.9%"></div> 
+          </div>
+
+          <div class="time-texts time-texts-right">
+            <p class="hide-on-very-little" style="top: 19%"><strong>Apr 06</strong><br>US Home prices peak</p>
+            <p style="top: 35%"><strong>Mar 08</strong><br>JP Morgan Chase buys Bear Stearns</p>
+            <p class="hide-on-little" style="top: 45%"><strong>Feb 09</strong><br>American Recovery and Reinvestment Act</p>
+            <p style="top: 80%"><strong>Early 13</strong><br>Stock market recovers</p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <div class="flex-column">
+      <div id="map-wrapper">
+        <div id="map" class="cover"></div>
+      </div>
+    </div>
 
   </div>
 

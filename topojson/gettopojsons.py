@@ -3,8 +3,8 @@ import sys
 import os
 from subprocess import call
 
-# Use like: gettopojsons CA tl_2010_06_zcta510.shp
-# the shp file has to have it's original name!
+# Use like: python gettopojsons.py CA tl_2010_06_zcta510.shp
+# the shp file has to have its original name!
 
 shpFilename = sys.argv[2]
 state = sys.argv[1]

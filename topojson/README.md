@@ -1,29 +1,27 @@
-*This needs to be updated*
+To get topojson files for new cities, do the following:
 
 1) Install [topojson](https://github.com/mbostock/topojson/wiki/Command-Line-Reference) globally:
 
 	npm install topojson -g
 
-2) Download the raw data (shape file with all ZIP codes in one state; this is pretty big so I cannot include it in the repo): Go [here](http://www.census.gov/cgi-bin/geo/shapefiles2010/main), select *ZIP Code Tabulation Areas*, and then in the upper field (for 2010) the state you want (here: California; do not take the file for the whole US, it is too big to convert it to topojson!).
+2) Download the raw data (shape file with all ZIP codes in one state): Go [here](http://www.census.gov/cgi-bin/geo/shapefiles2010/main), select *ZIP Code Tabulation Areas*, and then in the upper field (for 2010) the state you want (here: California; do not take the file for the whole US, it is too big to convert it to topojson!)
 
-3) Unzip the downloaded file, and copy the files *city-names.csv* and *zillow-properties.csv* from the repo into the unzipped folder.
+3) Unzip the downloaded file (do not rename it!)
 
-4) In the unzipped folder, run:
+4) From [Zillow](http://www.zillow.com/research/data/), download the following datasets from the column *Zip Code*: [Median Sale Price](http://files.zillowstatic.com/research/public/Zip/Zip_MedianSoldPrice_AllHomes.csv), [Decreasing Values](http://files.zillowstatic.com/research/public/Zip/Zip_PctOfHomesDecreasingInValues_AllHomes.csv), [Homes foreclosed](http://files.zillowstatic.com/research/public/Zip/Zip_HomesSoldAsForeclosures-Ratio_AllHomes.csv)
 
-	topojson -e city-names.csv -e zillow-properties.csv -p name=Name -p metro=Metro --id-property=ZCTA5CE10 -o California.json tl_2010_06_zcta510.shp
+5) Move the unzipped files, the files from Zillow and the files *gettopojson.py* and *city-names.csv* from this repository into the same folder
 
-This will convert the entire shape file you downloaded to topojson. Additionally, it will add properties from the two CSV files you copied above: The first file (*city-names.csv*) contains names for the ZIP code areas, although these are rather rough, for example most areas in San Diego are simply called "San Diego"). The second one (*zillow-properties.csv*) contains the City/Metro/etc-properties for each ZIP code that Zillow uses. 
+6) In this folder, open the terminal and run:
 
-The `-e` commands will merge the properties from the CSV files you copied above into the topojson file, the `-p` commands will set the properties for the ZIP code areas (here from the additional files), the `--id-property` command will set the ID for each area (this is needed for datamaps; here it's the ZIP code).
+	python gettopojsons.py CA tl_2010_06_zcta510.shp
 
-4) Use getmetro.py to extract the metro area you want, for example for San Diego:
+Substitute the name for your respective state and the file name for your .shp file. In a nutshell, this converts the .shp file to topojson, simplifies it, adds in names for the ZIP code areas from *city-names.csv*, and splits it into one topojson file per metro (according to the datasets from Zillow).
 
-	python getmetro.py California.json "San Diego"
+In the current directory, you will now find the following objects:
 
-This will create the file *SanDiego.json*. However, this file is pretty big as it still contains most of the raw data of the original file.
+* *CA.json*: Topojson file for the complete state
+* *CA*: Folder that contains the topojson files for each metro
+* *CA.txt*: Contains the names of all metros in .json format
 
-5) To get rid of this data, run:
-
-	topojson -p -o SanDiego-small.json SanDiego.json
-
-The final topojson file is in *SanDiego-small.json*.
+7) To add the topojsons to the website, copy the folder *CA* to *public/data* and append the content of *CA.txt* to the list of available metros in *util/constants.js*
