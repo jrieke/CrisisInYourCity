@@ -1,5 +1,8 @@
 # Crisis In Your City
 
+[](images/demo2.png)
+[][images/demo1.png]
+
 Live version: http://crisis-in-your-city.herokuapp.com/
 
 This website visualizes data about the housing market during the time of the financial crisis. Specifically, it shows how the crisis affected the situation within a city. Currently, all cities in the states of California and New York are integrated. 
